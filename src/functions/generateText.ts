@@ -7,7 +7,7 @@ const generateText = (language: Language) => {
     switch(language) {
         case Language.ENGLISH: return "Sugman balls"
         case Language.LATIN: return "Lorem Ipsum"
-        case Language.GERMAN: "Grosse schwanz"
+        case Language.GERMAN: return "Grosse schwanz"
     }
 };
 
