@@ -24,7 +24,7 @@ function InputForm(formSubmit: any,) {
 
 
 
-const RadioSelector = ({options: string[], selector: string}) =>
+const RadioSelector = ({options:string[], selector: string}) =>
      {
     
     return (
