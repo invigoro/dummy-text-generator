@@ -1,6 +1,8 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import './components/GenerateText'
+import GenerateText from './components/GenerateText';
 
 function App() {
   return (
@@ -19,6 +21,9 @@ function App() {
           Learn React
         </a>
       </header>
+      <div>
+        <GenerateText />
+      </div>
     </div>
   );
 }
