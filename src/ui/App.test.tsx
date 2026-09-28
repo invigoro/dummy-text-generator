@@ -3,6 +3,7 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/react
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
+import { encodeSetting, loadCustomSettings, sanitizeSetting, saveCustomSettings } from './customSettings';
 
 // Seeds come in a fixed sequence, so every run shows the same text.
 let nextSeed = 1;
@@ -14,6 +15,7 @@ vi.mock('../engine/rng', async (importOriginal) => ({
 beforeEach(() => {
   nextSeed = 1;
   window.history.replaceState(null, '', '/');
+  localStorage.clear();
 });
 afterEach(cleanup);
 
@@ -167,5 +169,163 @@ describe('App', () => {
     vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValueOnce(new Error('denied'));
     await user.click(screen.getByRole('button', { name: 'Copy' }));
     expect(screen.getByRole('status')).toHaveTextContent(/Couldn’t copy/);
+  });
+});
+
+const colonial = sanitizeSetting({
+  id: 'my-colonial',
+  name: 'Colonial',
+  choices: [
+    { name: 'Renan', language: 'french' },
+    { name: 'Old Deciman', language: 'latin' },
+  ],
+})!;
+
+const banner = () => screen.queryByRole('region', { name: 'Shared setting' });
+const editButton = () => screen.getByRole('button', { name: 'Name your own world’s languages…' });
+
+describe('Your own settings', () => {
+  it('names your own world’s languages, and keeps them for next time', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await paragraphs();
+    await user.click(editButton());
+    expect(screen.getByRole('heading', { name: 'Your settings' })).toHaveFocus();
+
+    await user.click(screen.getByRole('button', { name: '+ New setting' }));
+    // The new setting's name is selected, so typing replaces it.
+    expect(screen.getByRole('textbox', { name: 'Setting name' })).toHaveFocus();
+    await user.keyboard('Colonial');
+    expect(screen.getByRole('textbox', { name: 'Setting name' })).toHaveValue('Colonial');
+
+    const newName = screen.getByRole('textbox', { name: 'New language’s name' });
+    const add = newName.closest('form')!;
+    await user.type(newName, 'Renan{Enter}');
+    expect(newName).toHaveValue('');
+    expect(newName).toHaveFocus();
+    await user.type(newName, 'Old Deciman');
+    await user.selectOptions(within(add).getByRole('combobox', { name: 'Written as' }), 'latin');
+    await user.click(within(add).getByRole('button', { name: 'Add' }));
+    expect(screen.getAllByRole('textbox', { name: 'Language name' }).map((input) => (input as HTMLInputElement).value)).toEqual([
+      'Renan',
+      'Old Deciman',
+    ]);
+
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+    expect(editButton()).toHaveFocus();
+    expect(within(screen.getByRole('group', { name: 'Colonial' })).getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'Renan (French)',
+      'Old Deciman (Latin)',
+    ]);
+    await user.selectOptions(language(), 'my-world/old-deciman');
+    expect(await screen.findByText('De Bello Gallico')).toBeInTheDocument();
+    // The link carries the setting, so it works for anyone.
+    expect(window.location.hash).toMatch(/^#lang=my-world\/old-deciman&.*&world=[\w-]+$/);
+
+    cleanup();
+    render(<App />);
+    expect(language()).toHaveValue('my-world/old-deciman');
+    expect(banner()).not.toBeInTheDocument();
+  });
+
+  it('opens a link that brings a setting, and offers to save it', async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, '', `/#lang=my-colonial/renan&order=original&len=2p&seed=5&view=written&world=${encodeSetting(colonial)}`);
+    render(<App />);
+    expect(await paragraphs()).toHaveLength(2);
+    expect(language()).toHaveValue('my-colonial/renan');
+    expect(banner()).toHaveTextContent('This link brings a setting, Colonial');
+
+    await user.click(within(banner()!).getByRole('button', { name: 'Save it to your settings' }));
+    expect(banner()).not.toBeInTheDocument();
+    expect(loadCustomSettings()).toEqual([colonial]);
+    expect(language()).toHaveValue('my-colonial/renan');
+  });
+
+  it('can put off saving a setting from a link, which lasts until the page closes', async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, '', `/#lang=my-colonial/renan&world=${encodeSetting(colonial)}`);
+    render(<App />);
+    await paragraphs();
+    await user.click(within(banner()!).getByRole('button', { name: 'Not now' }));
+    expect(banner()).not.toBeInTheDocument();
+    expect(language()).toHaveValue('my-colonial/renan');
+    expect(loadCustomSettings()).toEqual([]);
+  });
+
+  it('keeps a setting from a link apart from a different one of yours with the same id', async () => {
+    saveCustomSettings([sanitizeSetting({ id: 'my-colonial', name: 'Mine', choices: [{ name: 'Renan', language: 'spanish' }] })!]);
+    window.history.replaceState(null, '', `/#lang=my-colonial/renan&world=${encodeSetting(colonial)}`);
+    render(<App />);
+    await paragraphs();
+    expect(language()).toHaveValue('my-colonial-2/renan');
+    expect(screen.getByText('Les Trois Mousquetaires')).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Renan (Spanish)' })).toBeInTheDocument();
+  });
+
+  it('takes a setting from a link pasted into the open page', async () => {
+    render(<App />);
+    await paragraphs();
+    window.location.hash = `#lang=my-colonial/old-deciman&world=${encodeSetting(colonial)}`;
+    await waitFor(() => expect(language()).toHaveValue('my-colonial/old-deciman'));
+    expect(banner()).toBeInTheDocument();
+  });
+
+  it('keeps a language’s link when it’s renamed', async () => {
+    const user = userEvent.setup();
+    saveCustomSettings([colonial]);
+    window.history.replaceState(null, '', '/#lang=my-colonial/renan');
+    render(<App />);
+    await paragraphs();
+    await user.click(editButton());
+    const [renan] = screen.getAllByRole('textbox', { name: 'Language name' });
+    await user.clear(renan);
+    await user.type(renan, 'Renani');
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+    expect(language()).toHaveValue('my-colonial/renan');
+    expect(screen.getByRole('option', { name: 'Renani (French)' })).toHaveProperty('selected', true);
+  });
+
+  it('names a language left blank, and removes one', async () => {
+    const user = userEvent.setup();
+    saveCustomSettings([colonial]);
+    render(<App />);
+    await paragraphs();
+    await user.click(editButton());
+    const [renan] = screen.getAllByRole('textbox', { name: 'Language name' });
+    await user.clear(renan);
+    await user.tab();
+    expect(renan).toHaveValue('Unnamed language');
+    await user.click(screen.getByRole('button', { name: 'Remove Old Deciman' }));
+    expect(screen.getAllByRole('textbox', { name: 'Language name' })).toHaveLength(1);
+    expect(loadCustomSettings()[0].choices.map((choice) => choice.name)).toEqual(['Unnamed language']);
+  });
+
+  it('deletes a setting, with a way to undo it', async () => {
+    const user = userEvent.setup();
+    saveCustomSettings([colonial]);
+    render(<App />);
+    await paragraphs();
+    await user.click(editButton());
+    await user.click(screen.getByRole('button', { name: 'Delete setting' }));
+    expect(screen.queryByRole('textbox', { name: 'Setting name' })).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Deleted “Colonial”.');
+    expect(loadCustomSettings()).toEqual([]);
+    await user.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(screen.getByRole('textbox', { name: 'Setting name' })).toHaveValue('Colonial');
+    expect(loadCustomSettings()).toEqual([colonial]);
+  });
+
+  it('imports a setting from a file, and refuses one that isn’t', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await paragraphs();
+    await user.click(editButton());
+    const input = screen.getByLabelText('Import…');
+    await user.upload(input, new File([JSON.stringify(colonial)], 'colonial.json', { type: 'application/json' }));
+    expect(await screen.findByText('Added “Colonial”.')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Setting name' })).toHaveValue('Colonial');
+    await user.upload(input, new File(['{"not": "a setting"}'], 'other.json', { type: 'application/json' }));
+    expect(await screen.findByText('That file isn’t a setting exported from here.')).toBeInTheDocument();
   });
 });

@@ -14,6 +14,14 @@ export interface PageState {
   length: Length;
   seed: number;
   view: View;
+  /** A custom setting the choice belongs to, encoded, so the link works for anyone. */
+  world?: string;
+}
+
+/** The encoded custom setting a hash carries, if any, before anything is checked against it. */
+export function worldInHash(hash: string): string | undefined {
+  const world = new URLSearchParams(hash.replace(/^#/, '')).get('world');
+  return world && /^[\w-]{1,20000}$/.test(world) ? world : undefined;
 }
 
 const UNIT_LETTERS: Record<Length['unit'], string> = { paragraphs: 'p', words: 'w' };
@@ -42,6 +50,9 @@ export function readHash(hash: string, isChoice: (key: string) => boolean): Part
   const view = params.get('view');
   if (view && (VIEWS as readonly string[]).includes(view)) state.view = view as View;
 
+  const world = worldInHash(hash);
+  if (world) state.world = world;
+
   return state;
 }
 
@@ -53,6 +64,7 @@ export function writeHash(state: PageState): string {
     seed: String(state.seed),
     view: state.view,
   });
+  if (state.world) params.set('world', state.world);
   // The slash in "dnd/elvish" reads better unescaped, and is safe in a fragment.
   return `#${params.toString().replace(/%2F/gi, '/')}`;
 }

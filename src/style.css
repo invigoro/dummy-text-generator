@@ -9,6 +9,7 @@
   --accent: #8a3b1f;
   --accent-ink: #fffaf2;
   --tip: #f7ecd5;
+  --danger: #a3261b;
   --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
@@ -27,6 +28,7 @@
     --accent: #e0885f;
     --accent-ink: #1b1714;
     --tip: #2e2620;
+    --danger: #f08a7e;
   }
 }
 
@@ -135,7 +137,8 @@ legend.label {
 input,
 select,
 button,
-a.button {
+a.button,
+label.button {
   font: inherit;
   color: var(--ink);
   background: var(--page);
@@ -149,15 +152,63 @@ select {
 }
 
 button,
-a.button {
+a.button,
+label.button {
   padding: 0.45rem 0.95rem;
   cursor: pointer;
   text-decoration: none;
 }
 
 button:hover,
-a.button:hover {
+a.button:hover,
+label.button:hover {
   background: var(--hover);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* A button that reads as a link: "Name your own world's languages…", "Undo". */
+button.link {
+  align-self: flex-start;
+  padding: 0;
+  font-size: 0.9rem;
+  color: var(--accent);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+button.link:hover {
+  background: none;
+  text-decoration-thickness: 2px;
+}
+
+button.quiet {
+  background: none;
+  border-color: transparent;
+}
+
+button.quiet:hover {
+  background: var(--hover);
+}
+
+button.danger {
+  color: var(--danger);
+}
+
+/* Hidden from sight, not from screen readers or the keyboard. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 a.button[aria-disabled='true'] {
@@ -166,7 +217,8 @@ a.button[aria-disabled='true'] {
 }
 
 :is(button, input, select, a):focus-visible,
-.segmented input:focus-visible + span {
+.segmented input:focus-visible + span,
+label.button:has(:focus-visible) {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -301,6 +353,11 @@ a.button[aria-disabled='true'] {
   color: var(--muted);
 }
 
+/* An empty status stays in place, for screen readers to hear what it says next, but takes no room. */
+:is(.actions, .setting-actions) > .status:empty {
+  margin-inline-end: -0.5rem;
+}
+
 .voicing {
   margin-bottom: 0.75rem;
   padding: 0.75rem 1rem;
@@ -376,4 +433,134 @@ a.button[aria-disabled='true'] {
 
 .message {
   color: var(--muted);
+}
+
+/* A setting that came with a link */
+
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  max-width: 46rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--tip);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.banner p {
+  margin: 0;
+}
+
+.banner-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* The person's own settings */
+
+.settings-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 46rem;
+}
+
+.editor-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.editor-bar h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.5rem;
+}
+
+/* Focus lands on the heading when the editor opens; it isn't something to click. */
+.editor-bar h2:focus {
+  outline: none;
+}
+
+.settings-editor > .hint {
+  margin: 0;
+}
+
+.setting {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--page);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.setting-name {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* The languages and the row for adding one share their columns. */
+.choice-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.choices,
+.choices li,
+.add-language {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  row-gap: 0.5rem;
+}
+
+.choices {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.choices li button {
+  padding-inline: 0.7rem;
+}
+
+.setting-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.setting .danger {
+  margin-left: auto;
+}
+
+/* On a phone, each language's name above what it's written as. */
+@media (max-width: 30rem) {
+  .setting {
+    padding: 0.85rem;
+  }
+
+  .choice-grid {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  :is(.choices li, .add-language) select {
+    grid-row: 2;
+    grid-column: 1;
+  }
+
+  .choices li + li {
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--line);
+  }
 }

@@ -1,7 +1,8 @@
-import { useId, useState } from 'react';
-import { SETTINGS } from '../data/settings';
+import { useId, useState, type Ref } from 'react';
+import type { Setting } from '../data/settings';
 import { languageDef } from '../data/languages';
 import { ARRANGEMENTS, MAX_LENGTH, type Arrangement, type Length } from '../engine/arrange';
+import { UNNAMED_LANGUAGE, UNTITLED_SETTING } from './customSettings';
 import { VIEWS, type View } from './urlState';
 
 const ORDERS: Record<Arrangement, { label: string; hint: string }> = {
@@ -16,6 +17,11 @@ const VIEW_LABELS: Record<View, string> = { written: 'Written', say: 'Say it', b
 const UNITS: Record<Length['unit'], string> = { paragraphs: 'paragraphs', words: 'words' };
 
 interface ControlsProps {
+  /** Every setting to choose from: built-in, the person's own, and any from a shared link. */
+  settings: readonly Setting[];
+  /** The button that opens the settings editor, to return to when it closes. */
+  editButton?: Ref<HTMLButtonElement>;
+  onEditSettings: () => void;
   choice: string;
   onChoice: (key: string) => void;
   /** Whether the language has a "say it" line, and so a choice of views. */
@@ -34,7 +40,8 @@ interface ControlsProps {
 /** "Elvish (French)" where the name isn't the language's own. */
 function optionLabel(name: string, language: string): string {
   const own = languageDef(language).name;
-  return name === own ? name : `${name} (${own})`;
+  const shown = name.trim() || UNNAMED_LANGUAGE;
+  return shown === own ? shown : `${shown} (${own})`;
 }
 
 export function Controls(props: ControlsProps) {
@@ -42,20 +49,27 @@ export function Controls(props: ControlsProps) {
   const { length } = props;
   return (
     <div className="controls">
-      <label className="field">
-        <span className="label">Language</span>
-        <select value={props.choice} onChange={(event) => props.onChoice(event.target.value)}>
-          {SETTINGS.map((setting) => (
-            <optgroup key={setting.id} label={setting.name}>
-              {setting.choices.map((choice) => (
-                <option key={choice.id} value={`${setting.id}/${choice.id}`}>
-                  {optionLabel(choice.name, choice.language)}
-                </option>
-              ))}
-            </optgroup>
-          ))}
+      <div className="field">
+        <label className="label" htmlFor={`${id}-language`}>
+          Language
+        </label>
+        <select id={`${id}-language`} value={props.choice} onChange={(event) => props.onChoice(event.target.value)}>
+          {props.settings
+            .filter((setting) => setting.choices.length > 0)
+            .map((setting) => (
+              <optgroup key={setting.id} label={setting.name.trim() || UNTITLED_SETTING}>
+                {setting.choices.map((choice) => (
+                  <option key={choice.id} value={`${setting.id}/${choice.id}`}>
+                    {optionLabel(choice.name, choice.language)}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
         </select>
-      </label>
+        <button ref={props.editButton} type="button" className="link" onClick={props.onEditSettings}>
+          Name your own world’s languages…
+        </button>
+      </div>
 
       {props.spoken && (
         <fieldset>
