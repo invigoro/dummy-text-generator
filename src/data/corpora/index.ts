@@ -1,3 +1,4 @@
+import { withoutSlurs } from '../../engine/blocklist';
 import { tokenize, type Corpus } from '../../engine/tokenize';
 
 /** A public-domain text the generator draws from. SOURCES.md records where each one came from. */
@@ -31,13 +32,18 @@ export function sourceText(id: string): SourceText {
 
 const loaded = new Map<string, Promise<Corpus>>();
 
-/** A source text split into paragraphs, sentences and words. Loaded once, then kept. */
+/**
+ * A source text split into paragraphs, sentences and words, without any sentence containing a
+ * slur. Loaded once, then kept.
+ */
 export function loadCorpus(id: string): Promise<Corpus> {
   let corpus = loaded.get(id);
   if (!corpus) {
     corpus = Promise.resolve()
-      .then(() => sourceText(id).load())
-      .then((text) => tokenize(text));
+      .then(async () => {
+        const source = sourceText(id);
+        return withoutSlurs(tokenize(await source.load()), source.language);
+      });
     // A failed download can be tried again.
     corpus.catch(() => loaded.delete(id));
     loaded.set(id, corpus);
