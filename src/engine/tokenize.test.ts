@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { countWords, renderParagraph, renderSentence, tokenize, tokenizeParagraph, type Token } from './tokenize';
+import { countWords, renderParagraph, renderSentence, tokenize, tokenizeParagraph, tokenizerFor, type Token } from './tokenize';
 
 /** The sentences of one paragraph, as text. */
 const sentences = (text: string) => tokenizeParagraph(text).sentences.map(renderSentence);
@@ -173,6 +173,36 @@ describe('words', () => {
 describe('quotation marks', () => {
   it('marks curly and straight double quotes as opening or closing', () => {
     expect(quoteMarks('“One,” he said, "two."')).toEqual(['“open', '”close', '"open', '"close']);
+  });
+});
+
+describe('other languages', () => {
+  const sentencesIn = (language: string, text: string) => tokenizeParagraph(text, tokenizerFor(language)).sentences.map(renderSentence);
+
+  it('knows French quotation marks and titles', () => {
+    expect(sentencesIn('fr', '« Où est Mme Bonacieux? Je la cherche », dit-il. Puis il partit.')).toEqual([
+      '« Où est Mme Bonacieux? Je la cherche », dit-il.',
+      'Puis il partit.',
+    ]);
+  });
+
+  it('knows Latin dates and lowercase abbreviations', () => {
+    expect(sentencesIn('la', 'Is a. u. c. 689 consul fuit. Qui fuit a. d. VI Id. Novembres. Cn. Pompeius venit.')).toEqual([
+      'Is a. u. c. 689 consul fuit.',
+      'Qui fuit a. d. VI Id. Novembres.',
+      'Cn. Pompeius venit.',
+    ]);
+  });
+
+  it('knows Icelandic quotation marks', () => {
+    expect(sentencesIn('is', '„Hvað er þetta? Ég veit það ekki“, sagði hann. Svo fór hann.')).toEqual([
+      '„Hvað er þetta? Ég veit það ekki“, sagði hann.',
+      'Svo fór hann.',
+    ]);
+  });
+
+  it('falls back to English rules', () => {
+    expect(tokenizerFor('xx')).toBe(tokenizerFor('en-US'));
   });
 });
 

@@ -13,6 +13,10 @@
 export interface CleanOptions {
   /** The first line of the text proper, such as its first heading. Everything before it is front matter. */
   startAt?: RegExp;
+  /** A line to stop before, such as a later chapter's heading, to keep only part of a long text. */
+  endBefore?: RegExp;
+  /** Characters to remove, such as the square brackets an edition puts round doubtful words. */
+  remove?: RegExp;
   /**
    * Words the edition sets in capitals (often for italics) and what to write instead, such as
    * { HISPANIOLA: 'Hispaniola' }. Any other word in capitals becomes lowercase, with a capital
@@ -30,11 +34,16 @@ export function cleanGutenberg(raw: string, options: CleanOptions = {}): string 
   const end = lines.findIndex((line) => /^\*\*\* ?END OF (?:THE|THIS) PROJECT GUTENBERG/i.test(line));
   lines = lines.slice(start + 1, end === -1 ? undefined : end);
 
-  const { startAt, capitals = {} } = options;
+  const { startAt, endBefore, remove, capitals = {} } = options;
   if (startAt) {
     const first = lines.findIndex((line) => startAt.test(line));
     if (first === -1) throw new Error(`No line matches ${startAt}`);
     lines = lines.slice(first);
+  }
+  if (endBefore) {
+    const last = lines.findIndex((line, i) => i > 0 && endBefore.test(line));
+    if (last === -1) throw new Error(`No line matches ${endBefore}`);
+    lines = lines.slice(0, last);
   }
 
   const paragraphs: string[] = [];
@@ -44,7 +53,8 @@ export function cleanGutenberg(raw: string, options: CleanOptions = {}): string 
       dropped = true;
       continue;
     }
-    const text = cleanProse(block.join(' '), capitals);
+    const joined = block.join(' ');
+    const text = cleanProse(remove ? joined.replace(remove, '') : joined, capitals);
     if (!text) continue;
     if (/^\p{Ll}/u.test(text) && paragraphs.length > 0) {
       // A paragraph starting in lowercase carries on a sentence from before a dropped block (a song).
@@ -89,8 +99,10 @@ function isDropped(block: string[]): boolean {
     /^(?: {2}|\t)/.test(first) ||
     // Footnotes and rows of asterisks.
     heading.startsWith('*') ||
-    // PART ONE, CHAPTER I, a chapter number on its own line, THE END.
-    /^(?:PART|BOOK|CHAPTER|VOLUME)\b/i.test(heading) ||
+    // The closing line older editions put just inside the end marker.
+    /^End of (?:the )?Project Gutenberg/i.test(heading) ||
+    // PART ONE, CHAPTER I (in several languages), a chapter number on its own line, THE END.
+    /^(?:PART|BOOK|CHAPTER|VOLUME|CHAPITRE|LIVRE|TOME|KAPITEL|CAPITOLO|CAP[IÍ]TULO|LIBRO|LUKU|PENNOD|KAFLI)\b/iu.test(heading) ||
     (ROMAN.test(heading.replace(/\.$/, '')) && heading.length > 0) ||
     /^THE END\.?$/i.test(heading) ||
     // A heading in capitals.
@@ -104,6 +116,8 @@ function cleanProse(text: string, capitals: Readonly<Record<string, string>>): s
     .replace(/ \*(?= |$)/g, '') // footnote markers
     .replace(/ ?-{2,} ?/g, '—')
     .replace(/_/g, '')
+    // A typo that runs two sentences together: "misit.Renuntiatum".
+    .replace(/(\p{Ll})([.!?])(\p{Lu})/gu, '$1$2 $3')
     .trim();
   return cleaned.replace(WORD, (word, offset: number) => ordinaryCase(word, capitals, atSentenceStart(cleaned, offset)));
 }

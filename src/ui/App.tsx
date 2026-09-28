@@ -32,7 +32,7 @@ export default function App() {
         </header>
 
         <p className="source">
-          From <cite>{SOURCE.title}</cite> by {SOURCE.author} ({SOURCE.year}), in the public domain.
+          From <cite>{SOURCE.title}</cite> by {SOURCE.author} ({SOURCE.date}), in the public domain.
         </p>
 
         <Controls

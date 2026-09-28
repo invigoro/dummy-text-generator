@@ -24,6 +24,26 @@ const RECIPES: Record<string, Recipe> = {
     // Ship names, which this edition prints in capitals for italics.
     capitals: { HISPANIOLA: 'Hispaniola', WALRUS: 'Walrus', ROYAL: 'Royal', FORTUNE: 'Fortune', CASSANDRA: 'Cassandra' },
   },
+  'fr-trois-mousquetaires': {
+    url: 'https://www.gutenberg.org/cache/epub/13951/pg13951.txt',
+    output: 'src/data/corpora/fr/trois-mousquetaires.txt',
+    // The first fifteen chapters (about 50,000 words) are plenty, and keep the download small.
+    startAt: /^CHAPITRE PREMIER$/,
+    endBefore: /^CHAPITRE XVI\.$/,
+  },
+  'la-de-bello-gallico': {
+    url: 'https://www.gutenberg.org/cache/epub/218/pg218.txt',
+    output: 'src/data/corpora/la/de-bello-gallico.txt',
+    startAt: /^C\. IULI CAESARIS DE BELLO GALLICO COMMENTARIUS PRIMUS$/,
+    // The edition brackets passages it doubts; the words stay.
+    remove: /[[\]]/g,
+  },
+  'is-saefarinn': {
+    url: 'https://www.gutenberg.org/cache/epub/17025/pg17025.txt',
+    output: 'src/data/corpora/is/saefarinn.txt',
+    // Skips the title pages, which end just before chapter I.
+    startAt: /^I\.$/,
+  },
 };
 
 const [id, file] = process.argv.slice(2);

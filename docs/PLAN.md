@@ -103,9 +103,9 @@ lists of names for them, one list per game world.
 | Sound system | Flow borrowed from (public domain) | Phase |
 |---|---|---|
 | English: real words, jumbled | Stevenson, *Treasure Island* (1883) | 0 |
-| French | Dumas, *Les Trois Mousquetaires* (1844) | 1 |
-| Latin: real lorem ipsum, or invented | Cicero, *De finibus* (45 BC), the source of lorem ipsum | 1 |
-| Old Norse | Icelandic sagas (13th century) | 1 |
+| French | Dumas, *Les Trois Mousquetaires* (1844), chapters I–XV | 1 |
+| Latin: classic lorem ipsum, or invented | Caesar, *De Bello Gallico* I–IV (about 50 BC). Lorem ipsum's own words come from Cicero's *De finibus*, which Project Gutenberg doesn't have in Latin | 1 |
+| Old Norse | *Sæfarinn* (1908), an anonymous Icelandic translation of Verne. Project Gutenberg has no sagas, and Icelandic is the closest living language to Old Norse | 1 |
 | English: invented words | *Treasure Island* | 2 |
 | Spanish | Cervantes, *Don Quijote* (1605) | 2 |
 | Portuguese | Eça de Queirós, *Os Maias* (1888) | 2 |

@@ -5,7 +5,7 @@
  * the result keeps the rhythm of the original.
  */
 import { randomInt, shuffled, type Random } from './rng';
-import { countWords, ENGLISH, type Corpus, type Paragraph, type Sentence, type Token } from './tokenize';
+import { countWords, ENGLISH, type Corpus, type Paragraph, type Sentence, type Token, type TokenizeOptions } from './tokenize';
 
 export type Arrangement = 'original' | 'paragraphs' | 'sentences' | 'words';
 
@@ -29,17 +29,19 @@ export function arrange(corpus: Corpus, arrangement: Arrangement, length: Length
       const paragraphs = take(inOrder(corpus, random), { unit: length.unit, count });
       // A passage can stop partway through a speech that runs on to the next paragraph.
       const last = paragraphs.at(-1);
-      if (last) last.sentences = last.sentences.map((sentence, i, all) => (i === all.length - 1 ? balanceQuotes(sentence) : sentence));
+      if (last) {
+        last.sentences = last.sentences.map((sentence, i, all) => (i === all.length - 1 ? balanceQuotes(sentence, corpus.options) : sentence));
+      }
       return paragraphs;
     }
     case 'paragraphs':
-      return balanced(take(shuffledParagraphs(corpus, random), { unit: length.unit, count }));
+      return balanced(take(shuffledParagraphs(corpus, random), { unit: length.unit, count }), corpus.options);
     case 'sentences':
-      return balanced(take(regrouped(corpus, random, sentencePool(corpus, random)), { unit: length.unit, count }));
+      return balanced(take(regrouped(corpus, random, sentencePool(corpus, random)), { unit: length.unit, count }), corpus.options);
     case 'words': {
       const words = wordPool(corpus, random);
       const sentences = mapSentences(sentencePool(corpus, random), (sentence) => refill(sentence, words));
-      return balanced(take(regrouped(corpus, random, sentences), { unit: length.unit, count }));
+      return balanced(take(regrouped(corpus, random, sentences), { unit: length.unit, count }), corpus.options);
     }
   }
 }
@@ -96,34 +98,47 @@ function* regrouped(corpus: Corpus, random: Random, sentences: Iterator<Sentence
   }
 }
 
-function balanced(paragraphs: Paragraph[]): Paragraph[] {
-  return paragraphs.map((paragraph) => ({ sentences: paragraph.sentences.map((sentence) => balanceQuotes(sentence)) }));
+function balanced(paragraphs: Paragraph[], options: TokenizeOptions): Paragraph[] {
+  return paragraphs.map((paragraph) => ({ sentences: paragraph.sentences.map((sentence) => balanceQuotes(sentence, options)) }));
 }
 
 /**
- * The sentence with its speech marks paired up: a quotation left open (a speech running on to the
- * next paragraph) gets its closing mark, and a stray closing mark gets an opening one.
+ * The sentence with its speech marks paired up. A quotation left open (a speech running on to the
+ * next paragraph) gets its closing mark. A stray closing mark gets an opening one, or is dropped
+ * where the language's rules say so.
  */
-export function balanceQuotes(sentence: Sentence, pairs: readonly (readonly [string, string])[] = ENGLISH.quotes): Sentence {
+export function balanceQuotes(sentence: Sentence, options: TokenizeOptions = ENGLISH): Sentence {
   const closers: string[] = [];
   const openers: string[] = [];
-  for (const token of sentence.tokens) {
-    if (token.kind !== 'punct' || !token.quote) continue;
-    const pair = pairs.find((marks) => marks.includes(token.text));
-    if (!pair) continue;
+  const strays = new Set<number>();
+  sentence.tokens.forEach((token, i) => {
+    if (token.kind !== 'punct' || !token.quote) return;
+    const pair = options.quotes.find((marks) => marks.includes(token.text));
+    if (!pair) return;
     if (token.quote === 'open') closers.push(pair[1]);
     else if (closers.length > 0) closers.pop();
+    else if (options.strayCloser === 'drop') strays.add(i);
     else openers.push(pair[0]);
-  }
-  if (closers.length === 0 && openers.length === 0) return sentence;
+  });
+  if (closers.length === 0 && openers.length === 0 && strays.size === 0) return sentence;
+
   const mark = (text: string, quote: 'open' | 'close'): Token => ({ kind: 'punct', text, quote });
+  const kept = sentence.tokens.filter((_, i) => !strays.has(i));
   return {
-    tokens: [
+    tokens: tidySpaces([
       ...openers.reverse().map((text) => mark(text, 'open')),
-      ...sentence.tokens,
+      ...kept,
       ...closers.reverse().map((text) => mark(text, 'close')),
-    ],
+    ]),
   };
+}
+
+/** No two spaces in a row, and none at either end: what's left after a mark is taken out. */
+function tidySpaces(tokens: Token[]): Token[] {
+  const tidy = tokens.filter((token, i) => token.kind !== 'space' || (i > 0 && tokens[i - 1].kind !== 'space'));
+  while (tidy[0]?.kind === 'space') tidy.shift();
+  while (tidy.at(-1)?.kind === 'space') tidy.pop();
+  return tidy;
 }
 
 const PRONOUN_I = /^I(?:$|['’])/u;

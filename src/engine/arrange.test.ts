@@ -2,7 +2,17 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { loadCorpus } from '../data/corpora';
 import { arrange, ARRANGEMENTS, balanceQuotes, MAX_LENGTH, type Arrangement, type Length } from './arrange';
 import { mulberry32 } from './rng';
-import { countWords, renderParagraph, renderSentence, tokenize, tokenizeParagraph, type Corpus, type Paragraph, type Sentence } from './tokenize';
+import {
+  countWords,
+  renderParagraph,
+  renderSentence,
+  tokenize,
+  tokenizeParagraph,
+  tokenizerFor,
+  type Corpus,
+  type Paragraph,
+  type Sentence,
+} from './tokenize';
 
 const small = tokenize(
   [
@@ -186,5 +196,13 @@ describe('balanceQuotes', () => {
   it('leaves a balanced sentence as it was', () => {
     const balanced = sentence('“Aye,” said he, “by thunder!”');
     expect(balanceQuotes(balanced)).toBe(balanced);
+  });
+
+  it('drops a stray closing mark in French, and still closes an open one', () => {
+    const french = tokenizerFor('fr');
+    const stray = tokenizeParagraph('— Mais je vous parle, moi! » s’écria le jeune homme.', french).sentences[0];
+    expect(renderSentence(balanceQuotes(stray, french))).toBe('— Mais je vous parle, moi! s’écria le jeune homme.');
+    const open = tokenizeParagraph('« Monsieur, dit-il, venez.', french).sentences[0];
+    expect(renderSentence(balanceQuotes(open, french))).toBe('« Monsieur, dit-il, venez.»');
   });
 });

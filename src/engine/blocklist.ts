@@ -34,6 +34,7 @@ export function withoutSlurs(corpus: Corpus, language: string): Corpus {
   if (slurs.size === 0) return corpus;
   const clean = (sentence: Sentence) => !sentence.tokens.some((token) => token.kind === 'word' && slurs.has(normalize(token.text)));
   return {
+    ...corpus,
     paragraphs: corpus.paragraphs
       .map((paragraph) => ({ sentences: paragraph.sentences.filter(clean) }))
       .filter((paragraph) => paragraph.sentences.length > 0),

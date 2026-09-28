@@ -34,6 +34,8 @@ export interface Paragraph {
 
 export interface Corpus {
   paragraphs: Paragraph[];
+  /** The rules the text was split with, which also say how its quotation marks pair up. */
+  options: TokenizeOptions;
 }
 
 export interface TokenizeOptions {
@@ -46,6 +48,14 @@ export interface TokenizeOptions {
   quotes: readonly (readonly [string, string])[];
   /** Words written with a leading straight apostrophe ('em, 'tis), which otherwise opens a quote. */
   elisions: ReadonlySet<string>;
+  /** Whether a lowercase letter and a full stop is an abbreviation too, as in Latin "a. u. c.". */
+  lowercaseInitials?: boolean;
+  /**
+   * What to do, when sentences are shuffled, with a closing quotation mark whose opening one is in
+   * an earlier paragraph. English and most languages add an opening mark ('open'). In French, where
+   * « can open a whole exchange of lines that each start with a dash, the mark goes ('drop').
+   */
+  strayCloser?: 'open' | 'drop';
 }
 
 export const ENGLISH: TokenizeOptions = {
@@ -58,6 +68,42 @@ export const ENGLISH: TokenizeOptions = {
   ],
   elisions: new Set(['em', 'tis', 'twas', 'twere', 'twill', 'twould', 'un', 'ere', 'n', 'cept', 'bout']),
 };
+
+const FRENCH: TokenizeOptions = {
+  abbreviations: new Set(['MM', 'Mme', 'Mmes', 'Mlle', 'Mlles', 'Mgr', 'Dr', 'St', 'Ste']),
+  quotes: [
+    ['«', '»'],
+    ['“', '”'],
+    ['"', '"'],
+  ],
+  elisions: new Set(),
+  strayCloser: 'drop',
+};
+
+const LATIN: TokenizeOptions = {
+  // Roman first names and dates: Cn. Pompeius, a. d. VI Id. Nov.
+  abbreviations: new Set(['Cn', 'Sp', 'Ti', 'Ser', 'Sex', 'Tib', 'App', 'Mam', 'Id', 'Kal', 'Non']),
+  quotes: ENGLISH.quotes,
+  elisions: new Set(),
+  lowercaseInitials: true,
+};
+
+const ICELANDIC: TokenizeOptions = {
+  abbreviations: new Set(['frv', 'bls', 'nr', 'sbr', 'þ']),
+  quotes: [
+    ['„', '“'],
+    ['"', '"'],
+  ],
+  elisions: new Set(),
+  lowercaseInitials: true,
+};
+
+const TOKENIZERS: Readonly<Record<string, TokenizeOptions>> = { en: ENGLISH, fr: FRENCH, la: LATIN, is: ICELANDIC };
+
+/** The options for text in a language, from its BCP 47 tag. English rules if there are none. */
+export function tokenizerFor(language: string): TokenizeOptions {
+  return TOKENIZERS[language.toLowerCase().split('-')[0]] ?? ENGLISH;
+}
 
 /** Letters and digits, with apostrophes or hyphens allowed between them ("Cap’n", "sea-chest"). */
 const WORD = /[\p{L}\p{M}\p{N}]+(?:['’-][\p{L}\p{M}\p{N}]+)*/uy;
@@ -168,7 +214,11 @@ function isAbbreviation(tokens: Token[], stop: number, options: TokenizeOptions)
   const word = tokens[stop - 1];
   if (word?.kind !== 'word') return false;
   // A single capital is an initial ("J. F. Flint"), except the pronoun I.
-  return options.abbreviations.has(word.text) || (/^\p{Lu}$/u.test(word.text) && word.text !== 'I');
+  return (
+    options.abbreviations.has(word.text) ||
+    (/^\p{Lu}$/u.test(word.text) && word.text !== 'I') ||
+    (!!options.lowercaseInitials && /^\p{Ll}$/u.test(word.text))
+  );
 }
 
 const startsUpper = (text: string) => /^[\p{Lu}\p{N}]/u.test(text);
@@ -242,6 +292,7 @@ export function tokenize(text: string, options: TokenizeOptions = ENGLISH): Corp
       .map((paragraph) => paragraph.trim())
       .filter((paragraph) => paragraph.length > 0)
       .map((paragraph) => tokenizeParagraph(paragraph, options)),
+    options,
   };
 }
 

@@ -1,15 +1,22 @@
 import { describe, expect, it } from 'vitest';
+import { balanceQuotes } from '../../engine/arrange';
 import { isSlur } from '../../engine/blocklist';
-import { renderParagraph, tokenize, type Corpus, type Paragraph } from '../../engine/tokenize';
+import { renderParagraph, tokenize, tokenizerFor, type Corpus, type Sentence, type TokenizeOptions } from '../../engine/tokenize';
 import { loadCorpus, SOURCE_TEXTS, sourceText } from './index';
 
 const sentenceCount = (corpus: Corpus) => corpus.paragraphs.reduce((n, paragraph) => n + paragraph.sentences.length, 0);
 
-/** Opening minus closing speech marks in a paragraph. */
-const openQuotes = (paragraph: Paragraph) =>
-  paragraph.sentences
-    .flatMap((sentence) => sentence.tokens)
-    .reduce((depth, token) => (token.kind === 'punct' && token.quote && token.text !== '‘' && token.text !== '’' ? depth + (token.quote === 'open' ? 1 : -1) : depth), 0);
+/** How deep in quotation a sentence ends, and the shallowest it gets on the way (below 0 is a stray closing mark). */
+function quoteDepth(sentence: Sentence, options: TokenizeOptions) {
+  let depth = 0;
+  let lowest = 0;
+  for (const token of sentence.tokens) {
+    if (token.kind !== 'punct' || !token.quote || !options.quotes.some((pair) => pair.includes(token.text))) continue;
+    depth += token.quote === 'open' ? 1 : -1;
+    lowest = Math.min(lowest, depth);
+  }
+  return { depth, lowest };
+}
 
 describe.each(SOURCE_TEXTS.map((source) => [source.id, source] as const))('%s', (id, source) => {
   it('is clean prose: no Project Gutenberg text, headings or markup', async () => {
@@ -21,7 +28,7 @@ describe.each(SOURCE_TEXTS.map((source) => [source.id, source] as const))('%s', 
 
   it('comes back exactly from the tokenizer, paragraph by paragraph', async () => {
     const text = await source.load();
-    const corpus = tokenize(text);
+    const corpus = tokenize(text, tokenizerFor(source.language));
     const paragraphs = text.trimEnd().split('\n\n');
     expect(corpus.paragraphs).toHaveLength(paragraphs.length);
     corpus.paragraphs.forEach((paragraph, i) => expect(renderParagraph(paragraph)).toBe(paragraphs[i]));
@@ -33,11 +40,13 @@ describe.each(SOURCE_TEXTS.map((source) => [source.id, source] as const))('%s', 
     expect(words.filter((word) => isSlur(word, source.language))).toEqual([]);
   });
 
-  it('closes nearly every quotation within its paragraph', async () => {
-    const { paragraphs } = await loadCorpus(id);
-    // Speeches running on to the next paragraph are the only ones left open, and never more closed than opened.
-    expect(paragraphs.filter((paragraph) => openQuotes(paragraph) !== 0).length).toBeLessThan(paragraphs.length / 100);
-    expect(paragraphs.every((paragraph) => openQuotes(paragraph) >= 0)).toBe(true);
+  it('balances every sentence once its quotation marks are paired up', async () => {
+    const corpus = await loadCorpus(id);
+    for (const paragraph of corpus.paragraphs) {
+      for (const sentence of paragraph.sentences) {
+        expect(quoteDepth(balanceQuotes(sentence, corpus.options), corpus.options)).toEqual({ depth: 0, lowest: 0 });
+      }
+    }
   });
 });
 

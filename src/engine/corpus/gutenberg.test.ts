@@ -48,6 +48,8 @@ const download = [
   '',
   'THE END',
   '',
+  "End of Project Gutenberg's Test Book, by Nobody",
+  '',
   '*** END OF THE PROJECT GUTENBERG EBOOK TEST BOOK ***',
   '',
   'Project Gutenberg license text.',
@@ -82,6 +84,16 @@ describe('cleanGutenberg', () => {
 
   it('refuses a start line that matches nothing', () => {
     expect(() => cleanGutenberg(download, { startAt: /^NOWHERE/ })).toThrow(/NOWHERE/);
+  });
+
+  it('can stop before a later heading, and remove characters', () => {
+    const text = 'CHAPITRE PREMIER\n\nLe premier [lundi] du mois.\n\nCHAPITRE II.\n\nPlus tard.';
+    expect(cleanGutenberg(text, { endBefore: /^CHAPITRE II\./, remove: /[[\]]/g })).toBe('Le premier lundi du mois.\n');
+    expect(() => cleanGutenberg(text, { endBefore: /^NOWHERE/ })).toThrow(/NOWHERE/);
+  });
+
+  it('puts back a missing space between sentences', () => {
+    expect(cleanGutenberg('Legatos misit.Renuntiatum est.')).toBe('Legatos misit. Renuntiatum est.\n');
   });
 
   it('leaves Roman numerals and single capitals alone', () => {
