@@ -12,7 +12,7 @@ jobs:
 The generated text must flow like the real language, every source text must be in the public
 domain, and the site must be static, hosted on GitHub Pages.
 
-**Current phase:** Phase 2. Phases 0 and 1 are done. See [Milestones](#milestones).
+**Current phase:** Phase 3. Phases 0 to 2 are done. See [Milestones](#milestones).
 
 ## The approach
 
@@ -109,17 +109,21 @@ lists of names for them, one list per game world.
 | English: invented words | *Treasure Island* | 2 |
 | Spanish | Cervantes, *Don Quijote* (1605) | 2 |
 | Portuguese | Eça de Queirós, *Os Maias* (1888) | 2 |
-| Italian | Manzoni, *I promessi sposi* (1827) | 2 |
-| German | the Grimms' *Kinder- und Hausmärchen* (1812) | 2 |
+| Italian | Manzoni, *I promessi sposi* (1840), chapters I–VIII | 2 |
+| German | Kafka, *Die Verwandlung* (1915). The Grimms' *Deutsche Sagen* was the first choice, but it includes antisemitic legends | 2 |
 | Finnish | Kivi, *Seitsemän veljestä* (1870) | 2 |
-| Welsh | the *Mabinogion* (medieval Welsh) | 2 |
-| Old English | *Beowulf* | 2 |
-| Enochian | John Dee's Enochian Keys (1580s) | 2 |
-| Invented: harsh and clipped; hissing and grand; legalistic; alien; four elemental dialects | one of the texts above | 2 |
+| Welsh | Owen M. Edwards, *Cartrefi Cymru* (1896) | 2 |
+| Old English | *Treasure Island*: Project Gutenberg has no Old English prose | 2 |
+| Enochian, after John Dee's angelic language (1580s) | Caesar: Project Gutenberg has no Enochian | 2 |
+| Orcish: harsh and clipped | *Sæfarinn* | 2 |
+| Draconic: hissing and grand | Caesar | 2 |
+| Infernal: legalistic | Caesar | 2 |
+| Abyssal: alien | *Seitsemän veljestä* | 2 |
+| Primordial, in four elemental dialects | Aquan: *I promessi sposi*; Auran: *Les Trois Mousquetaires*; Ignan: *Don Quijote*; Terran: *Die Verwandlung* | 2 |
 
 The exact edition of each text is chosen when its language is added, and it has to pass the
-[public-domain rules](#public-domain-sources). Monstrous languages get invented sound systems, not
-real living languages.
+[public-domain rules](#public-domain-sources). [SOURCES.md](../SOURCES.md) records each one.
+Monstrous languages get invented sound systems, not real living languages.
 
 ### Settings
 
@@ -128,21 +132,26 @@ real living languages.
 - **D&D 5e** (built in): the standard languages, named as in the SRD (CC BY 4.0).
 - **Custom:** any names mapped to any sound systems. For example, a colonial-era setting where
   Renan = French, Threcian = English, Soranan = Spanish, Dreyillan = Portuguese, Deciman = Italian
-  and Old Deciman = Latin. A custom setting is saved in the browser and shared by link or as a
-  JSON file.
+  and Old Deciman = Latin. A custom setting is saved in the browser, exported and imported as a
+  JSON file, and carried inside any share link that uses it, so the person opening the link sees
+  the same names and can save the setting too.
 
 | D&D preset | Sound system | Suggested Stele script |
 |---|---|---|
 | Common | English: real words, jumbled | Latin letters |
 | Elvish | French | Latin letters |
 | High Elvish | Finnish | Latin letters |
-| Sylvan, Druidic | Welsh | Latin letters |
+| Gnomish | German | Latin letters |
+| Halfling | English: invented words | Latin letters |
+| Sylvan, Druidic | Welsh | Latin letters, uncial hand |
 | Dwarvish, Giant | Old Norse | Elder or Younger Futhark runes |
-| Orc, Goblin | invented: harsh and clipped | Younger Futhark runes |
+| Orc, Goblin | Orcish | Younger Futhark runes |
+| Undercommon | Portuguese | Latin letters |
 | Celestial | Enochian | Latin letters |
-| Draconic | invented: hissing and grand | Latin letters |
-| Infernal | invented: legalistic | Latin letters, blackletter hand |
-| Abyssal, Deep Speech | invented: alien | cuneiform |
+| Draconic | Draconic | Latin letters |
+| Infernal | Infernal | Latin letters, blackletter hand |
+| Abyssal, Deep Speech | Abyssal | cuneiform |
+| Primordial (Aquan, Auran, Ignan, Terran) | Primordial's four dialects | Latin letters |
 
 Each preset is only a default. If Elvish sounds Welsh in your world, change it in one dropdown.
 
@@ -205,6 +214,7 @@ Items marked *(planned)* don't exist yet.
 ```
 .github/workflows/               # deploy.yml (master → Pages), test.yml (other branches)
 index.html · vite.config.ts · package.json · .nvmrc · tsconfig.json
+lab.html                         # the sound-system lab, for tuning (dev server only)
 docs/PLAN.md                     # this file
 SOURCES.md                       # provenance of every source text
 scripts/import-gutenberg.ts      # cleans a Project Gutenberg download into a source text
@@ -215,6 +225,7 @@ src/
     rng.ts                       # seeded PRNG, shuffling, string hashing
     tokenize.ts                  # paragraphs → sentences → words and punctuation, per language
     arrange.ts                   # original order, or shuffled paragraphs, sentences or words
+    forms.ts                     # conversations (the source's speech) and inscriptions (its short phrases)
     generate.ts                  # flow text + options → a document in the language's words
     corpus/gutenberg.ts          # the cleaning steps behind scripts/import-gutenberg.ts
     sounds/                      # phonemes, sound systems, and inventing words from them
@@ -229,7 +240,8 @@ src/
     corpora/                     # source texts (one folder per language) and their registry
     languages/                   # one file per language, and the registry that loads them
     settings.ts                  # Real world and D&D 5e: names for languages, and Stele styles
-  ui/                            # React components, and the page's state in its URL
+  ui/                            # React components, custom settings, and the page's state in its URL
+  dev/                           # the lab page: sample words and statistics for each sound system
 ```
 
 ## Milestones
@@ -259,7 +271,13 @@ language, with a Latin spelling-to-sound converter for its "say it" line.)*
 - *Done when* you can generate a conversation in invented French to read aloud as Renan or Elvish,
   and a Dwarvish inscription that opens in Stele as runes.
 
-**Phase 2: More languages and settings.**
+**Phase 2: More languages and settings.** *(done. German's flow comes from Kafka, and Welsh's from
+Owen M. Edwards's essays; Old English and Enochian borrow English's and Latin's, as Project
+Gutenberg has neither in prose. A custom setting travels inside its share link. Conversations take
+their lines from speech in quotation marks, from dialogue set off with dashes, and from the lines
+of Kivi's play-like novel; Caesar, who has no speech, lends short sentences instead. The
+short-inscription length became an Inscription form, and the tuning page is `lab.html`, on the
+dev server only.)*
 - the colonial set first (invented English, Spanish, Portuguese, Italian), then the rest of the
   sound systems
 - settings: Real world and D&D 5e built in, custom settings saved and shared
