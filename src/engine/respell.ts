@@ -3,8 +3,20 @@
  * hyphens between syllables and the stressed one in capitals ("lay-RAHN"). Also IPA, for anyone
  * who reads it.
  */
-import { phoneme, type Phoneme } from './sounds/phonemes';
+import { phoneme, single, type Phoneme } from './sounds/phonemes';
 import type { Syllable, WordSounds } from './sounds/system';
+
+/** Double consonants said across the syllable break: "ga.tːo" as "gat.to". */
+function splitDoubles(syllables: readonly Syllable[]): Syllable[] {
+  return syllables.map((syllable, i) => {
+    let split = syllable;
+    const first = syllable.onset[0];
+    if (first && phoneme(first).geminate) split = { ...split, onset: [single(first), ...split.onset.slice(1)] };
+    const next = syllables[i + 1]?.onset[0];
+    if (next && phoneme(next).geminate) split = { ...split, coda: [...split.coda, single(next)] };
+    return split;
+  });
+}
 
 /** A language's own tweaks to how its vowels are respelled: Latin wants "IP-sum", not "IP-soom". */
 export type SayOverrides = Readonly<Record<string, Partial<Pick<Phoneme, 'say' | 'sayClosed' | 'sayAlone'>>>>;
@@ -48,15 +60,16 @@ export function respeller(overrides: SayOverrides = {}): Respeller {
 
   return {
     say(word, stressed) {
-      return word.syllables
+      const syllables = splitDoubles(word.syllables);
+      return syllables
         .map((syllable, i) => {
-          const text = saySyllable(syllable, word.syllables[i + 1]);
+          const text = saySyllable(syllable, syllables[i + 1]);
           return i === stressed ? text.toUpperCase() : text;
         })
         .join('-');
     },
     ipa(word, stressed) {
-      return word.syllables
+      return splitDoubles(word.syllables)
         .map((syllable, i) => {
           const text = [...syllable.onset, syllable.nucleus, ...syllable.coda].join('');
           if (i === stressed) return `ˈ${text}`;

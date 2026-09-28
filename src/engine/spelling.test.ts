@@ -64,6 +64,25 @@ describe('spell', () => {
     expect(spell(word('|o|'), choice, mulberry32(3))).toBe(spell(word('|o|'), choice, mulberry32(3)));
   });
 
+  it('writes a long sound no rule covers doubled', () => {
+    expect(write(word('m|a|', 'tː|aː|'))).toBe('mattaa');
+  });
+
+  it('puts an accent only on the stressed vowel of a word whose stress is marked', () => {
+    const accents = compileSpelling([
+      { sounds: 'o', write: 'ó', stress: 'marked' },
+      { sounds: 'a', write: 'á', stress: 'marked' },
+    ]);
+    const marked = { ...word('k|a|n', 's|o|n'), stress: 1, marked: true };
+    expect(spell(marked, accents, mulberry32(1))).toBe('kansón');
+    expect(spell({ ...marked, marked: false }, accents, mulberry32(1))).toBe('kanson');
+  });
+
+  it('matches a sound however its accents were typed', () => {
+    const nasal = compileSpelling([{ sounds: 'ẽ', write: 'em' }]);
+    expect(spell(word('b|ẽ|'), nasal, mulberry32(1))).toBe('bem');
+  });
+
   it('refuses rules with unknown sounds', () => {
     expect(() => compileSpelling([{ sounds: 'qq', write: 'x' }])).toThrow(/qq/);
     expect(() => compileSpelling([{ sounds: 'k', write: 'x', before: 'zz' }])).toThrow(/zz/);

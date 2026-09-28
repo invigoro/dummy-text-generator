@@ -18,6 +18,11 @@ export interface Phoneme {
   long?: boolean;
   /** A consonant made with the lips. French writes "m" rather than "n" before one ("tomber"). */
   labial?: boolean;
+  /**
+   * A double consonant, written with ː: the tt of Italian "gatto" or Finnish "kukka". It starts a
+   * syllable, and is said across the break: "GAHT-toh".
+   */
+  geminate?: boolean;
 }
 
 const vowel = (say: string, extra: Omit<Phoneme, 'type' | 'say'> = {}): Phoneme => ({ type: 'vowel', say, ...extra });
@@ -26,7 +31,7 @@ const consonant = (say: string, extra: Omit<Phoneme, 'type' | 'say'> = {}): Phon
 /** "eye" alone, "y" after a consonant (sky), "igh" before one (night). */
 const EYE = { sayAlone: 'eye', sayClosed: 'igh', long: true } as const;
 
-export const PHONEMES: Readonly<Record<string, Phoneme>> = {
+const BASE: Readonly<Record<string, Phoneme>> = {
   // Vowels
   a: vowel('ah'),
   aː: vowel('ah', { long: true }),
@@ -75,6 +80,30 @@ export const PHONEMES: Readonly<Record<string, Phoneme>> = {
   oʊ: vowel('oh', { long: true }),
   // French "oi".
   wa: vowel('wah'),
+  // English: the o of "lot", the ur of "bird".
+  ɒ: vowel('o'),
+  ɜ: vowel('ur'),
+  ɜː: vowel('ur', { long: true }),
+  // Finnish ää, Old English ǣ.
+  æː: vowel('a', { long: true }),
+  // Portuguese nasal vowels and diphthongs: "sim", "bom", "mão", "põe", "mãe".
+  ẽ: vowel('ayn', { front: true }),
+  ĩ: vowel('een', { front: true }),
+  õ: vowel('ohn'),
+  ũ: vowel('oon'),
+  ɐ̃: vowel('ahn'),
+  ɐ̃w̃: vowel('owng', { long: true }),
+  õj̃: vowel('oyng', { long: true }),
+  ɐ̃j̃: vowel('ayng', { front: true, long: true }),
+  // Welsh diphthongs: "cau", "oer", "wyth", "tew", "byw".
+  aɨ: vowel('y', EYE),
+  ɔɨ: vowel('oy', { long: true }),
+  ʊɨ: vowel('wee', { long: true }),
+  ɛu: vowel('ehoo', { long: true }),
+  ɨu: vowel('ew', { long: true }),
+  // Old English "ea" and "eo".
+  eɑ: vowel('eah', { long: true }),
+  eo: vowel('ayo', { long: true }),
 
   // Consonants
   p: consonant('p', { labial: true }),
@@ -99,6 +128,7 @@ export const PHONEMES: Readonly<Record<string, Phoneme>> = {
   ʁ: consonant('r'),
   h: consonant('h'),
   ħ: consonant('h'),
+  ʕ: consonant("'"),
   ç: consonant('kh'),
   m: consonant('m', { labial: true }),
   n: consonant('n'),
@@ -124,10 +154,24 @@ export const PHONEMES: Readonly<Record<string, Phoneme>> = {
   ɸ: consonant('f', { labial: true }),
 };
 
+/** Consonants that can be doubled, as in Italian, Finnish or Old Norse. */
+const DOUBLED = ['p', 'b', 't', 'd', 'k', 'g', 'f', 'v', 's', 'z', 'ʃ', 'm', 'n', 'l', 'r', 'ɲ', 'ʎ', 'tʃ', 'dʒ', 'ts', 'dz', 'θ', 'ð', 'x', 'j', 'ŋ'];
+
+/** Sound symbols are compared in decomposed form, so "ẽ" matches however it was typed. */
+export const normalizeSound = (symbol: string) => symbol.normalize('NFD');
+
+export const PHONEMES: Readonly<Record<string, Phoneme>> = Object.fromEntries([
+  ...Object.entries(BASE).map(([symbol, sound]) => [normalizeSound(symbol), sound]),
+  ...DOUBLED.map((symbol) => [`${symbol}ː`, { ...BASE[symbol], geminate: true }]),
+]);
+
 export function phoneme(symbol: string): Phoneme {
-  const found = PHONEMES[symbol];
+  const found = PHONEMES[normalizeSound(symbol)];
   if (!found) throw new Error(`Unknown sound "${symbol}"`);
   return found;
 }
 
-export const isVowel = (symbol: string) => PHONEMES[symbol]?.type === 'vowel';
+export const isVowel = (symbol: string) => PHONEMES[normalizeSound(symbol)]?.type === 'vowel';
+
+/** A double consonant's single form: "tː" is "t". */
+export const single = (symbol: string) => (phoneme(symbol).geminate ? symbol.slice(0, -1) : symbol);

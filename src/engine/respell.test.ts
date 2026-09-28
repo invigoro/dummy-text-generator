@@ -61,6 +61,13 @@ describe('say', () => {
   });
 });
 
+describe('double consonants', () => {
+  it('are said across the syllable break', () => {
+    expect(say(word('g|a|', 'tː|o|'), 0)).toBe('GAHT-toh');
+    expect(ipa(word('g|a|', 'tː|o|'), 0)).toBe('ˈgat.to');
+  });
+});
+
 describe('ipa', () => {
   it('writes syllables with dots and a stress mark', () => {
     expect(ipa(word('d|o|', 'l|o|ʁ'), 0)).toBe('ˈdo.loʁ');

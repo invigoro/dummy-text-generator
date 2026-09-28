@@ -103,6 +103,22 @@ describe('inventWord', () => {
   it('marks the stress by the language’s rule', () => {
     for (const word of words) expect(word.stress).toBe(Math.max(0, word.syllables.length - 2));
   });
+
+  it('sometimes stresses a word elsewhere, and marks it if the language writes that', () => {
+    const irregular = compileSounds({ ...def, irregularStress: { chance: 1, to: ['final'], marked: 'final' } });
+    const word = inventWord(irregular, mulberry32(4), { syllables: 3 });
+    expect(word.stress).toBe(2);
+    expect(word.marked).toBe(true);
+    const unmarked = compileSounds({ ...def, irregularStress: { chance: 1, to: ['antepenultimate'], marked: 'final' } });
+    const other = inventWord(unmarked, mulberry32(4), { syllables: 3 });
+    expect(other.stress).toBe(0);
+    expect(other.marked).toBe(false);
+  });
+
+  it('never moves the stress of a one-syllable word', () => {
+    const irregular = compileSounds({ ...def, irregularStress: { chance: 1, to: ['final', 'antepenultimate'], marked: 'all' } });
+    expect(inventWord(irregular, mulberry32(4), { syllables: 1 }).marked).toBeUndefined();
+  });
 });
 
 describe('stressOf', () => {
@@ -115,6 +131,14 @@ describe('stressOf', () => {
     expect(stressOf('penultimate', three)).toBe(1);
     expect(stressOf('final', three)).toBe(2);
     expect(stressOf('phrase', three)).toBeNull();
+  });
+
+  it('follows the Spanish rule: second-to-last after a vowel, n or s, otherwise last', () => {
+    const ending = (coda: string[]): Syllable => ({ onset: ['t'], nucleus: 'a', coda });
+    expect(stressOf('spanish', [open(), ending([])])).toBe(0);
+    expect(stressOf('spanish', [open(), ending(['n'])])).toBe(0);
+    expect(stressOf('spanish', [open(), ending(['s'])])).toBe(0);
+    expect(stressOf('spanish', [open(), ending(['r'])])).toBe(1);
   });
 
   it('follows the Latin rule: a heavy second-to-last syllable, otherwise the one before', () => {

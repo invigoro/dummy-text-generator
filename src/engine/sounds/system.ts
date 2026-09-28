@@ -4,7 +4,7 @@
  * them into something the generator can draw from.
  */
 import { randomInt, type Random } from '../rng';
-import { phoneme } from './phonemes';
+import { normalizeSound, phoneme } from './phonemes';
 
 /** A syllable: the consonants before its vowel, the vowel, and the consonants after. */
 export interface Syllable {
@@ -17,14 +17,17 @@ export interface Syllable {
 export interface WordSounds {
   syllables: Syllable[];
   stress: number | null;
+  /** The stress is not where the rule puts it, and the spelling marks it with an accent. */
+  marked?: boolean;
 }
 
 /**
  * Where stress falls: on a word's first, second-to-last or last syllable; on the last syllable of
- * each phrase, as in French; or by the Latin rule (the second-to-last syllable if it's heavy,
- * otherwise the one before).
+ * each phrase, as in French; by the Latin rule (the second-to-last syllable if it's heavy,
+ * otherwise the one before); or by the Spanish rule (second-to-last after a vowel, n or s,
+ * otherwise last).
  */
-export type StressRule = 'initial' | 'penultimate' | 'final' | 'phrase' | 'latin';
+export type StressRule = 'initial' | 'penultimate' | 'final' | 'phrase' | 'latin' | 'spanish';
 
 export interface SoundsDef {
   /**
@@ -41,6 +44,12 @@ export interface SoundsDef {
   /** Shapes for a word of one syllable, if different. */
   single?: string;
   stress: StressRule;
+  /**
+   * Some words stressed elsewhere, as Spanish "árbol" or Italian "tavola" and "città" are. `to`
+   * lists where the stress may move; `marked` says which moves the spelling shows with an accent
+   * (Spanish marks all of them, Italian only a stressed last syllable).
+   */
+  irregularStress?: { chance: number; to: readonly ('final' | 'antepenultimate')[]; marked: 'all' | 'final' | 'none' };
   /** Whether a syllable may end in a vowel with the next beginning with one ("de-us"). */
   hiatus?: boolean;
   /**
@@ -70,6 +79,7 @@ export interface SoundSystem {
   last: WeightedList<string[]>;
   single: WeightedList<string[]>;
   stress: StressRule;
+  irregularStress?: SoundsDef['irregularStress'];
   hiatus: boolean;
   avoid: readonly RegExp[];
   maxSyllables: number;
@@ -117,7 +127,7 @@ export function compileSounds(def: SoundsDef): SoundSystem {
   const classes = new Map<string, SoundClass>();
   for (const [name, list] of Object.entries(def.classes)) {
     if (!/^\p{Lu}$/u.test(name)) throw new Error(`Class names are single capital letters, not "${name}"`);
-    const entries = parseWeights(list).map(({ item, weight }) => ({ item: item.split('+'), weight }));
+    const entries = parseWeights(list).map(({ item, weight }) => ({ item: item.split('+').map(normalizeSound), weight }));
     const types = new Set(entries.flatMap(({ item }) => item.map((sound) => phoneme(sound).type)));
     if (types.size !== 1) throw new Error(`Class ${name} mixes vowels and consonants`);
     if (types.has('vowel') && entries.some(({ item }) => item.length > 1)) throw new Error(`Class ${name} joins vowels; use a diphthong`);
@@ -142,6 +152,7 @@ export function compileSounds(def: SoundsDef): SoundSystem {
     last: def.last ? shapes(def.last) : syllables,
     single: def.single ? shapes(def.single) : syllables,
     stress: def.stress,
+    irregularStress: def.irregularStress,
     hiatus: def.hiatus ?? false,
     avoid: (def.avoid ?? []).map((pattern) => new RegExp(pattern, 'u')),
     maxSyllables: def.maxSyllables ?? 5,
@@ -172,5 +183,10 @@ export function stressOf(rule: StressRule, syllables: readonly Syllable[]): numb
     case 'latin':
       if (n <= 2) return 0;
       return isHeavy(syllables[n - 2]) ? n - 2 : n - 3;
+    case 'spanish': {
+      const coda = syllables[n - 1].coda;
+      const last = coda[coda.length - 1];
+      return coda.length === 0 || last === 'n' || last === 's' ? Math.max(0, n - 2) : n - 1;
+    }
   }
 }
