@@ -96,6 +96,17 @@ describe('cleanGutenberg', () => {
     expect(cleanGutenberg('[Illustrazione: renzo (pag. 22)]\n\nÁ porta de M.^{me} Levaillant, dos Medina-C[oe]li.')).toBe(
       'Á porta de Mme Levaillant, dos Medina-Cœli.\n',
     );
+    expect(cleanGutenberg('Disse a sr.^a D. Maria a v. ex^a, em S.^ta Olavia.')).toBe('Disse a sra D. Maria a v. exa, em Sta Olavia.\n');
+  });
+
+  it('keeps a compound whole where it breaks across lines at its hyphen', () => {
+    expect(cleanGutenberg('Il pansait ses blessures lui-\nmême, rue du Vieux-\nColombier -\net ailleurs.')).toBe(
+      'Il pansait ses blessures lui-même, rue du Vieux-Colombier - et ailleurs.\n',
+    );
+  });
+
+  it('makes an edition’s own corrections', () => {
+    expect(cleanGutenberg('Là- dessus, voulez- vous?', { fixes: [[/(\p{L})- (\p{L})/gu, '$1-$2']] })).toBe('Là-dessus, voulez-vous?\n');
   });
 
   it('puts back a missing space between sentences', () => {

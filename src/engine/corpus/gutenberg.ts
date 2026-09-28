@@ -17,6 +17,8 @@ export interface CleanOptions {
   endBefore?: RegExp;
   /** Characters to remove, such as the square brackets an edition puts round doubtful words. */
   remove?: RegExp;
+  /** Corrections for an edition's own slips, as [pattern, replacement] pairs, made to each paragraph. */
+  fixes?: readonly (readonly [RegExp, string])[];
   /**
    * Words the edition sets in capitals (often for italics) and what to write instead, such as
    * { HISPANIOLA: 'Hispaniola' }. Any other word in capitals becomes lowercase, with a capital
@@ -34,7 +36,7 @@ export function cleanGutenberg(raw: string, options: CleanOptions = {}): string 
   const end = lines.findIndex((line) => /^\*\*\* ?END OF (?:THE|THIS) PROJECT GUTENBERG/i.test(line));
   lines = lines.slice(start + 1, end === -1 ? undefined : end);
 
-  const { startAt, endBefore, remove, capitals = {} } = options;
+  const { startAt, endBefore, remove, fixes = [], capitals = {} } = options;
   if (startAt) {
     const first = lines.findIndex((line) => startAt.test(line));
     if (first === -1) throw new Error(`No line matches ${startAt}`);
@@ -53,7 +55,7 @@ export function cleanGutenberg(raw: string, options: CleanOptions = {}): string 
       dropped = true;
       continue;
     }
-    const joined = block.join(' ');
+    const joined = fixes.reduce((text, [pattern, replacement]) => text.replace(pattern, replacement), joinLines(block));
     const text = cleanProse(remove ? joined.replace(remove, '') : joined, capitals);
     if (!text) continue;
     if (/^\p{Ll}/u.test(text) && paragraphs.length > 0) {
@@ -67,6 +69,11 @@ export function cleanGutenberg(raw: string, options: CleanOptions = {}): string 
   }
   if (dropped) endIntroduction(paragraphs);
   return paragraphs.join('\n\n') + '\n';
+}
+
+/** A block's lines as one, keeping a compound that breaks at its hyphen whole: "lui-" and "même" are "lui-même". */
+function joinLines(lines: string[]): string {
+  return lines.reduce((text, line) => (/\p{L}-$/u.test(text) ? text + line.trimStart() : `${text} ${line}`));
 }
 
 /** "He began his song:" introduced a block that's gone, so it ends the paragraph instead. */
@@ -115,8 +122,8 @@ function cleanProse(text: string, capitals: Readonly<Record<string, string>>): s
     .replace(/\s+/g, ' ')
     // Notes where a picture was: [Illustration: …], [Illustrazione: …]
     .replace(/\[(?:Illustra|Ilustra|Picture|Image|Imagem|Bild|Gravura)[^\]]*\]/giu, '')
-    // Transcribers' conventions: superscripts (M.^{me} for Mme) and ligatures ([oe] for œ).
-    .replace(/\.?\^\{([^}]*)\}/g, '$1')
+    // Transcribers' conventions: superscripts (M.^{me} for Mme, sr.^a for sra) and ligatures ([oe] for œ).
+    .replace(/\.?\^(?:\{([^}]*)\}|(\p{L}+))/gu, (_, braced?: string, bare?: string) => braced ?? bare ?? '')
     .replace(/\[(oe|OE|ae|AE)\]/g, (_, pair: string) => ({ oe: 'œ', OE: 'Œ', ae: 'æ', AE: 'Æ' })[pair]!)
     .replace(/ \*(?= |$)/g, '') // footnote markers
     .replace(/ ?-{2,} ?/g, '—')

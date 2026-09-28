@@ -30,13 +30,15 @@ const RECIPES: Record<string, Recipe> = {
     // The first fifteen chapters (about 50,000 words) are plenty, and keep the download small.
     startAt: /^CHAPITRE PREMIER$/,
     endBefore: /^CHAPITRE XVI\.$/,
+    // This edition keeps a space where a compound broke across a line in print: "lui- même".
+    fixes: [[/(\p{L})- (\p{L})/gu, '$1-$2']],
   },
   'la-de-bello-gallico': {
     url: 'https://www.gutenberg.org/cache/epub/218/pg218.txt',
     output: 'src/data/corpora/la/de-bello-gallico.txt',
     startAt: /^C\. IULI CAESARIS DE BELLO GALLICO COMMENTARIUS PRIMUS$/,
-    // The edition brackets passages it doubts; the words stay.
-    remove: /[[\]]/g,
+    // The edition brackets passages it doubts, and marks a doubtful word or two with %; the words stay.
+    remove: /[[\]%]/g,
   },
   'is-saefarinn': {
     url: 'https://www.gutenberg.org/cache/epub/17025/pg17025.txt',

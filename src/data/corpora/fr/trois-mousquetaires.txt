@@ -22,7 +22,7 @@ Avec un pareil vade mecum, d’Artagnan se trouva, au moral comme au physique, u
 
 Mais là, comme il descendait de cheval à la porte du Franc-Meunier sans que personne, hôte, garçon ou palefrenier, fût venu prendre l’étrier au montoir, d’Artagnan avisa à une fenêtre entrouverte du rez-de-chaussée un gentilhomme de belle taille et de haute mine, quoique au visage légèrement renfrogné, lequel causait avec deux personnes qui paraissaient l’écouter avec déférence. D’Artagnan crut tout naturellement, selon son habitude, être l’objet de la conversation et écouta. Cette fois, d’Artagnan ne s’était trompé qu’à moitié: ce n’était pas de lui qu’il était question, mais de son cheval. Le gentilhomme paraissait énumérer à ses auditeurs toutes ses qualités, et comme, ainsi que je l’ai dit, les auditeurs paraissaient avoir une grande déférence pour le narrateur, ils éclataient de rire à tout moment. Or, comme un demi-sourire suffisait pour éveiller l’irascibilité du jeune homme, on comprend quel effet produisit sur lui tant de bruyante hilarité.
 
-Cependant d’Artagnan voulut d’abord se rendre compte de la physionomie de l’impertinent qui se moquait de lui. Il fixa son regard fier sur l’étranger et reconnut un homme de quarante à quarante-cinq ans, aux yeux noirs et perçants, au teint pâle, au nez fortement accentué, à la moustache noire et parfaitement taillée; il était vêtu d’un pourpoint et d’un haut-de-chausses violet avec des aiguillettes de même couleur, sans aucun ornement que les crevés habituels par lesquels passait la chemise. Ce haut- de-chausses et ce pourpoint, quoique neufs, paraissaient froissés comme des habits de voyage longtemps renfermés dans un portemanteau. D’Artagnan fit toutes ces remarques avec la rapidité de l’observateur le plus minutieux, et sans doute par un sentiment instinctif qui lui disait que cet inconnu devait avoir une grande influence sur sa vie à venir.
+Cependant d’Artagnan voulut d’abord se rendre compte de la physionomie de l’impertinent qui se moquait de lui. Il fixa son regard fier sur l’étranger et reconnut un homme de quarante à quarante-cinq ans, aux yeux noirs et perçants, au teint pâle, au nez fortement accentué, à la moustache noire et parfaitement taillée; il était vêtu d’un pourpoint et d’un haut-de-chausses violet avec des aiguillettes de même couleur, sans aucun ornement que les crevés habituels par lesquels passait la chemise. Ce haut-de-chausses et ce pourpoint, quoique neufs, paraissaient froissés comme des habits de voyage longtemps renfermés dans un portemanteau. D’Artagnan fit toutes ces remarques avec la rapidité de l’observateur le plus minutieux, et sans doute par un sentiment instinctif qui lui disait que cet inconnu devait avoir une grande influence sur sa vie à venir.
 
 Or, comme au moment où d’Artagnan fixait son regard sur le gentilhomme au pourpoint violet, le gentilhomme faisait à l’endroit du bidet béarnais une de ses plus savantes et de ses plus profondes démonstrations, ses deux auditeurs éclatèrent de rire, et lui-même laissa visiblement, contre son habitude, errer, si l’on peut parler ainsi, un pâle sourire sur son visage. Cette fois, il n’y avait plus de doute, d’Artagnan était réellement insulté. Aussi, plein de cette conviction, enfonça-t-il son béret sur ses yeux, et, tâchant de copier quelques-uns des airs de cour qu’il avait surpris en Gascogne chez des seigneurs en voyage, il s’avança, une main sur la garde de son épée et l’autre appuyée sur la hanche. Malheureusement, au fur et à mesure qu’il avançait, la colère l’aveuglant de plus en plus, au lieu du discours digne et hautain qu’il avait préparé pour formuler sa provocation, il ne trouva plus au bout de sa langue qu’une personnalité grossière qu’il accompagna d’un geste furieux.
 
@@ -156,7 +156,7 @@ Son interlocutrice, dont la tête apparaissait encadrée par la portière, étai
 
 L’inconnu allait répondre: mais, au moment où il ouvrait la bouche, d’Artagnan, qui avait tout entendu, s’élança sur le seuil de la porte.
 
-— C’est cet insolent petit garçon qui châtie les autres, s’écria-t- il, et j’espère bien que cette fois-ci celui qu’il doit châtier ne lui échappera pas comme la première.
+— C’est cet insolent petit garçon qui châtie les autres, s’écria-t-il, et j’espère bien que cette fois-ci celui qu’il doit châtier ne lui échappera pas comme la première.
 
 — Ne lui échappera pas? reprit l’inconnu en fronçant le sourcil.
 
@@ -188,11 +188,11 @@ Mais le blessé était trop faible encore pour supporter une pareille secousse. 
 
 Et il s’évanouit une seconde fois.
 
-— C’est égal, dit l’hôte, j’en perds deux, mais il me reste celui- là, que je suis sûr de conserver au moins quelques jours. C’est toujours onze écus de gagnés.
+— C’est égal, dit l’hôte, j’en perds deux, mais il me reste celui-là, que je suis sûr de conserver au moins quelques jours. C’est toujours onze écus de gagnés.
 
 On sait que onze écus faisaient juste la somme qui restait dans la bourse de d’Artagnan.
 
-L’hôte avait compté sur onze jours de maladie à un écu par jour; mais il avait compté sans son voyageur. Le lendemain, dès cinq heures du matin, d’Artagnan se leva, descendit lui-même à la cuisine, demanda, outre quelques autres ingrédients dont la liste n’est pas parvenue jusqu’à nous, du vin, de l’huile, du romarin, et, la recette de sa mère à la main, se composa un baume dont il oignit ses nombreuses blessures, renouvelant ses compresses lui- même et ne voulant admettre l’adjonction d’aucun médecin. Grâce sans doute à l’efficacité du baume de Bohême, et peut-être aussi grâce à l’absence de tout docteur, d’Artagnan se trouva sur pied dès le soir même, et à peu près guéri le lendemain.
+L’hôte avait compté sur onze jours de maladie à un écu par jour; mais il avait compté sans son voyageur. Le lendemain, dès cinq heures du matin, d’Artagnan se leva, descendit lui-même à la cuisine, demanda, outre quelques autres ingrédients dont la liste n’est pas parvenue jusqu’à nous, du vin, de l’huile, du romarin, et, la recette de sa mère à la main, se composa un baume dont il oignit ses nombreuses blessures, renouvelant ses compresses lui-même et ne voulant admettre l’adjonction d’aucun médecin. Grâce sans doute à l’efficacité du baume de Bohême, et peut-être aussi grâce à l’absence de tout docteur, d’Artagnan se trouva sur pied dès le soir même, et à peu près guéri le lendemain.
 
 Mais, au moment de payer ce romarin, cette huile et ce vin, seule dépense du maître qui avait gardé une diète absolue, tandis qu’au contraire le cheval jaune, au dire de l’hôtelier du moins, avait mangé trois fois plus qu’on n’eût raisonnablement pu le supposer pour sa taille, d’Artagnan ne trouva dans sa poche que sa petite bourse de velours râpé ainsi que les onze écus qu’elle contenait; mais quant à la lettre adressée à M. de Tréville, elle avait disparu.
 
@@ -248,7 +248,7 @@ Un trait de lumière frappa tout à coup l’esprit de l’hôte qui se donnait 
 
 D’Artagnan entra donc dans Paris à pied, portant son petit paquet sous son bras, et marcha tant qu’il trouvât à louer une chambre qui convînt à l’exiguïté de ses ressources. Cette chambre fut une espèce de mansarde, sise rue des Fossoyeurs, près du Luxembourg.
 
-Aussitôt le denier à Dieu donné, d’Artagnan prit possession de son logement, passa le reste de la journée à coudre à son pourpoint et à ses chausses des passementeries que sa mère avait détachées d’un pourpoint presque neuf de M. d’Artagnan père, et qu’elle lui avait données en cachette; puis il alla quai de la Ferraille, faire remettre une lame à son épée; puis il revint au Louvre s’informer, au premier mousquetaire qu’il rencontra, de la situation de l’hôtel de M. de Tréville, lequel était situé rue du Vieux- Colombier, c’est-à-dire justement dans le voisinage de la chambre arrêtée par d’Artagnan: circonstance qui lui parut d’un heureux augure pour le succès de son voyage.
+Aussitôt le denier à Dieu donné, d’Artagnan prit possession de son logement, passa le reste de la journée à coudre à son pourpoint et à ses chausses des passementeries que sa mère avait détachées d’un pourpoint presque neuf de M. d’Artagnan père, et qu’elle lui avait données en cachette; puis il alla quai de la Ferraille, faire remettre une lame à son épée; puis il revint au Louvre s’informer, au premier mousquetaire qu’il rencontra, de la situation de l’hôtel de M. de Tréville, lequel était situé rue du Vieux-Colombier, c’est-à-dire justement dans le voisinage de la chambre arrêtée par d’Artagnan: circonstance qui lui parut d’un heureux augure pour le succès de son voyage.
 
 Après quoi, content de la façon dont il s’était conduit à Meung, sans remords dans le passé, confiant dans le présent et plein d’espérance dans l’avenir, il se coucha et s’endormit du sommeil du brave.
 
@@ -282,7 +282,7 @@ Un d’eux, placé sur le degré supérieur, l’épée nue à la main, empêcha
 
 Ces trois autres s’escrimaient contre lui de leurs épées fort agiles. D’Artagnan prit d’abord ces fers pour des fleurets d’escrime, il les crut boutonnés: mais il reconnut bientôt à certaines égratignures que chaque arme, au contraire, était affilée et aiguisée à souhait, et à chacune de ces égratignures, non seulement les spectateurs, mais encore les acteurs riaient comme des fous.
 
-Celui qui occupait le degré en ce moment tenait merveilleusement ses adversaires en respect. On faisait cercle autour d’eux: la condition portait qu’à chaque coup le touché quitterait la partie, en perdant son tour d’audience au profit du toucheur. En cinq minutes trois furent effleurés, l’un au poignet, l’autre au menton, l’autre à l’oreille par le défenseur du degré, qui lui- même ne fut pas atteint: adresse qui lui valut, selon les conventions arrêtées, trois tours de faveur.
+Celui qui occupait le degré en ce moment tenait merveilleusement ses adversaires en respect. On faisait cercle autour d’eux: la condition portait qu’à chaque coup le touché quitterait la partie, en perdant son tour d’audience au profit du toucheur. En cinq minutes trois furent effleurés, l’un au poignet, l’autre au menton, l’autre à l’oreille par le défenseur du degré, qui lui-même ne fut pas atteint: adresse qui lui valut, selon les conventions arrêtées, trois tours de faveur.
 
 Si difficile non pas qu’il fût, mais qu’il voulût être à étonner, ce passe-temps étonna notre jeune voyageur; il avait vu dans sa province, cette terre où s’échauffent cependant si promptement les têtes, un peu plus de préliminaires aux duels, et la gasconnade de ces quatre joueurs lui parut la plus forte de toutes celles qu’il avait ouïes jusqu’alors, même en Gascogne. Il se crut transporté dans ce fameux pays des géants où Gulliver alla depuis et eut si grand-peur; et cependant il n’était pas au bout: restaient le palier et l’antichambre.
 
@@ -306,7 +306,7 @@ Ce mousquetaire venait de descendre de garde à l’instant même, se plaignait 
 
 — Ah! Porthos! s’écria un des assistants, n’essaie pas de nous faire croire que ce baudrier te vient de la générosité paternelle: il t’aura été donné par la dame voilée avec laquelle je t’ai rencontré l’autre dimanche vers la porte Saint-Honoré.
 
-— Non, sur mon honneur et foi de gentilhomme, je l’ai acheté moi- même, et de mes propres deniers, répondit celui qu’on venait de désigner sous le nom de Porthos.
+— Non, sur mon honneur et foi de gentilhomme, je l’ai acheté moi-même, et de mes propres deniers, répondit celui qu’on venait de désigner sous le nom de Porthos.
 
 — Oui, comme j’ai acheté, moi, dit un autre mousquetaire, cette bourse neuve, avec ce que ma maîtresse avait mis dans la vieille.
 
@@ -342,7 +342,7 @@ Cette affirmation parut avoir fixé tous les doutes à l’endroit du baudrier; 
 
 — Et vous, vous passeriez un triste quart d’heure avec le duc Rouge, reprit Aramis.
 
-— Ah! le duc Rouge! bravo, bravo, le duc Rouge! répondit Porthos en battant des mains et en approuvant de la tête. Le «duc Rouge» est charmant. Je répandrai le mot, mon cher, soyez tranquille. A- t-il de l’esprit, cet Aramis! Quel malheur que vous n’ayez pas pu suivre votre vocation, mon cher! quel délicieux abbé vous eussiez fait!
+— Ah! le duc Rouge! bravo, bravo, le duc Rouge! répondit Porthos en battant des mains et en approuvant de la tête. Le «duc Rouge» est charmant. Je répandrai le mot, mon cher, soyez tranquille. A-t-il de l’esprit, cet Aramis! Quel malheur que vous n’ayez pas pu suivre votre vocation, mon cher! quel délicieux abbé vous eussiez fait!
 
 — Oh! ce n’est qu’un retard momentané, reprit Aramis; un jour, je le serai. Vous savez bien, Porthos, que je continue d’étudier la théologie pour cela.
 
@@ -366,7 +366,7 @@ Cette affirmation parut avoir fixé tous les doutes à l’endroit du baudrier; 
 
 — Mon cher, soyez mousquetaire ou abbé. Soyez l’un ou l’autre, mais pas l’un et l’autre, reprit Porthos. Tenez, Athos vous l’a dit encore l’autre jour: vous mangez à tous les râteliers. Ah! ne nous fâchons pas, je vous prie, ce serait inutile, vous savez bien ce qui est convenu entre vous, Athos et moi. Vous allez chez Mme d’Aiguillon, et vous lui faites la cour; vous allez chez Mme de Bois-Tracy, la cousine de Mme de Chevreuse, et vous passez pour être fort en avant dans les bonnes grâces de la dame. Oh! mon Dieu, n’avouez pas votre bonheur, on ne vous demande pas votre secret, on connaît votre discrétion. Mais puisque vous possédez cette vertu, que diable! Faites-en usage à l’endroit de Sa Majesté. S’occupe qui voudra et comme on voudra du roi et du cardinal; mais la reine est sacrée, et si l’on en parle, que ce soit en bien.
 
-— Porthos, vous êtes prétentieux comme Narcisse, je vous en préviens, répondit Aramis; vous savez que je hais la morale, excepté quand elle est faite par Athos. Quant à vous, mon cher, vous avez un trop magnifique baudrier pour être bien fort là- dessus. Je serai abbé s’il me convient; en attendant, je suis mousquetaire: en cette qualité, je dis ce qu’il me plaît, et en ce moment il me plaît de vous dire que vous m’impatientez.
+— Porthos, vous êtes prétentieux comme Narcisse, je vous en préviens, répondit Aramis; vous savez que je hais la morale, excepté quand elle est faite par Athos. Quant à vous, mon cher, vous avez un trop magnifique baudrier pour être bien fort là-dessus. Je serai abbé s’il me convient; en attendant, je suis mousquetaire: en cette qualité, je dis ce qu’il me plaît, et en ce moment il me plaît de vous dire que vous m’impatientez.
 
 — Aramis!
 
@@ -382,7 +382,7 @@ M. de Tréville était pour le moment de fort méchante humeur; néanmoins il sa
 
 «Athos! Porthos! Aramis!»
 
-Les deux mousquetaires avec lesquels nous avons déjà fait connaissance, et qui répondaient aux deux derniers de ces trois noms, quittèrent aussitôt les groupes dont ils faisaient partie et s’avancèrent vers le cabinet, dont la porte se referma derrière eux dès qu’ils en eurent franchi le seuil. Leur contenance, bien qu’elle ne fût pas tout à fait tranquille, excita cependant par son laisser-aller à la fois plein de dignité et de soumission, l’admiration de d’Artagnan, qui voyait dans ces hommes des demi- dieux, et dans leur chef un Jupiter olympien armé de tous ses foudres.
+Les deux mousquetaires avec lesquels nous avons déjà fait connaissance, et qui répondaient aux deux derniers de ces trois noms, quittèrent aussitôt les groupes dont ils faisaient partie et s’avancèrent vers le cabinet, dont la porte se referma derrière eux dès qu’ils en eurent franchi le seuil. Leur contenance, bien qu’elle ne fût pas tout à fait tranquille, excita cependant par son laisser-aller à la fois plein de dignité et de soumission, l’admiration de d’Artagnan, qui voyait dans ces hommes des demi-dieux, et dans leur chef un Jupiter olympien armé de tous ses foudres.
 
 Quand les deux mousquetaires furent entrés, quand la porte fut refermée derrière eux, quand le murmure bourdonnant de l’antichambre, auquel l’appel qui venait d’être fait avait sans doute donné un nouvel aliment eut recommencé; quand enfin M. de Tréville eut trois ou quatre fois arpenté, silencieux et le sourcil froncé, toute la longueur de son cabinet, passant chaque fois devant Porthos et Aramis, roides et muets comme à la parade, il s’arrêta tout à coup en face d’eux, et les couvrant des pieds à la tête d’un regard irrité:
 
@@ -552,7 +552,7 @@ M. de Tréville fut surpris au dernier point. Tant de pénétration, tant de fra
 
 «Vous êtes un honnête garçon, mais dans ce moment je ne puis faire que ce que je vous ai offert tout à l’heure. Mon hôtel vous sera toujours ouvert. Plus tard, pouvant me demander à toute heure et par conséquent saisir toutes les occasions, vous obtiendrez probablement ce que vous désirez obtenir.
 
-— C’est-à-dire, monsieur, reprit d’Artagnan, que vous attendez que je m’en sois rendu digne. Eh bien, soyez tranquille, ajouta-t- il avec la familiarité du Gascon, vous n’attendrez pas longtemps.»
+— C’est-à-dire, monsieur, reprit d’Artagnan, que vous attendez que je m’en sois rendu digne. Eh bien, soyez tranquille, ajouta-t-il avec la familiarité du Gascon, vous n’attendrez pas longtemps.»
 
 Et il salua pour se retirer, comme si désormais le reste le regardait.
 
@@ -572,7 +572,7 @@ M. de Tréville, après avoir écrit la lettre, la cacheta et, se levant, s’ap
 
 Et il disparut.
 
-«Diable de fou! murmura M. de Tréville. À moins toutefois, ajouta- t-il, que ce ne soit une manière adroite de s’esquiver, en voyant qu’il a manqué son coup.»
+«Diable de fou! murmura M. de Tréville. À moins toutefois, ajouta-t-il, que ce ne soit une manière adroite de s’esquiver, en voyant qu’il a manqué son coup.»
 
 D’Artagnan, furieux, avait traversé l’antichambre en trois bonds et s’élançait sur l’escalier, dont il comptait descendre les degrés quatre à quatre, lorsque, emporté par sa course, il alla donner tête baissée dans un mousquetaire qui sortait de chez M. de Tréville par une porte de dégagement, et, le heurtant du front à l’épaule, lui fit pousser un cri ou plutôt un hurlement.
 
@@ -678,7 +678,7 @@ Aramis lança à d’Artagnan un de ces regards qui font comprendre à un homme 
 
 Cette fois, d’Artagnan ne souffla pas mot, il avait reconnu sa bévue; mais les amis d’Aramis ne se laissèrent pas convaincre par ses dénégations, et l’un d’eux, s’adressant au jeune mousquetaire avec un sérieux affecté:
 
-«Si cela était, dit-il, ainsi que tu le prétends, je serais forcé, mon cher Aramis, de te le redemander; car, comme tu le sais, Bois- Tracy est de mes intimes, et je ne veux pas qu’on fasse trophée des effets de sa femme.
+«Si cela était, dit-il, ainsi que tu le prétends, je serais forcé, mon cher Aramis, de te le redemander; car, comme tu le sais, Bois-Tracy est de mes intimes, et je ne veux pas qu’on fasse trophée des effets de sa femme.
 
 — Tu demandes cela mal, répondit Aramis, et tout en reconnaissant la justesse de ta réclamation quant au fond, je refuserais à cause de la forme.
 
@@ -688,7 +688,7 @@ Cette fois, d’Artagnan ne souffla pas mot, il avait reconnu sa bévue; mais le
 
 Puis, se retournant vers celui des gardes qui s’était déclaré l’ami de Bois-Tracy:
 
-«D’ailleurs, continua-t-il, je réfléchis, mon cher intime de Bois- Tracy, que je suis son ami non moins tendre que tu peux l’être toi-même; de sorte qu’à la rigueur ce mouchoir peut aussi bien être sorti de ta poche que de la mienne.
+«D’ailleurs, continua-t-il, je réfléchis, mon cher intime de Bois-Tracy, que je suis son ami non moins tendre que tu peux l’être toi-même; de sorte qu’à la rigueur ce mouchoir peut aussi bien être sorti de ta poche que de la mienne.
 
 — Non, sur mon honneur! s’écria le garde de Sa Majesté.
 
@@ -748,7 +748,7 @@ D’Artagnan ne connaissait personne à Paris. Il alla donc au rendez-vous d’A
 
 Au reste, ou nous avons mal exposé le caractère de notre chercheur d’aventures, ou notre lecteur a déjà dû remarquer que d’Artagnan n’était point un homme ordinaire. Aussi, tout en se répétant à lui-même que sa mort était inévitable, il ne se résigna point à mourir tout doucettement, comme un autre moins courageux et moins modéré que lui eût fait à sa place. Il réfléchit aux différents caractères de ceux avec lesquels il allait se battre, et commença à voir plus clair dans sa situation. Il espérait, grâce aux excuses loyales qu’il lui réservait, se faire un ami d’Athos, dont l’air grand seigneur et la mine austère lui agréaient fort. Il se flattait de faire peur à Porthos avec l’aventure du baudrier, qu’il pouvait, s’il n’était pas tué sur le coup, raconter à tout le monde, récit qui, poussé adroitement à l’effet, devait couvrir Porthos de ridicule; enfin, quant au sournois Aramis, il n’en avait pas très grand-peur, et en supposant qu’il arrivât jusqu’à lui, il se chargeait de l’expédier bel et bien, ou du moins en le frappant au visage, comme César avait recommandé de faire aux soldats de Pompée, d’endommager à tout jamais cette beauté dont il était si fier.
 
-Ensuite il y avait chez d’Artagnan ce fonds inébranlable de résolution qu’avaient déposé dans son coeur les conseils de son père, conseils dont la substance était: «Ne rien souffrir de personne que du roi, du cardinal et de M. de Tréville.» Il vola donc plutôt qu’il ne marcha vers le couvent des Carmes Déchaussés, ou plutôt Deschaux, comme on disait à cette époque, sorte de bâtiment sans fenêtres, bordé de prés arides, succursale du Pré- aux-Clercs, et qui servait d’ordinaire aux rencontres des gens qui n’avaient pas de temps à perdre.
+Ensuite il y avait chez d’Artagnan ce fonds inébranlable de résolution qu’avaient déposé dans son coeur les conseils de son père, conseils dont la substance était: «Ne rien souffrir de personne que du roi, du cardinal et de M. de Tréville.» Il vola donc plutôt qu’il ne marcha vers le couvent des Carmes Déchaussés, ou plutôt Deschaux, comme on disait à cette époque, sorte de bâtiment sans fenêtres, bordé de prés arides, succursale du Pré-aux-Clercs, et qui servait d’ordinaire aux rencontres des gens qui n’avaient pas de temps à perdre.
 
 Lorsque d’Artagnan arriva en vue du petit terrain vague qui s’étendait au pied de ce monastère, Athos attendait depuis cinq minutes seulement, et midi sonnait. Il était donc ponctuel comme la Samaritaine, et le plus rigoureux casuiste à l’égard des duels n’avait rien a dire.
 
@@ -884,7 +884,7 @@ Mais il était trop tard. Les deux combattants avaient été vus dans une pose q
 
 «Holà! cria Jussac en s’avançant vers eux et en faisant signe à ses hommes d’en faire autant, holà! mousquetaires, on se bat donc ici? Et les édits, qu’en faisons-nous?
 
-— Vous êtes bien généreux, messieurs les gardes, dit Athos plein de rancune, car Jussac était l’un des agresseurs de l’avant- veille. Si nous vous voyions battre, je vous réponds, moi, que nous nous garderions bien de vous en empêcher. Laissez-nous donc faire, et vous allez avoir du plaisir sans prendre aucune peine.
+— Vous êtes bien généreux, messieurs les gardes, dit Athos plein de rancune, car Jussac était l’un des agresseurs de l’avant-veille. Si nous vous voyions battre, je vous réponds, moi, que nous nous garderions bien de vous en empêcher. Laissez-nous donc faire, et vous allez avoir du plaisir sans prendre aucune peine.
 
 — Messieurs, dit Jussac, c’est avec grand regret que je vous déclare que la chose est impossible. Notre devoir avant tout. Rengainez donc, s’il vous plaît, et nous suivez.
 
@@ -1002,7 +1002,7 @@ L’affaire fit grand bruit. M. de Tréville gronda beaucoup tout haut contre se
 
 «Venez ici, monsieur le capitaine, dit-il, venez que je vous gronde; savez-vous que Son Éminence est venue me faire des plaintes sur vos mousquetaires, et cela avec une telle émotion, que ce soir Son Éminence en est malade? Ah çà, mais ce sont des diables à quatre, des gens à pendre, que vos mousquetaires!
 
-— Non, Sire, répondit Tréville, qui vit du premier coup d’oeil comment la chose allait tourner; non, tout au contraire, ce sont de bonnes créatures, douces comme des agneaux, et qui n’ont qu’un désir, je m’en ferais garant: c’est que leur épée ne sorte du fourreau que pour le service de Votre Majesté. Mais, que voulez- vous, les gardes de M. le cardinal sont sans cesse à leur chercher querelle, et, pour l’honneur même du corps, les pauvres jeunes gens sont obligés de se défendre.
+— Non, Sire, répondit Tréville, qui vit du premier coup d’oeil comment la chose allait tourner; non, tout au contraire, ce sont de bonnes créatures, douces comme des agneaux, et qui n’ont qu’un désir, je m’en ferais garant: c’est que leur épée ne sorte du fourreau que pour le service de Votre Majesté. Mais, que voulez-vous, les gardes de M. le cardinal sont sans cesse à leur chercher querelle, et, pour l’honneur même du corps, les pauvres jeunes gens sont obligés de se défendre.
 
 — Écoutez M. de Tréville! dit le roi, écoutez-le! ne dirait-on pas qu’il parle d’une communauté religieuse! En vérité, mon cher capitaine, j’ai envie de vous ôter votre brevet et de le donner à Mlle de Chémerault, à laquelle j’ai promis une abbaye. Mais ne pensez pas que je vous croirai ainsi sur parole. On m’appelle Louis le Juste, monsieur de Tréville, et tout à l’heure, tout à l’heure nous verrons.
 
@@ -1012,7 +1012,7 @@ L’affaire fit grand bruit. M. de Tréville gronda beaucoup tout haut contre se
 
 En effet, la chance tournait, et comme le roi commençait à perdre ce qu’il avait gagné, il n’était pas fâché de trouver un prétexte pour faire — qu’on nous passe cette expression de joueur, dont, nous l’avouons, nous ne connaissons pas l’origine —, pour faire charlemagne. Le roi se leva donc au bout d’un instant, et mettant dans sa poche l’argent qui était devant lui et dont la majeure partie venait de son gain:
 
-«La Vieuville, dit-il, prenez ma place, il faut que je parle à M. de Tréville pour affaire d’importance. Ah!… j’avais quatre- vingts louis devant moi; mettez la même somme, afin que ceux qui ont perdu n’aient point à se plaindre. La justice avant tout.»
+«La Vieuville, dit-il, prenez ma place, il faut que je parle à M. de Tréville pour affaire d’importance. Ah!… j’avais quatre-vingts louis devant moi; mettez la même somme, afin que ceux qui ont perdu n’aient point à se plaindre. La justice avant tout.»
 
 Puis, se retournant vers M. de Tréville et marchant avec lui vers l’embrasure d’une fenêtre:
 
@@ -1200,7 +1200,7 @@ Les deux seigneurs se saluèrent poliment, car, s’il n’y avait pas amitié e
 
 M. de La Trémouille réfléchit un instant, puis, comme il était difficile de faire une proposition plus raisonnable, il accepta.
 
-Tous deux descendirent dans la chambre où était le blessé. Celui- ci, en voyant entrer ces deux nobles seigneurs qui venaient lui faire visite, essaya de se relever sur son lit, mais il était trop faible, et, épuisé par l’effort qu’il avait fait, il retomba presque sans connaissance.
+Tous deux descendirent dans la chambre où était le blessé. Celui-ci, en voyant entrer ces deux nobles seigneurs qui venaient lui faire visite, essaya de se relever sur son lit, mais il était trop faible, et, épuisé par l’effort qu’il avait fait, il retomba presque sans connaissance.
 
 M. de La Trémouille s’approcha de lui et lui fit respirer des sels qui le rappelèrent à la vie. Alors M. de Tréville, ne voulant pas qu’on pût l’accuser d’avoir influencé le malade, invita M. de La Trémouille à l’interroger lui-même.
 
@@ -1364,7 +1364,7 @@ D’Artagnan, qui comprit que c’était à lui que le compliment s’adressait,
 
 — Sans compter, dit Athos, que s’il ne m’avait pas tiré des mains de Biscarat, je n’aurais très certainement pas l’honneur de faire en ce moment-ci ma très humble révérence à Votre Majesté.
 
-— Mais c’est donc un véritable démon que ce Béarnais, ventre- saint-gris! monsieur de Tréville comme eût dit le roi mon père. À ce métier-là, on doit trouer force pourpoints et briser force épées. Or les Gascons sont toujours pauvres, n’est-ce pas?
+— Mais c’est donc un véritable démon que ce Béarnais, ventre-saint-gris! monsieur de Tréville comme eût dit le roi mon père. À ce métier-là, on doit trouer force pourpoints et briser force épées. Or les Gascons sont toujours pauvres, n’est-ce pas?
 
 — Sire, je dois dire qu’on n’a pas encore trouvé des mines d’or dans leurs montagnes, quoique le Seigneur dût bien ce miracle en récompense de la manière dont ils ont soutenu les prétentions du roi votre père.
 
@@ -1384,7 +1384,7 @@ D’Artagnan raconta l’aventure de la veille dans tous ses détails: comment, 
 
 — Oh! Sire, s’écrièrent d’une même voix les quatre compagnons, nous nous ferions couper en morceaux pour Votre Majesté.
 
-— Bien, bien; mais restez entiers: cela vaut mieux, et vous me serez plus utiles. Tréville, ajouta le roi à demi-voix pendant que les autres se retiraient, comme vous n’avez pas de place dans les mousquetaires et que d’ailleurs pour entrer dans ce corps nous avons décidé qu’il fallait faire un noviciat, placez ce jeune homme dans la compagnie des gardes de M. des Essarts, votre beau- frère. Ah! pardieu! Tréville, je me réjouis de la grimace que va faire le cardinal: il sera furieux, mais cela m’est égal; je suis dans mon droit.»
+— Bien, bien; mais restez entiers: cela vaut mieux, et vous me serez plus utiles. Tréville, ajouta le roi à demi-voix pendant que les autres se retiraient, comme vous n’avez pas de place dans les mousquetaires et que d’ailleurs pour entrer dans ce corps nous avons décidé qu’il fallait faire un noviciat, placez ce jeune homme dans la compagnie des gardes de M. des Essarts, votre beau-frère. Ah! pardieu! Tréville, je me réjouis de la grimace que va faire le cardinal: il sera furieux, mais cela m’est égal; je suis dans mon droit.»
 
 Et le roi salua de la main Tréville, qui sortit et s’en vint rejoindre ses mousquetaires, qu’il trouva partageant avec d’Artagnan les quarante pistoles.
 
@@ -1422,7 +1422,7 @@ Enfin, un coffre de magnifique orfèvrerie, aux mêmes armes que l’épée et l
 
 Porthos habitait un appartement très vaste et d’une très somptueuse apparence, rue du Vieux-Colombier. Chaque fois qu’il passait avec quelque ami devant ses fenêtres, à l’une desquelles Mousqueton se tenait toujours en grande livrée, Porthos levait la tête et la main, et disait: Voilà ma demeure! Mais jamais on ne le trouvait chez lui, jamais il n’invitait personne à y monter, et nul ne pouvait se faire une idée de ce que cette somptueuse apparence renfermait de richesses réelles.
 
-Quant à Aramis, il habitait un petit logement composé d’un boudoir, d’une salle à manger et d’une chambre à coucher, laquelle chambre, située comme le reste de l’appartement au rez-de- chaussée, donnait sur un petit jardin frais, vert, ombreux et impénétrable aux yeux du voisinage.
+Quant à Aramis, il habitait un petit logement composé d’un boudoir, d’une salle à manger et d’une chambre à coucher, laquelle chambre, située comme le reste de l’appartement au rez-de-chaussée, donnait sur un petit jardin frais, vert, ombreux et impénétrable aux yeux du voisinage.
 
 Quant à d’Artagnan, nous savons comment il était logé, et nous avons déjà fait connaissance avec son laquais, maître Planchet.
 
@@ -1742,7 +1742,7 @@ Aramis avait dit que ces sortes de choses étant mystérieuses, mieux valait ne 
 
 Ils comprirent donc, sur les quelques mots échappés à d’Artagnan, de quelle affaire il était question, et comme ils pensèrent qu’après avoir rejoint son homme ou l’avoir perdu de vue, d’Artagnan finirait toujours par remonter chez lui, ils continuèrent leur chemin.
 
-Lorsqu’ils entrèrent dans la chambre de d’Artagnan, la chambre était vide: le propriétaire, craignant les suites de la rencontre qui allait sans doute avoir lieu entre le jeune homme et l’inconnu, avait, par suite de l’exposition qu’il avait faite lui- même de son caractère, jugé qu’il était prudent de décamper.
+Lorsqu’ils entrèrent dans la chambre de d’Artagnan, la chambre était vide: le propriétaire, craignant les suites de la rencontre qui allait sans doute avoir lieu entre le jeune homme et l’inconnu, avait, par suite de l’exposition qu’il avait faite lui-même de son caractère, jugé qu’il était prudent de décamper.
 
 Comme l’avaient prévu Athos et Porthos, au bout d’une demi-heure d’Artagnan rentra. Cette fois encore il avait manqué son homme, qui avait disparu comme par enchantement. D’Artagnan avait couru, l’épée à la main, toutes les rues environnantes, mais il n’avait rien trouvé qui ressemblât à celui qu’il cherchait, puis enfin il en était revenu à la chose par laquelle il aurait dû commencer peut-être, et qui était de frapper à la porte contre laquelle l’inconnu était appuyé; mais c’était inutilement qu’il avait dix ou douze fois de suite fait résonner le marteau, personne n’avait répondu, et des voisins qui, attirés par le bruit, étaient accourus sur le seuil de leur porte ou avaient mis le nez à leurs fenêtres, lui avaient assuré que cette maison, dont au reste toutes les ouvertures étaient closes, était depuis six mois complètement inhabitée.
 
@@ -1764,7 +1764,7 @@ Pendant que d’Artagnan courait les rues et frappait aux portes, Aramis avait r
 
 Quant à Athos, fidèle à son système de mutisme, il se contenta d’interroger d’Artagnan du regard.
 
-«Planchet, dit d’Artagnan à son domestique, qui passait en ce moment la tête par la porte entrebâillée pour tâcher de surprendre quelques bribes de la conversation, descendez chez mon propriétaire, M. Bonacieux, et dites-lui de nous envoyer une demi- douzaine de bouteilles de vin de Beaugency: c’est celui que je préfère.
+«Planchet, dit d’Artagnan à son domestique, qui passait en ce moment la tête par la porte entrebâillée pour tâcher de surprendre quelques bribes de la conversation, descendez chez mon propriétaire, M. Bonacieux, et dites-lui de nous envoyer une demi-douzaine de bouteilles de vin de Beaugency: c’est celui que je préfère.
 
 — Ah çà, mais vous avez donc crédit ouvert chez votre propriétaire? demanda Porthos.
 
@@ -1904,7 +1904,7 @@ Les trois amis se mirent à rire.
 
 En ce moment, un bruit précipité de pas retentit dans l’escalier, la porte s’ouvrit avec fracas, et le malheureux mercier s’élança dans la chambre où se tenait le conseil.
 
-«Ah! messieurs, s’écria-t-il, sauvez-moi, au nom du Ciel, sauvez- moi! Il y a quatre hommes qui viennent pour m’arrêter; sauvez-moi, sauvez-moi!»
+«Ah! messieurs, s’écria-t-il, sauvez-moi, au nom du Ciel, sauvez-moi! Il y a quatre hommes qui viennent pour m’arrêter; sauvez-moi, sauvez-moi!»
 
 Porthos et Aramis se levèrent.
 
@@ -1932,7 +1932,7 @@ En ce moment, les quatre gardes apparurent à la porte de l’antichambre, et vo
 
 — Il me semble, cependant…
 
-— Venez, messieurs, venez, dit tout haut d’Artagnan; je n’ai aucun motif de défendre monsieur. Je l’ai vu aujourd’hui pour la première fois, et encore à quelle occasion, il vous le dira lui- même, pour me venir réclamer le prix de mon loyer. Est-ce vrai, monsieur Bonacieux? Répondez!
+— Venez, messieurs, venez, dit tout haut d’Artagnan; je n’ai aucun motif de défendre monsieur. Je l’ai vu aujourd’hui pour la première fois, et encore à quelle occasion, il vous le dira lui-même, pour me venir réclamer le prix de mon loyer. Est-ce vrai, monsieur Bonacieux? Répondez!
 
 — C’est la vérité pure, s’écria le mercier, mais monsieur ne vous dit pas…
 
@@ -1988,7 +1988,7 @@ Vaincu par l’exemple, maugréant tout bas, Porthos étendit la main, et les qu
 
 L’invention de la souricière ne date pas de nos jours; dès que les sociétés, en se formant, eurent inventé une police quelconque, cette police, à son tour, inventa les souricières.
 
-Comme peut-être nos lecteurs ne sont pas familiarisés encore avec l’argot de la rue de Jérusalem, et que c’est, depuis que nous écrivons — et il y a quelque quinze ans de cela —, la première fois que nous employons ce mot appliqué à cette chose, expliquons- leur ce que c’est qu’une souricière.
+Comme peut-être nos lecteurs ne sont pas familiarisés encore avec l’argot de la rue de Jérusalem, et que c’est, depuis que nous écrivons — et il y a quelque quinze ans de cela —, la première fois que nous employons ce mot appliqué à cette chose, expliquons-leur ce que c’est qu’une souricière.
 
 Quand, dans une maison quelle qu’elle soit, on a arrêté un individu soupçonné d’un crime quelconque, on tient secrète l’arrestation; on place quatre ou cinq hommes en embuscade dans la première pièce, on ouvre la porte à tous ceux qui frappent, on la referme sur eux et on les arrête; de cette façon, au bout de deux ou trois jours, on tient à peu près tous les familiers de l’établissement.
 
@@ -2072,7 +2072,7 @@ Tandis que d’Artagnan examinait Mme Bonacieux, et en était aux pieds, comme n
 
 Depuis ce temps, d’Artagnan se méfiait des mouchoirs armoriés; il remit donc sans rien dire celui qu’il avait ramassé dans la poche de Mme Bonacieux. En ce moment, Mme Bonacieux reprenait ses sens. Elle ouvrit les yeux, regarda avec terreur autour d’elle, vit que l’appartement était vide, et qu’elle était seule avec son libérateur. Elle lui tendit aussitôt les mains en souriant. Mme Bonacieux avait le plus charmant sourire du monde.
 
-«Ah! monsieur! dit-elle, c’est vous qui m’avez sauvée; permettez- moi que je vous remercie.
+«Ah! monsieur! dit-elle, c’est vous qui m’avez sauvée; permettez-moi que je vous remercie.
 
 — Madame, dit d’Artagnan, je n’ai fait que ce que tout gentilhomme eût fait à ma place, vous ne me devez donc aucun remerciement.
 
@@ -2240,7 +2240,7 @@ Tout s’exécuta comme l’avait annoncé Mme Bonacieux. Au mot d’ordre conve
 
 D’Artagnan trouva le conseil prudent; il prit ses jambes à son cou, il arriva chez M. de Tréville, mais, au lieu de passer au salon avec tout le monde, il demanda à entrer dans son cabinet. Comme d’Artagnan était un des habitués de l’hôtel, on ne fit aucune difficulté d’accéder à sa demande; et l’on alla prévenir M. de Tréville que son jeune compatriote, ayant quelque chose d’important à lui dire, sollicitait une audience particulière. Cinq minutes après, M. de Tréville demandait à d’Artagnan ce qu’il pouvait faire pour son service et ce qui lui valait sa visite à une heure si avancée.
 
-«Pardon, monsieur! dit d’Artagnan, qui avait profité du moment où il était resté seul pour retarder l’horloge de trois quarts d’heure; j’ai pensé que, comme il n’était que neuf heures vingt- cinq minutes, il était encore temps de me présenter chez vous.
+«Pardon, monsieur! dit d’Artagnan, qui avait profité du moment où il était resté seul pour retarder l’horloge de trois quarts d’heure; j’ai pensé que, comme il n’était que neuf heures vingt-cinq minutes, il était encore temps de me présenter chez vous.
 
 — Neuf heures vingt-cinq minutes! s’écria M. de Tréville en regardant sa pendule; mais c’est impossible!
 
@@ -2282,7 +2282,7 @@ Puis, tout bas, il pensait que c’était pour lui une occasion de parler de la 
 
 Paris depuis deux heures était sombre et commençait à se faire désert. Onze heures sonnaient à toutes les horloges du faubourg Saint-Germain, il faisait un temps doux. D’Artagnan suivait une ruelle située sur l’emplacement où passe aujourd’hui la rue d’Assas, respirant les émanations embaumées qui venaient avec le vent de la rue de Vaugirard et qu’envoyaient les jardins rafraîchis par la rosée du soir et par la brise de la nuit. Au loin résonnaient, assourdis cependant par de bons volets, les chants des buveurs dans quelques cabarets perdus dans la plaine. Arrivé au bout de la ruelle, d’Artagnan tourna à gauche. La maison qu’habitait Aramis se trouvait située entre la rue Cassette et la rue Servandoni.
 
-D’Artagnan venait de dépasser la rue Cassette et reconnaissait déjà la porte de la maison de son ami, enfouie sous un massif de sycomores et de clématites qui formaient un vaste bourrelet au- dessus d’elle lorsqu’il aperçut quelque chose comme une ombre qui sortait de la rue Servandoni. Ce quelque chose était enveloppé d’un manteau, et d’Artagnan crut d’abord que c’était un homme; mais, à la petitesse de la taille, à l’incertitude de la démarche, à l’embarras du pas, il reconnut bientôt une femme. De plus, cette femme, comme si elle n’eût pas été bien sûre de la maison qu’elle cherchait, levait les yeux pour se reconnaître, s’arrêtait, retournait en arrière, puis revenait encore. D’Artagnan fut intrigué.
+D’Artagnan venait de dépasser la rue Cassette et reconnaissait déjà la porte de la maison de son ami, enfouie sous un massif de sycomores et de clématites qui formaient un vaste bourrelet au-dessus d’elle lorsqu’il aperçut quelque chose comme une ombre qui sortait de la rue Servandoni. Ce quelque chose était enveloppé d’un manteau, et d’Artagnan crut d’abord que c’était un homme; mais, à la petitesse de la taille, à l’incertitude de la démarche, à l’embarras du pas, il reconnut bientôt une femme. De plus, cette femme, comme si elle n’eût pas été bien sûre de la maison qu’elle cherchait, levait les yeux pour se reconnaître, s’arrêtait, retournait en arrière, puis revenait encore. D’Artagnan fut intrigué.
 
 «Si j’allais lui offrir mes services! pensa-t-il. À son allure, on voit qu’elle est jeune; peut-être jolie. Oh! oui. Mais une femme qui court les rues à cette heure ne sort guère que pour aller rejoindre son amant. Peste! si j’allais troubler les rendez-vous, ce serait une mauvaise porte pour entrer en relations.»
 
@@ -2488,7 +2488,7 @@ D’Artagnan offrit son bras à Mme Bonacieux, qui s’y suspendit, moitié rieu
 
 — Taisez-vous, taisez-vous, malheureux! s’écria la jeune femme, voulez-vous me perdre?
 
-— Vous voyez bien qu’il y a encore du danger pour vous, puisqu’un seul mot vous fait trembler, et que vous avouez que, si on entendait ce mot, vous seriez perdue. Ah! tenez, madame, s’écria d’Artagnan en lui saisissant la main et la couvrant d’un ardent regard, tenez! soyez plus généreuse, confiez-vous à moi; n’avez- vous donc pas lu dans mes yeux qu’il n’y a que dévouement et sympathie dans mon coeur?
+— Vous voyez bien qu’il y a encore du danger pour vous, puisqu’un seul mot vous fait trembler, et que vous avouez que, si on entendait ce mot, vous seriez perdue. Ah! tenez, madame, s’écria d’Artagnan en lui saisissant la main et la couvrant d’un ardent regard, tenez! soyez plus généreuse, confiez-vous à moi; n’avez-vous donc pas lu dans mes yeux qu’il n’y a que dévouement et sympathie dans mon coeur?
 
 — Si fait, répondit Mme Bonacieux; aussi demandez-moi mes secrets, et je vous les dirai; mais ceux des autres, c’est autre chose.
 
@@ -2614,7 +2614,7 @@ D’Artagnan continua son chemin, il avait donné sa parole de ne pas épier Mme
 
 — Bravo, Athos! noble coeur, murmura d’Artagnan, je le reconnais bien là! Et qu’ont fait les sbires?
 
-— Quatre l’ont emmené je ne sais où, à la Bastille ou au For- l’Évêque; deux sont restés avec les hommes noirs, qui ont fouillé partout et qui ont pris tous les papiers. Enfin les deux derniers, pendant cette expédition, montaient la garde à la porte; puis, quand tout a été fini, ils sont partis, laissant la maison vide et tout ouvert.
+— Quatre l’ont emmené je ne sais où, à la Bastille ou au For-l’Évêque; deux sont restés avec les hommes noirs, qui ont fouillé partout et qui ont pris tous les papiers. Enfin les deux derniers, pendant cette expédition, montaient la garde à la porte; puis, quand tout a été fini, ils sont partis, laissant la maison vide et tout ouvert.
 
 — Et Porthos et Aramis?
 
@@ -2738,7 +2738,7 @@ Georges Villiers se plaça donc devant une glace, comme nous l’avons dit, rend
 
 En ce moment, une porte cachée dans la tapisserie s’ouvrit et une femme apparut. Buckingham vit cette apparition dans la glace; il jeta un cri, c’était la reine!
 
-Anne d’Autriche avait alors vingt-six ou vingt-sept ans, c’est-à- dire qu’elle se trouvait dans tout l’éclat de sa beauté.
+Anne d’Autriche avait alors vingt-six ou vingt-sept ans, c’est-à-dire qu’elle se trouvait dans tout l’éclat de sa beauté.
 
 Sa démarche était celle d’une reine ou d’une déesse; ses yeux, qui jetaient des reflets d’émeraude, étaient parfaitement beaux, et tout à la fois pleins de douceur et de majesté.
 
@@ -2788,7 +2788,7 @@ Anne d’Autriche fit deux pas en avant; Buckingham se précipita à ses genoux,
 
 «Quel but pensez-vous qu’aient eu cette expédition de Ré et cette ligue avec les protestants de La Rochelle que je projette? Le plaisir de vous voir!
 
-«Je n’ai pas l’espoir de pénétrer à main armée jusqu’à Paris, je le sais bien: mais cette guerre pourra amener une paix, cette paix nécessitera un négociateur, ce négociateur ce sera moi. On n’osera plus me refuser alors, et je reviendrai à Paris, et je vous reverrai, et je serai heureux un instant. Des milliers d’hommes, il est vrai, auront payé mon bonheur de leur vie; mais que m’importera, à moi, pourvu que je vous revoie! Tout cela est peut- être bien fou, peut-être bien insensé; mais, dites-moi, quelle femme a un amant plus amoureux? quelle reine a eu un serviteur plus ardent?
+«Je n’ai pas l’espoir de pénétrer à main armée jusqu’à Paris, je le sais bien: mais cette guerre pourra amener une paix, cette paix nécessitera un négociateur, ce négociateur ce sera moi. On n’osera plus me refuser alors, et je reviendrai à Paris, et je vous reverrai, et je serai heureux un instant. Des milliers d’hommes, il est vrai, auront payé mon bonheur de leur vie; mais que m’importera, à moi, pourvu que je vous revoie! Tout cela est peut-être bien fou, peut-être bien insensé; mais, dites-moi, quelle femme a un amant plus amoureux? quelle reine a eu un serviteur plus ardent?
 
 — Milord, Milord, vous invoquez pour votre défense des choses qui vous accusent encore; Milord, toutes ces preuves d’amour que vous voulez me donner sont presque des crimes.
 
@@ -3100,7 +3100,7 @@ Plus loin, une grande terreur le prit encore, ce fut en côtoyant le cimetière 
 
 Cette menace rassura quelque peu Bonacieux: si l’on eût dû l’exécuter en Grève, ce n’était pas la peine de le bâillonner, puisqu’on était presque arrivé au lieu de l’exécution. En effet, la voiture traversa la place fatale sans s’arrêter. Il ne restait plus à craindre que la Croix-du-Trahoir: la voiture en prit justement le chemin.
 
-Cette fois, il n’y avait plus de doute, c’était à la Croix-du- Trahoir qu’on exécutait les criminels subalternes. Bonacieux s’était flatté en se croyant digne de Saint-Paul ou de la place de Grève: c’était à la Croix-du-Trahoir qu’allaient finir son voyage et sa destinée! Il ne pouvait voir encore cette malheureuse croix, mais il la sentait en quelque sorte venir au-devant de lui. Lorsqu’il n’en fut plus qu’à une vingtaine de pas, il entendit une rumeur, et la voiture s’arrêta. C’était plus que n’en pouvait supporter le pauvre Bonacieux, déjà écrasé par les émotions successives qu’il avait éprouvées; il poussa un faible gémissement, qu’on eût pu prendre pour le dernier soupir d’un moribond, et il s’évanouit.
+Cette fois, il n’y avait plus de doute, c’était à la Croix-du-Trahoir qu’on exécutait les criminels subalternes. Bonacieux s’était flatté en se croyant digne de Saint-Paul ou de la place de Grève: c’était à la Croix-du-Trahoir qu’allaient finir son voyage et sa destinée! Il ne pouvait voir encore cette malheureuse croix, mais il la sentait en quelque sorte venir au-devant de lui. Lorsqu’il n’en fut plus qu’à une vingtaine de pas, il entendit une rumeur, et la voiture s’arrêta. C’était plus que n’en pouvait supporter le pauvre Bonacieux, déjà écrasé par les émotions successives qu’il avait éprouvées; il poussa un faible gémissement, qu’on eût pu prendre pour le dernier soupir d’un moribond, et il s’évanouit.
 
 Ce rassemblement était produit non point par l’attente d’un homme qu’on devait pendre, mais par la contemplation d’un pendu.
 
@@ -3130,7 +3130,7 @@ Et il s’effaça pour que le mercier pût passer. Celui-ci obéit sans répliqu
 
 C’était un grand cabinet, aux murailles garnies d’armes offensives et défensives, clos et étouffé, et dans lequel il y avait déjà du feu, quoique l’on fût à peine à la fin du mois de septembre. Une table carrée, couverte de livres et de papiers sur lesquels était déroulé un plan immense de la ville de La Rochelle, tenait le milieu de l’appartement.
 
-Debout devant la cheminée était un homme de moyenne taille, à la mine haute et fière, aux yeux perçants, au front large, à la figure amaigrie qu’allongeait encore une royale surmontée d’une paire de moustaches. Quoique cet homme eût trente-six à trente- sept ans à peine, cheveux, moustache et royale s’en allaient grisonnant. Cet homme, moins l’épée, avait toute la mine d’un homme de guerre, et ses bottes de buffle encore légèrement couvertes de poussière indiquaient qu’il avait monté à cheval dans la journée.
+Debout devant la cheminée était un homme de moyenne taille, à la mine haute et fière, aux yeux perçants, au front large, à la figure amaigrie qu’allongeait encore une royale surmontée d’une paire de moustaches. Quoique cet homme eût trente-six à trente-sept ans à peine, cheveux, moustache et royale s’en allaient grisonnant. Cet homme, moins l’épée, avait toute la mine d’un homme de guerre, et ses bottes de buffle encore légèrement couvertes de poussière indiquaient qu’il avait monté à cheval dans la journée.
 
 Cet homme, c’était Armand-Jean Duplessis, cardinal de Richelieu, non point tel qu’on nous le représente, cassé comme un vieillard, souffrant comme un martyr, le corps brisé, la voix éteinte, enterré dans un grand fauteuil comme dans une tombe anticipée, ne vivant plus que par la force de son génie, et ne soutenant plus la lutte avec l’Europe que par l’éternelle application de sa pensée, mais tel qu’il était réellement à cette époque, c’est-à-dire adroit et galant cavalier, faible de corps déjà, mais soutenu par cette puissance morale qui a fait de lui un des hommes les plus extraordinaires qui aient existé; se préparant enfin, après avoir soutenu le duc de Nevers dans son duché de Mantoue, après avoir pris Nîmes, Castres et Uzès, à chasser les Anglais de l’île de Ré et à faire le siège de La Rochelle.
 
@@ -3384,7 +3384,7 @@ Le nouveau personnage qu’on venait d’introduire suivit des yeux avec impatie
 
 — Maintenant, savez-vous où se cachaient la duchesse de Chevreuse et le duc de Buckingham?
 
-— Non, Monseigneur, mes gens n’ont pu rien me dire de positif là- dessus.
+— Non, Monseigneur, mes gens n’ont pu rien me dire de positif là-dessus.
 
 — Je le sais, moi.
 
@@ -3458,7 +3458,7 @@ Comme il en était au plus profond de ses méditations stratégiques, la porte s
 
 «Eh bien? dit vivement le cardinal en se levant avec une promptitude qui prouvait le degré d’importance qu’il attachait à la commission dont il avait chargé le comte.
 
-— Eh bien, dit celui-ci, une jeune femme de vingt-six à vingt- huit ans et un homme de trente-cinq à quarante ans ont logé effectivement, l’un quatre jours et l’autre cinq, dans les maisons indiquées par Votre Éminence: mais la femme est partie cette nuit, et l’homme ce matin.
+— Eh bien, dit celui-ci, une jeune femme de vingt-six à vingt-huit ans et un homme de trente-cinq à quarante ans ont logé effectivement, l’un quatre jours et l’autre cinq, dans les maisons indiquées par Votre Éminence: mais la femme est partie cette nuit, et l’homme ce matin.
 
 — C’étaient eux! s’écria le cardinal, qui regardait à la pendule; et maintenant, continua-t-il, il est trop tard pour faire courir après: la duchesse est à Tours, et le duc à Boulogne. C’est à Londres qu’il faut les rejoindre.
 
@@ -3492,7 +3492,7 @@ Voici ce que contenait la lettre:
 
 «Trouvez-vous au premier bal où se trouvera le duc de Buckingham. Il aura à son pourpoint douze ferrets de diamants, approchez-vous de lui et coupez-en deux.
 
-«Aussitôt que ces ferrets seront en votre possession, prévenez- moi.»
+«Aussitôt que ces ferrets seront en votre possession, prévenez-moi.»
 
 Le lendemain du jour où ces événements étaient arrivés, Athos n’ayant point reparu, M. de Tréville avait été prévenu par d’Artagnan et par Porthos de sa disparition.
 
@@ -3544,7 +3544,7 @@ Louis XIII mettait déjà la main sur le bouton de la porte; au bruit que fit M.
 
 — Merci! dit le cardinal en se pinçant les lèvres de colère.
 
-— M. Athos était donc allé rendre visite à l’un de ses amis alors absent, continua M. de Tréville, à un jeune Béarnais, cadet aux gardes de Sa Majesté, compagnie des Essarts; mais à peine venait- il de s’installer chez son ami et de prendre un livre en l’attendant, qu’une nuée de recors et de soldats mêlés ensemble vint faire le siège de la maison, enfonça plusieurs portes…»
+— M. Athos était donc allé rendre visite à l’un de ses amis alors absent, continua M. de Tréville, à un jeune Béarnais, cadet aux gardes de Sa Majesté, compagnie des Essarts; mais à peine venait-il de s’installer chez son ami et de prendre un livre en l’attendant, qu’une nuée de recors et de soldats mêlés ensemble vint faire le siège de la maison, enfonça plusieurs portes…»
 
 Le cardinal fit au roi un signe qui signifiait: «C’est pour l’affaire dont je vous ai parlé.»
 
