@@ -105,6 +105,9 @@ function survey(corpus: Corpus, language: string): { entries: Map<string, Entry>
 
 const ATTEMPTS = 12;
 
+/** A word as the list of kept words has it: lowercase, with a straight apostrophe. */
+const keyOf = (word: string) => word.toLowerCase().replace(/’/g, "'");
+
 export class Lexicon {
   readonly language: InventedLanguage;
   /** The corpus's language, as a BCP 47 tag, for estimating syllables. */
@@ -112,16 +115,23 @@ export class Lexicon {
   private readonly words = new Map<string, InventedWord>();
   private readonly clitics = new Map<string, InventedClitic>();
   private readonly taken = new Set<string>();
+  private readonly kept: ReadonlySet<string>;
 
   constructor(language: InventedLanguage, corpus: Corpus, sourceLanguage: string) {
     this.language = language;
     this.sourceLanguage = sourceLanguage;
+    this.kept = new Set((language.keep ?? []).map(keyOf));
     const { entries, clitics } = survey(corpus, sourceLanguage);
     // Clitics first, so words that follow one can be checked with it: "n’" and "azi" are fine
     // apart, but not together.
     for (const clitic of [...clitics].sort()) this.clitic(clitic);
     const ordered = [...entries].sort(([a, x], [b, y]) => y.count - x.count || (a < b ? -1 : 1));
-    for (const [key, entry] of ordered) this.words.set(key, this.invent(key, entry));
+    for (const [key, entry] of ordered) if (!this.kept.has(key)) this.words.set(key, this.invent(key, entry));
+  }
+
+  /** Whether a source word is left as it is, being one of the language's kept words. */
+  keeps(source: string): boolean {
+    return this.kept.has(keyOf(source));
   }
 
   /** The invented word for a source word (any case). */

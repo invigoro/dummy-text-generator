@@ -32,6 +32,7 @@ export const SETTINGS: readonly Setting[] = [
     choices: [
       { id: 'english', name: 'Real English', language: 'english', stele: PAPER },
       { id: 'english-invented', name: 'Invented English', language: 'english-invented', stele: PAPER },
+      { id: 'shakespearean', name: 'Shakespearean English', language: 'shakespearean', stele: PAPER },
       { id: 'french', name: 'French', language: 'french', stele: PARCHMENT },
       { id: 'french-real', name: 'Real French', language: 'french-real', stele: PARCHMENT },
       { id: 'spanish', name: 'Spanish', language: 'spanish', stele: PARCHMENT },
@@ -43,6 +44,7 @@ export const SETTINGS: readonly Setting[] = [
       { id: 'finnish', name: 'Finnish', language: 'finnish', stele: PAPER },
       { id: 'welsh', name: 'Welsh', language: 'welsh', stele: { medium: 'slate' } },
       { id: 'old-english', name: 'Old English', language: 'old-english', stele: { medium: 'parchment', font: 'uncial-antiqua' } },
+      { id: 'middle-english', name: 'Middle English', language: 'middle-english', stele: { medium: 'parchment', font: 'unifrakturmaguntia' } },
       { id: 'old-norse', name: 'Old Norse', language: 'old-norse', stele: { medium: 'granite', script: 'younger-futhark' } },
       { id: 'enochian', name: 'Enochian', language: 'enochian', stele: PARCHMENT },
     ],

@@ -162,6 +162,17 @@ const GERMAN: TokenizeOptions = {
   elision: 'after',
 };
 
+const MIDDLE_ENGLISH: TokenizeOptions = {
+  abbreviations: new Set(),
+  // Skeat's Chaucer puts speech in single marks, and what someone quotes in double ones.
+  quotes: [
+    ['‘', '’'],
+    ['“', '”'],
+  ],
+  elisions: new Set(),
+  elision: 'after',
+};
+
 const TOKENIZERS: Readonly<Record<string, TokenizeOptions>> = {
   en: ENGLISH,
   fr: FRENCH,
@@ -173,6 +184,7 @@ const TOKENIZERS: Readonly<Record<string, TokenizeOptions>> = {
   fi: FINNISH,
   cy: WELSH,
   de: GERMAN,
+  enm: MIDDLE_ENGLISH,
 };
 
 /** The options for text in a language, from its BCP 47 tag. English rules if there are none. */

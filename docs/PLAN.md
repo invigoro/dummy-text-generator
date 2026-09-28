@@ -114,6 +114,8 @@ lists of names for them, one list per game world.
 | Finnish | Kivi, *Seitsemän veljestä* (1870) | 2 |
 | Welsh | Owen M. Edwards, *Cartrefi Cymru* (1896) | 2 |
 | Old English | *Treasure Island*: Project Gutenberg has no Old English prose | 2 |
+| Middle English, its little words real | Chaucer, *The Canterbury Tales* (about 1390): the prose of Melibee and the Parson's Tale, in Skeat's edition (1894) | later |
+| Shakespearean English, its little words real | Shakespeare, *Hamlet* (about 1600) | later |
 | Enochian, after John Dee's angelic language (1580s) | Caesar: Project Gutenberg has no Enochian | 2 |
 | Orcish: harsh and clipped | *Sæfarinn* | 2 |
 | Draconic: hissing and grand | Caesar | 2 |
@@ -318,8 +320,9 @@ out liaison.)*
 
 ## Decisions
 
-- **Invented words** for every fantasy and "plain" language. Real words only for Common filler and
-  real lorem ipsum.
+- **Invented words** for every fantasy and "plain" language. Real words only for Common filler, real
+  French and real lorem ipsum, and for the little words Middle English and Shakespearean English
+  keep ("whan", "thou", "hath"), without which they wouldn't read as either.
 - **Presentation stays in Stele.** This tool makes the text; styles, fonts, scripts and export
   belong there.
 - **React for the UI.** Stele uses plain TypeScript because its hard part is the renderer. This

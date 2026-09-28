@@ -202,6 +202,20 @@ function cached<T>(make: (corpus: Corpus) => T): (corpus: Corpus) => T {
 const speechOf = cached((corpus) => speechLines(corpus));
 const phrasesOf = cached((corpus) => phraseLines(corpus));
 
+/**
+ * The text as prose: a play's speeches without the speakers' names that start them, which would
+ * otherwise turn up as sentences of their own ("Barnardo.").
+ */
+export const proseOf = cached((corpus: Corpus): Corpus => {
+  const speakers = scriptSpeakers(corpus);
+  if (speakers.size === 0) return corpus;
+  const paragraphs = corpus.paragraphs.map((paragraph) => {
+    const name = scriptSpeaker(paragraph);
+    return name && speakers.has(name) ? { sentences: paragraph.sentences.slice(1) } : paragraph;
+  });
+  return { ...corpus, paragraphs };
+});
+
 
 /** Every line of speech in the source, in order; its short sentences too, where it has little speech. */
 export function speechLines(corpus: Corpus): Sentence[] {

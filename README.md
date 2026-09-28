@@ -10,13 +10,16 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
 ## Using it
 
 - **Pick a language:** a real one (English, French, Spanish, Portuguese, Italian, German, Latin,
-  lorem ipsum, Finnish, Welsh, Old English, Old Norse, Enochian), or one of D&D's, such as Elvish
+  lorem ipsum, Finnish, Welsh, Old English, Middle English, Shakespearean English, Old Norse,
+  Enochian), or one of D&D's, such as Elvish
   (invented French), Dwarvish (invented Old Norse) or Orc. Apart from Real English and Real French,
   the words are invented. The text flows like the real language, with its rhythm, its punctuation
   and its short words turning up everywhere, but nobody can understand it, not even someone who
   speaks the language. The same word always comes out the same, so a language keeps its vocabulary
   from one session to the next. Real French comes with a "say it" line worked out from its
-  spelling, near enough to read aloud.
+  spelling, near enough to read aloud. Middle English and Shakespearean English keep their little
+  words real ("whan", "quod", "thou", "hath") and invent the rest, as "Jabberwocky" does, so
+  they read as Chaucer and Shakespeare and still mean nothing.
 - **Name your own world's languages:** a setting of your own gives the languages your game's
   names, such as Renan for French and Old Deciman for Latin. Settings are kept in the browser,
   exported and imported as files, and carried in share links, so whoever opens one sees the same

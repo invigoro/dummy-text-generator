@@ -109,6 +109,11 @@ describe('cleanGutenberg', () => {
     expect(cleanGutenberg('Là- dessus, voulez- vous?', { fixes: [[/(\p{L})- (\p{L})/gu, '$1-$2']] })).toBe('Là-dessus, voulez-vous?\n');
   });
 
+  it('drops a play’s act and scene headings, and the blocks a recipe says to', () => {
+    const play = 'ACT I\n\nSCENE I. Elsinore. A platform.\n\nEnter Horatio.\n\nHAMLET.\nWho’s there?\n\n[_Exit._]\n\nHORATIO.\nFriends to this ground.';
+    expect(cleanGutenberg(play, { dropBlocks: /^(?:Enter|\[)/ })).toBe('Hamlet. Who’s there?\n\nHoratio. Friends to this ground.\n');
+  });
+
   it('puts back a missing space between sentences', () => {
     expect(cleanGutenberg('Legatos misit.Renuntiatum est.')).toBe('Legatos misit. Renuntiatum est.\n');
   });

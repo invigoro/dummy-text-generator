@@ -103,6 +103,22 @@ export const SOURCE_TEXTS: readonly SourceText[] = [
     date: '1915',
     load: () => import('./de/verwandlung.txt?raw').then((module) => module.default),
   },
+  {
+    id: 'enm-canterbury-prose',
+    language: 'enm',
+    title: 'The Canterbury Tales',
+    author: 'Geoffrey Chaucer',
+    date: 'c. 1390',
+    load: () => import('./enm/canterbury-prose.txt?raw').then((module) => module.default),
+  },
+  {
+    id: 'en-hamlet',
+    language: 'en',
+    title: 'Hamlet',
+    author: 'William Shakespeare',
+    date: 'c. 1600',
+    load: () => import('./en/hamlet.txt?raw').then((module) => module.default),
+  },
 ];
 
 export function sourceText(id: string): SourceText {

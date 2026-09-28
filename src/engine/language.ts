@@ -34,6 +34,11 @@ export interface InventedLanguageDef extends LanguageBase {
   say?: SayOverrides;
   punctuation: PunctuationDef;
   voicing: string;
+  /**
+   * Words left as they are, the rest invented, as in "Jabberwocky": the little words that make a
+   * text read as its language to an English reader ("thou", "hath", "whan").
+   */
+  keep?: readonly string[];
 }
 
 export interface VocabularyLanguageDef extends LanguageBase {

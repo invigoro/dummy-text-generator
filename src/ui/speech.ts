@@ -13,6 +13,7 @@ export const canSpeak = () =>
 const NATIVE: Readonly<Record<string, readonly string[]>> = {
   english: ['en-GB', 'en'],
   'english-invented': ['en-GB', 'en'],
+  shakespearean: ['en-GB', 'en'],
   french: ['fr-FR', 'fr'],
   'french-real': ['fr-FR', 'fr'],
   spanish: ['es-ES', 'es'],

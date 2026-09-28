@@ -81,6 +81,34 @@ const RECIPES: Record<string, Recipe> = {
     startAt: /^DOLWAR FECHAN\.$/,
     endBefore: /^NODIADAU\.$/,
   },
+  'enm-canterbury-prose': {
+    url: 'https://www.gutenberg.org/cache/epub/22120/pg22120.txt',
+    output: 'src/data/corpora/enm/canterbury-prose.txt',
+    // The Canterbury Tales in prose, Melibee and the Parson's Tale, about 48,000 words. Skeat
+    // indents the verse between them and his notes, which go.
+    startAt: /^THE TALE OF MELIBEUS\.$/,
+    endBefore: /^=Here is ended the book of the Tales of Caunterbury/,
+    // Section headings (=Sequitur de…=) and the notes that give a passage's line numbers.
+    dropBlocks: /^(?:=|\[\d+:)/,
+    fixes: [
+      // Page numbers ("[200]"), section numbers ("§ 23."), and the line markers "/" and "/2160".
+      [/\[\d+\]\s*/g, ''],
+      [/§\s*\d+\.\s*/g, ''],
+      [/\s*\/\d*(?=\s|$)/g, ''],
+    ],
+    // Square brackets round words the editor supplied; the words stay.
+    remove: /[[\]]/g,
+  },
+  'en-hamlet': {
+    url: 'https://www.gutenberg.org/cache/epub/1524/pg1524.txt',
+    output: 'src/data/corpora/en/hamlet.txt',
+    // From the first act, after the contents and the list of characters.
+    startAt: /^ACT I$/,
+    // Stage directions, alone ("Enter Horatio.") or in brackets ("[_Exit._]"), and the dumb-show.
+    dropBlocks: /^(?:Enter|Exit|Exeunt|Re-enter|Flourish|Alarum|Trumpets|Danish march|A march|Noise|Sound|Drum|Hautboys|\[|_)/,
+    // Stage directions inside a speech: "[_Aside._]", "[_Sings._]".
+    fixes: [[/\s*\[[^\]]*\]\s*/g, ' ']],
+  },
   'de-verwandlung': {
     url: 'https://www.gutenberg.org/cache/epub/22367/pg22367.txt',
     output: 'src/data/corpora/de/verwandlung.txt',

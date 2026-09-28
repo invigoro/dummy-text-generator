@@ -32,6 +32,7 @@ const NBSP = ' ';
 /** Quotation marks a language can use, with any space they take inside, and a name for each. */
 export const QUOTE_STYLES: readonly { quotes: readonly [string, string]; name: string }[] = [
   { quotes: ['“', '”'], name: 'English' },
+  { quotes: ['‘', '’'], name: 'English, single' },
   { quotes: [`«${NBSP}`, `${NBSP}»`], name: 'French, spaced' },
   { quotes: ['«', '»'], name: 'Spanish and Italian' },
   { quotes: ['„', '“'], name: 'German and Icelandic' },
@@ -209,6 +210,10 @@ export function sanitizeLanguage(data: unknown): CustomLanguageDef | null {
   const flow = FLOWS.find((source) => source.id === input.flow)?.id ?? SCRATCH.flow;
   const say = sanitizeSay(input.say);
   const basedOn = typeof input.basedOn === 'string' && /^[a-z-]{1,40}$/.test(input.basedOn) ? input.basedOn : undefined;
+  // Real words the language keeps, as Shakespearean English keeps "thou" and "hath".
+  const keep = Array.isArray(input.keep)
+    ? input.keep.filter((word): word is string => typeof word === 'string' && /^[\p{L}'’-]{1,24}$/u.test(word)).slice(0, 400)
+    : [];
   const def: CustomLanguageDef = {
     kind: 'invented',
     id,
@@ -219,6 +224,7 @@ export function sanitizeLanguage(data: unknown): CustomLanguageDef | null {
     ...(say ? { say } : {}),
     punctuation: sanitizePunctuation(input.punctuation),
     voicing: text(input.voicing, 600) ?? '',
+    ...(keep.length > 0 ? { keep } : {}),
     ...(basedOn ? { basedOn } : {}),
   };
   return languageProblem(def) ? null : def;

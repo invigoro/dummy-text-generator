@@ -75,7 +75,7 @@ describe.each(LANGUAGES.map((def) => [def.name, def] as const))('%s', (_, def) =
       expect(say).toMatch(/\p{Lu}/u);
       // Letters, hyphens and apostrophes; plain punctuation, and Spanish's ¿ ¡ to warn of a question
       // or an exclamation to come; numbers left as they were.
-      expect(say).not.toMatch(/[^a-zA-Z0-9'\-\s.,;:!?¿¡…—–“”()]/u);
+      expect(say).not.toMatch(/[^a-zA-Z0-9'’‘\-\s.,;:!?¿¡…—–“”()]/u);
     }
   });
 
@@ -119,6 +119,22 @@ describe('Lorem ipsum', () => {
     for (const form of ['conversation', 'inscription'] as const) {
       const text = writtenText(generate(loaded, { arrangement: 'sentences', length: { unit: 'paragraphs', count: 3 }, seed: 1, form }));
       expect(text).not.toMatch(/Lorem ipsum dolor sit amet/);
+    }
+  });
+});
+
+describe('Middle English and Shakespearean English', () => {
+  it('keep their little words real, and invent the rest', async () => {
+    for (const [id, kept] of [
+      ['middle-english', ['and', 'of', 'the']],
+      ['shakespearean', ['the', 'you', 'my']],
+    ] as const) {
+      const loaded = await loadLanguage(id);
+      const doc = generate(loaded, { arrangement: 'sentences', length: { unit: 'words', count: 400 }, seed: 2 });
+      const text = ` ${writtenText(doc).toLowerCase()} `;
+      for (const word of kept) expect(text, `${id}: ${word}`).toContain(` ${word} `);
+      const invented = doc.flatMap((p) => p.sentences.flatMap((s) => s.tokens)).filter((t) => t.kind === 'word' && t.spoken);
+      expect(invented.length, id).toBeGreaterThan(150);
     }
   });
 });

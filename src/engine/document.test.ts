@@ -60,6 +60,20 @@ describe('inventWordToken', () => {
   });
 });
 
+describe('kept words', () => {
+  it('leaves a language’s kept words real, as written, with no "say it" form of their own', () => {
+    const def = { ...french, keep: ['the', 'thou', "'tis"] };
+    const { doc } = invented(def, '’Tis the hour, and thou art late. The night is cold.', 'en');
+    const texts = words(doc).map((word) => word.text);
+    expect(texts).toEqual(expect.arrayContaining(['’Tis', 'the', 'thou', 'The']));
+    for (const word of words(doc)) {
+      if (['’Tis', 'the', 'thou', 'The'].includes(word.text)) expect(word.spoken).toBeUndefined();
+      else expect(word.spoken).toBeDefined();
+    }
+    expect(texts).not.toContain('hour');
+  });
+});
+
 describe('inventedWords', () => {
   it('uses the language’s quotation marks and spacing', () => {
     const { doc } = invented(french, '« Où est-il? » dit-il. Quoi!', 'fr');

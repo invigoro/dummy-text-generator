@@ -18,17 +18,20 @@ import infernal from './infernal';
 import italian from './italian';
 import latin from './latin';
 import loremIpsum from './lorem-ipsum';
+import middleEnglish from './middle-english';
 import oldEnglish from './old-english';
 import oldNorse from './old-norse';
 import orcish from './orcish';
 import portuguese from './portuguese';
 import { aquan, auran, ignan, terran } from './primordial';
+import shakespearean from './shakespearean';
 import spanish from './spanish';
 import welsh from './welsh';
 
 export const LANGUAGES: readonly LanguageDef[] = [
   english,
   englishInvented,
+  shakespearean,
   french,
   frenchReal,
   spanish,
@@ -40,6 +43,7 @@ export const LANGUAGES: readonly LanguageDef[] = [
   finnish,
   welsh,
   oldEnglish,
+  middleEnglish,
   oldNorse,
   enochian,
   orcish,

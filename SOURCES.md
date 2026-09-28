@@ -154,3 +154,37 @@ paragraph lengths, punctuation and word lengths, and replaces every word.
   chapter numbers.
 - **Why this text:** the Grimms' *Deutsche Sagen* was the first choice, but it includes
   antisemitic legends, so it's not used even as a flow.
+
+## Middle English
+
+### The Canterbury Tales: the Tale of Melibee and the Parson's Tale
+
+- **Author:** Geoffrey Chaucer (c. 1343–1400), edited by Walter W. Skeat (1835–1912)
+- **Written:** about 1390; this edition published 1894
+- **File:** [`src/data/corpora/enm/canterbury-prose.txt`](src/data/corpora/enm/canterbury-prose.txt)
+- **From:** Project Gutenberg eBook #22120, *The Complete Works of Geoffrey Chaucer*, Volume 4,
+  <https://www.gutenberg.org/ebooks/22120>
+- **Cleaning:** `npm run import-gutenberg -- enm-canterbury-prose` keeps the two tales Chaucer
+  wrote in prose, Melibee and the Parson's Tale (about 47,000 words). It drops the verse between
+  them and the editor's notes (Skeat indents both), the section headings and the notes giving
+  line numbers. It removes page numbers, section numbers ("§ 23."), the line markers ("/" and
+  "/2160") and the square brackets round words the editor supplied.
+- **Why this text:** prose gives the flow of sentences, where the verse would give the rhythm of
+  couplets.
+
+## Shakespearean English
+
+### Hamlet
+
+- **Author:** William Shakespeare (1564–1616)
+- **Written:** about 1600
+- **File:** [`src/data/corpora/en/hamlet.txt`](src/data/corpora/en/hamlet.txt)
+- **From:** Project Gutenberg eBook #1524, <https://www.gutenberg.org/ebooks/1524>
+- **Cleaning:** `npm run import-gutenberg -- en-hamlet` starts at the first act, after the
+  contents and the list of characters. It removes the act and scene headings, the stage
+  directions (on their own, in brackets, or inside a speech) and the dumb-show. Speakers' names
+  printed in capitals get ordinary case, so each paragraph is a speech that starts with its
+  speaker's name ("Hamlet. …"): conversations use the names, and prose leaves them out.
+
+Middle English and Shakespearean English keep some of their texts' little words real ("whan",
+"quod", "thou", "hath"), as "Jabberwocky" does, and invent the rest.

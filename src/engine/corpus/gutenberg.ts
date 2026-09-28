@@ -19,6 +19,8 @@ export interface CleanOptions {
   remove?: RegExp;
   /** Corrections for an edition's own slips, as [pattern, replacement] pairs, made to each paragraph. */
   fixes?: readonly (readonly [RegExp, string])[];
+  /** Blocks to leave out by their first line, such as a play's stage directions ("Enter Horatio."). */
+  dropBlocks?: RegExp;
   /**
    * Words the edition sets in capitals (often for italics) and what to write instead, such as
    * { HISPANIOLA: 'Hispaniola' }. Any other word in capitals becomes lowercase, with a capital
@@ -36,7 +38,7 @@ export function cleanGutenberg(raw: string, options: CleanOptions = {}): string 
   const end = lines.findIndex((line) => /^\*\*\* ?END OF (?:THE|THIS) PROJECT GUTENBERG/i.test(line));
   lines = lines.slice(start + 1, end === -1 ? undefined : end);
 
-  const { startAt, endBefore, remove, fixes = [], capitals = {} } = options;
+  const { startAt, endBefore, remove, fixes = [], dropBlocks, capitals = {} } = options;
   if (startAt) {
     const first = lines.findIndex((line) => startAt.test(line));
     if (first === -1) throw new Error(`No line matches ${startAt}`);
@@ -51,7 +53,7 @@ export function cleanGutenberg(raw: string, options: CleanOptions = {}): string 
   const paragraphs: string[] = [];
   let dropped = false;
   for (const block of splitBlocks(lines)) {
-    if (isDropped(block)) {
+    if (isDropped(block) || dropBlocks?.test(block[0].trim())) {
       dropped = true;
       continue;
     }
@@ -108,8 +110,9 @@ function isDropped(block: string[]): boolean {
     heading.startsWith('*') ||
     // The closing line older editions put just inside the end marker.
     /^End of (?:the )?Project Gutenberg/i.test(heading) ||
-    // PART ONE, CHAPTER I (in several languages), a chapter number on its own line, THE END.
-    /^(?:PART|BOOK|CHAPTER|VOLUME|CHAPITRE|LIVRE|TOME|KAPITEL|CAPITOLO|CAP[IÍ]TULO|LIBRO|LUKU|PENNOD|KAFLI)\b/iu.test(heading) ||
+    // PART ONE, CHAPTER I (in several languages), a play's ACT and SCENE, a chapter number on its
+    // own line, THE END.
+    /^(?:PART|BOOK|CHAPTER|VOLUME|CHAPITRE|LIVRE|TOME|KAPITEL|CAPITOLO|CAP[IÍ]TULO|LIBRO|LUKU|PENNOD|KAFLI|ACT|SCENE)\b/iu.test(heading) ||
     (ROMAN.test(heading.replace(/\.$/, '')) && heading.length > 0) ||
     /^THE END\.?$/i.test(heading) ||
     // A heading in capitals.

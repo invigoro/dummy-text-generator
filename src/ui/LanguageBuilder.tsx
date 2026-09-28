@@ -443,6 +443,24 @@ function LanguageEditor({ saved, onSave, onUse, onExport, onDelete }: LanguageEd
               {avoidLeftOut.length > 0 && <> Left out, as they could take too long to check: {avoidLeftOut.join(', ')}.</>}
             </small>
           </div>
+          <div className="field">
+            <label className="label" htmlFor={`${id}-keep`}>
+              Words kept as they are
+            </label>
+            <textarea
+              id={`${id}-keep`}
+              rows={2}
+              aria-describedby={`${id}-keep-hint`}
+              value={(draft.keep ?? []).join(' ')}
+              onChange={(event) => {
+                const keep = event.target.value.split(/\s+/).filter(Boolean);
+                update({ ...draft, keep: keep.length > 0 ? keep : undefined });
+              }}
+            />
+            <small className="hint" id={`${id}-keep-hint`}>
+              Words of the flow text left real, the rest invented, as in “Jabberwocky”: “thou hath ’tis” keeps Shakespeare’s.
+            </small>
+          </div>
         </details>
 
         <div className="setting-actions">

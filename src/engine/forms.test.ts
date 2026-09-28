@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { conversation, inscription, phraseLines, speechLines } from './forms';
+import { conversation, inscription, phraseLines, proseOf, speechLines } from './forms';
 import { mulberry32 } from './rng';
 import { countWords, renderParagraph, renderSentence, tokenize, tokenizerFor, type Corpus } from './tokenize';
 
@@ -154,5 +154,17 @@ describe('inscription', () => {
       'Elit sed do eiusmod tempor incididunt ut',
       'Labore et dolore magna aliqua',
     ]);
+  });
+});
+
+describe('proseOf', () => {
+  it('leaves out the speakers’ names that start a play’s speeches', () => {
+    const play = corpus('en', 'Hamlet. Who’s there?', 'Horatio. Friends to this ground.', 'Hamlet. Welcome.', 'Horatio. Good night.', 'Hamlet. Farewell.', 'Horatio. Adieu.');
+    expect(proseOf(play).paragraphs.map(renderParagraph)).toEqual(['Who’s there?', 'Friends to this ground.', 'Welcome.', 'Good night.', 'Farewell.', 'Adieu.']);
+  });
+
+  it('leaves prose as it is', () => {
+    const prose = corpus('en', 'It was a dark night. The rain fell.');
+    expect(proseOf(prose)).toBe(prose);
   });
 });

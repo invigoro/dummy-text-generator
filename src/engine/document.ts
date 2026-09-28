@@ -54,7 +54,8 @@ function caseLike(source: string, word: string): string {
 
 /** One source word replaced by its invented word, keeping apostrophes, hyphens and capitals. */
 export function inventWordToken(text: string, lexicon: Lexicon, elision: TokenizeOptions['elision']): DocWord {
-  if (isNumber(text)) return { kind: 'word', text };
+  // A kept word stays real, and has no "say it" form: it's read as it's written.
+  if (isNumber(text) || lexicon.keeps(text)) return { kind: 'word', text };
 
   const parts = pieces(text, elision);
   let written = '';

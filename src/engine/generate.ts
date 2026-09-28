@@ -1,6 +1,6 @@
 import { arrange, MAX_LENGTH, type Arrangement, type Length } from './arrange';
 import type { DocParagraph, DocSentence, DocWord } from './document';
-import { conversation, inscription, SPEAKERS, type Form } from './forms';
+import { conversation, inscription, proseOf, SPEAKERS, type Form } from './forms';
 import { stressRule, type Language } from './language';
 import { personNames, placeNames, type NameKind, type NameRecipe } from './names';
 import { mulberry32 } from './rng';
@@ -38,7 +38,7 @@ export function generate(source: TextSource, options: GenerateOptions): DocParag
   const { arrangement, length } = options;
   switch (options.form ?? 'prose') {
     case 'prose':
-      return source.words(arrange(source.flow, arrangement, length, random));
+      return source.words(arrange(proseOf(source.flow), arrangement, length, random));
     case 'inscription':
       return source.words(inscription(source.flow, arrangement, length, random), { opening: false });
     case 'names': {
