@@ -4,23 +4,14 @@ import { arrange } from '../engine/arrange';
 import { sayWords, spokenText, writtenText, type DocParagraph, type DocWord } from '../engine/document';
 import type { Form } from '../engine/forms';
 import { generate } from '../engine/generate';
-import { stressRule, type Language } from '../engine/language';
-import type { Respeller } from '../engine/respell';
+import { voiceOf, type Language, type Voice } from '../engine/language';
 import { mulberry32 } from '../engine/rng';
-import type { StressRule } from '../engine/sounds/system';
 import { inventWord } from '../engine/sounds/words';
 import { spell } from '../engine/spelling';
 import { tally, textStats, type Tally, type TextStats } from './stats';
 
 /** How much running text the statistics are taken over. */
 const STAT_WORDS = 5000;
-
-type Voice = { rule: StressRule; respell: Respeller };
-
-function voiceOf(language: Language): Voice | null {
-  const rule = stressRule(language);
-  return rule && language.kind !== 'real' ? { rule, respell: language.respell } : null;
-}
 
 interface Row {
   source?: string;

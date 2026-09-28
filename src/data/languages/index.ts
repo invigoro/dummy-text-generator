@@ -12,6 +12,7 @@ import englishInvented from './english-invented';
 import enochian from './enochian';
 import finnish from './finnish';
 import french from './french';
+import frenchReal from './french-real';
 import german from './german';
 import infernal from './infernal';
 import italian from './italian';
@@ -29,6 +30,7 @@ export const LANGUAGES: readonly LanguageDef[] = [
   english,
   englishInvented,
   french,
+  frenchReal,
   spanish,
   portuguese,
   italian,
@@ -101,7 +103,7 @@ async function build(def: LanguageDef): Promise<LoadedLanguage> {
 
   switch (language.kind) {
     case 'real':
-      return { ...base, words: realWords };
+      return { ...base, words: (paragraphs: Paragraph[]) => realWords(paragraphs, language.pronounce) };
     case 'invented': {
       const lexicon = new Lexicon(language, flow, source.language);
       return { ...base, words: (paragraphs: Paragraph[]) => inventedWords(paragraphs, lexicon, flow.options, language.punctuation) };

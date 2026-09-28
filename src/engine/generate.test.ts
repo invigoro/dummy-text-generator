@@ -19,6 +19,7 @@ describe('generate', () => {
 
   it('is reproducible from its seed', () => {
     const options = { arrangement: 'words', length: { unit: 'words', count: 40 }, seed: 99 } as const;
-    expect(generate({ flow, words: realWords }, options)).toEqual(generate({ flow, words: realWords }, options));
+    const words = (paragraphs: Paragraph[]) => realWords(paragraphs);
+    expect(generate({ flow, words }, options)).toEqual(generate({ flow, words }, options));
   });
 });

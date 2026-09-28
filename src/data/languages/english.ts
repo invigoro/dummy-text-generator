@@ -4,7 +4,7 @@ import type { RealLanguageDef } from '../../engine/language';
 const english: RealLanguageDef = {
   kind: 'real',
   id: 'english',
-  name: 'English',
+  name: 'Real English',
   flow: 'en-treasure-island',
 };
 

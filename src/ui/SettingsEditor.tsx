@@ -17,8 +17,6 @@ interface SettingsEditorProps {
 
 const Languages = createContext<readonly LanguageDef[]>([]);
 
-/** Real English is the source text itself; every other language is invented words. */
-const label = (language: LanguageDef) => (language.kind === 'real' ? `${language.name} (the real text)` : language.name);
 
 function LanguageSelect({ value, onChange }: { value: string; onChange: (language: string) => void }) {
   const languages = useContext(Languages);
@@ -33,7 +31,7 @@ function LanguageSelect({ value, onChange }: { value: string; onChange: (languag
       )}
       {builtIn.map((language) => (
         <option key={language.id} value={language.id}>
-          {label(language)}
+          {language.name}
         </option>
       ))}
       {made.length > 0 && (

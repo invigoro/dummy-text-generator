@@ -30,9 +30,10 @@ export const SETTINGS: readonly Setting[] = [
     id: 'real',
     name: 'Real world',
     choices: [
-      { id: 'english', name: 'English', language: 'english', stele: PAPER },
+      { id: 'english', name: 'Real English', language: 'english', stele: PAPER },
       { id: 'english-invented', name: 'Invented English', language: 'english-invented', stele: PAPER },
       { id: 'french', name: 'French', language: 'french', stele: PARCHMENT },
+      { id: 'french-real', name: 'Real French', language: 'french-real', stele: PARCHMENT },
       { id: 'spanish', name: 'Spanish', language: 'spanish', stele: PARCHMENT },
       { id: 'portuguese', name: 'Portuguese', language: 'portuguese', stele: PARCHMENT },
       { id: 'italian', name: 'Italian', language: 'italian', stele: PARCHMENT },

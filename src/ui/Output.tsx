@@ -9,9 +9,7 @@ import {
   type DocSentence,
 } from '../engine/document';
 import type { Form } from '../engine/forms';
-import { stressRule, type Language } from '../engine/language';
-import type { Respeller } from '../engine/respell';
-import type { StressRule } from '../engine/sounds/system';
+import { voiceOf, type Language, type Voice } from '../engine/language';
 import { steleLink, trimForStele, type SteleOptions } from '../engine/stele';
 import type { View } from './urlState';
 
@@ -25,13 +23,6 @@ interface OutputProps {
   stele: SteleOptions;
   /** What the language is called here, for the read-aloud view's heading: "Elvish". */
   title: string;
-}
-
-type Voice = { rule: StressRule; respell: Respeller };
-
-function voiceOf(language: Language): Voice | null {
-  const rule = stressRule(language);
-  return rule && language.kind !== 'real' ? { rule, respell: language.respell } : null;
 }
 
 /**

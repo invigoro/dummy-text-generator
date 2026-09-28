@@ -52,6 +52,20 @@ describe('App', () => {
     expect(screen.queryByRole('radio', { name: 'Say it' })).not.toBeInTheDocument();
   });
 
+  it('writes real French, with a "say it" line worked out from its spelling', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await paragraphs();
+    await user.selectOptions(language(), 'real/french-real');
+    expect(await screen.findByText(/^From/)).toHaveTextContent('From Les Trois Mousquetaires by Alexandre Dumas (1844), in the public domain.');
+    const written = await paragraphs();
+    await user.click(screen.getByRole('radio', { name: 'Say it' }));
+    const said = await paragraphs();
+    expect(said).not.toEqual(written);
+    expect(said.join(' ')).not.toMatch(/[éèêàçœ«»]/u);
+    expect(screen.getByText(/worked out from the spelling/)).toBeInTheDocument();
+  });
+
   it('shows how to say it, with a tip for voicing it', async () => {
     const user = userEvent.setup();
     render(<App />);

@@ -29,9 +29,14 @@ export interface DocParagraph {
   speaker?: DocSentence;
 }
 
-/** Real words, as they are. */
-export function realWords(paragraphs: Paragraph[]): DocParagraph[] {
-  return paragraphs.map((paragraph) => ({ sentences: paragraph.sentences.map((sentence) => ({ tokens: [...sentence.tokens] })) }));
+/** Real words, as they are, and how each is said where the language can say them (real French). */
+export function realWords(paragraphs: Paragraph[], pronounce?: (word: string) => WordSounds[]): DocParagraph[] {
+  const convert = (token: Token): DocToken => {
+    if (token.kind !== 'word' || !pronounce || isNumber(token.text)) return { ...token };
+    const spoken = pronounce(token.text);
+    return spoken.length > 0 ? { kind: 'word', text: token.text, spoken } : { kind: 'word', text: token.text };
+  };
+  return paragraphs.map((paragraph) => ({ sentences: paragraph.sentences.map((sentence) => ({ tokens: sentence.tokens.map(convert) })) }));
 }
 
 const ROMAN = /^(?=[MDCLXVI]{2,}$)M{0,4}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})$/;
