@@ -1,4 +1,4 @@
-const treasureIsland = `I had scarce gained a position on the bowsprit, when the flying jib flapped and filled upon the other tack, with a report like a gun. The schooner trembled to her keel under the reverse; but next moment, the other sails still drawing, the jib flapped back again and hung idle.
+I had scarce gained a position on the bowsprit, when the flying jib flapped and filled upon the other tack, with a report like a gun. The schooner trembled to her keel under the reverse; but next moment, the other sails still drawing, the jib flapped back again and hung idle.
 
 This had nearly tossed me off into the sea; and now I lost no time, crawled back along the bowsprit, and tumbled head foremost on the deck.
 
@@ -70,8 +70,4 @@ Then I lashed the tiller and went below to my own chest, where I got a soft silk
 
 The breeze served us admirably. We skimmed before it like a bird, the coast of the island flashing by, and the view changing every minute. Soon we were past the high lands and bowling beside low, sandy country, sparsely dotted with dwarf pines, and soon we were beyond that again, and had turned the corner of the rocky hill that ends the island on the north.
 
-I was greatly elated with my new command, and pleased with the bright, sunshiny weather and these different prospects of the coast. I had now plenty of water and good things to eat, and my conscience, which had smitten me hard for my desertion, was quieted by the great conquest I had made. I should, I think, have had nothing left me to desire but for the eyes of the coxswain as they followed me derisively about the deck, and the odd smile that appeared continually on his face. It was a smile that had in it something both of pain and weakness—a haggard old man's smile; but there was, besides that, a grain of derision, a shadow of treachery, in his expression as he craftily watched, and watched, and watched me at my work.`;
-
-export default [
-    treasureIsland
-];
+I was greatly elated with my new command, and pleased with the bright, sunshiny weather and these different prospects of the coast. I had now plenty of water and good things to eat, and my conscience, which had smitten me hard for my desertion, was quieted by the great conquest I had made. I should, I think, have had nothing left me to desire but for the eyes of the coxswain as they followed me derisively about the deck, and the odd smile that appeared continually on his face. It was a smile that had in it something both of pain and weakness—a haggard old man's smile; but there was, besides that, a grain of derision, a shadow of treachery, in his expression as he craftily watched, and watched, and watched me at my work.
