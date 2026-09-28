@@ -11,11 +11,12 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
 
 - **Pick a language:** a real one (English, French, Spanish, Portuguese, Italian, German, Latin,
   lorem ipsum, Finnish, Welsh, Old English, Old Norse, Enochian), or one of D&D's, such as Elvish
-  (invented French), Dwarvish (invented Old Norse) or Orc. Apart from English, the words are
-  invented. The text flows like the real language, with its rhythm, its punctuation and its short
-  words turning up everywhere, but nobody can understand it, not even someone who speaks the
-  language. The same word always comes out the same, so a language keeps its vocabulary from one
-  session to the next.
+  (invented French), Dwarvish (invented Old Norse) or Orc. Apart from Real English and Real French,
+  the words are invented. The text flows like the real language, with its rhythm, its punctuation
+  and its short words turning up everywhere, but nobody can understand it, not even someone who
+  speaks the language. The same word always comes out the same, so a language keeps its vocabulary
+  from one session to the next. Real French comes with a "say it" line worked out from its
+  spelling, near enough to read aloud.
 - **Name your own world's languages:** a setting of your own gives the languages your game's
   names, such as Renan for French and Old Deciman for Latin. Settings are kept in the browser,
   exported and imported as files, and carried in share links, so whoever opens one sees the same
@@ -30,6 +31,9 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
   - **Conversation:** lines of speech for two to four speakers, each after the speaker's name in
     the language. The lines come from the speech in the source text.
   - **Inscription:** a few short lines without punctuation, for a stone, a sign or a seal.
+  - **Names:** names for people or places, in the language's own words. People are named after
+    the source text's people, and places are built the way that language's real places are
+    ("-ford" in English, "Saint-" in French, "Llan" in Welsh).
 - **Show it written, or how to say it:**
   - "Say it" respells every word for English readers, with the stressed syllable in capitals
     ("lay-RAHN").
@@ -46,6 +50,8 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
 - **Take it away:**
   - **Read aloud** shows the text in large type for reading at the table, with the language's tip
     for voicing it.
+  - **Listen** reads it out with the browser's own voices. A French voice reads Elvish, for one,
+    and an English voice reads the "say it" line of a language with no voice of its own.
   - **Copy** copies the text as it's shown.
   - **Share link** copies a link that recreates it exactly.
   - **Open in Stele** puts it on an object: parchment for Elvish, runes on granite for Dwarvish,

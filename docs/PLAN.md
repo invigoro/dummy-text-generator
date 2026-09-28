@@ -12,7 +12,7 @@ jobs:
 The generated text must flow like the real language, every source text must be in the public
 domain, and the site must be static, hosted on GitHub Pages.
 
-**Current phase:** Phases 0 to 3 are done; the backlog is what's left. See [Milestones](#milestones).
+**Current phase:** Phases 0 to 3 and the backlog are all done. See [Milestones](#milestones).
 
 ## The approach
 
@@ -226,6 +226,7 @@ src/
     tokenize.ts                  # paragraphs → sentences → words and punctuation, per language
     arrange.ts                   # original order, or shuffled paragraphs, sentences or words
     forms.ts                     # conversations (the source's speech) and inscriptions (its short phrases)
+    names.ts                     # people's and places' names, made the way the source's language makes them
     generate.ts                  # flow text + options → a document in the language's words
     corpus/gutenberg.ts          # the cleaning steps behind scripts/import-gutenberg.ts
     sounds/                      # phonemes, sound systems, and inventing words from them
@@ -233,7 +234,7 @@ src/
     language.ts                  # the three kinds of language: invented, vocabulary, real
     lexicon.ts · vocabulary.ts   # one invented (or lorem ipsum) word per source word, for good
     document.ts                  # the output: words with their sounds; written, "say it", IPA
-    g2p/latin.ts                 # how written Latin is said, for lorem ipsum
+    g2p/latin.ts · g2p/french.ts # how written Latin and French are said, for lorem ipsum and real French
     blocklist.ts                 # slurs and swear words, kept out of real and invented text
     stele.ts                     # Open in Stele links
   data/
@@ -294,7 +295,12 @@ opens over the page.)*
 - saving, sharing by link or JSON, and use in custom settings
 - a read-aloud view in large type, with each language's voicing tips
 
-**Backlog:**
+**Backlog.** *(done. Names are a fourth form: people are named after the flow text's people,
+told from its places by the words that come before them, and places are built from the kinds of
+word real place names are made of in the text's language. The browser reads a language spelled
+like a real one in a voice for that language, and anything else from its "say it" line in English.
+Real French's "say it" line comes from spelling rules and a short list of exceptions, and leaves
+out liaison.)*
 - a name generator for NPCs and places, using the same sound systems
 - a preview through the browser's text-to-speech
 - real French text with an approximate "say it" line
