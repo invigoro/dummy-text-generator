@@ -503,3 +503,41 @@ describe('Your own languages', () => {
     expect(loadCustomLanguages()).toEqual([grukk]);
   });
 });
+
+describe('Reading aloud', () => {
+  it('shows the text in large type, how to say it first, and closes back to the page', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const written = await paragraphs();
+    const read = screen.getByRole('button', { name: 'Read aloud' });
+    await user.click(read);
+    const dialog = screen.getByRole('dialog', { name: 'Elvish' });
+    expect(within(dialog).getByRole('radio', { name: 'Say it' })).toBeChecked();
+    expect(within(dialog).getByText(/How to say it:/)).toBeInTheDocument();
+    const said = within(within(dialog).getByRole('article')).getAllByRole('paragraph').map((p) => p.textContent);
+    expect(said).toHaveLength(3);
+    expect(said.join(' ')).not.toMatch(/[éèêàçœ«»]/u);
+
+    await user.click(within(dialog).getByRole('radio', { name: 'Written' }));
+    expect(within(within(dialog).getByRole('article')).getAllByRole('paragraph').map((p) => p.textContent)).toEqual(written);
+
+    const text = within(dialog).getByRole('article').parentElement!;
+    const before = parseFloat(text.style.fontSize);
+    await user.click(within(dialog).getByRole('button', { name: 'Larger text' }));
+    expect(parseFloat(text.style.fontSize)).toBeGreaterThan(before);
+
+    await user.click(within(dialog).getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(read).toHaveFocus();
+  });
+
+  it('shows real English as it is, with no views to choose', async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, '', '/#lang=dnd/common');
+    render(<App />);
+    await paragraphs();
+    await user.click(screen.getByRole('button', { name: 'Read aloud' }));
+    const dialog = screen.getByRole('dialog', { name: 'Common' });
+    expect(within(dialog).queryByRole('radio')).not.toBeInTheDocument();
+  });
+});

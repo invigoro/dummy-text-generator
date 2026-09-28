@@ -419,8 +419,12 @@ label.button:has(:focus-visible) {
 .view-say,
 .view-ipa {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  font-size: 1.05rem;
   line-height: 1.8;
+}
+
+.page.view-say,
+.page.view-ipa {
+  font-size: 1.05rem;
 }
 
 .view-ipa {
@@ -835,5 +839,83 @@ details.part[open] > summary {
     position: static;
     order: -1;
     max-height: none;
+  }
+}
+
+/* Reading aloud: the text in large type, over the page */
+
+.read-aloud {
+  width: min(64rem, calc(100vw - 2rem));
+  max-width: none;
+  height: calc(100vh - 2rem);
+  max-height: none;
+  margin: auto;
+  padding: 0 1.5rem 2rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: auto;
+}
+
+.read-aloud::backdrop {
+  background: rgb(20 14 10 / 0.6);
+}
+
+.read-aloud-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  padding: 1rem 0 0.75rem;
+  margin-bottom: 0.75rem;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+
+.read-aloud-bar h2 {
+  margin: 0 auto 0 0;
+  font-family: var(--serif);
+  font-size: 1.4rem;
+}
+
+.read-aloud-bar .segmented {
+  min-width: 15rem;
+}
+
+.read-aloud-size {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.read-aloud .voicing {
+  max-width: 44rem;
+  margin: 0 auto 1.25rem;
+}
+
+.read-aloud-text {
+  max-width: 40em;
+  margin: 0 auto;
+  font-family: var(--serif);
+  line-height: 1.55;
+}
+
+.read-aloud-text p {
+  margin: 0 0 1em;
+}
+
+.read-aloud-text.view-both p {
+  line-height: 2.5;
+}
+
+@media (max-width: 52rem) {
+  .read-aloud {
+    width: 100vw;
+    height: 100vh;
+    padding: 0 1rem 1.5rem;
+    border-radius: 0;
   }
 }

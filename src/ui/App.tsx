@@ -279,7 +279,14 @@ export default function App() {
               </div>
             )}
             {text && language.status === 'ready' && (
-              <Output paragraphs={text} language={language.loaded.language} view={view} form={form} stele={found.choice.stele} />
+              <Output
+                paragraphs={text}
+                language={language.loaded.language}
+                view={view}
+                form={form}
+                stele={found.choice.stele}
+                title={found.choice.name}
+              />
             )}
           </>
         )}

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import {
   countDocWords,
   paragraphText,
@@ -23,6 +23,8 @@ interface OutputProps {
   /** Prose, a conversation (a speaker before each line) or an inscription (one short line each). */
   form: Form;
   stele: SteleOptions;
+  /** What the language is called here, for the read-aloud view's heading: "Elvish". */
+  title: string;
 }
 
 type Voice = { rule: StressRule; respell: Respeller };
@@ -42,34 +44,146 @@ function viewText(paragraphs: DocParagraph[], view: View, voice: Voice | null, s
   return paragraphs.map((paragraph) => `${paragraphText(paragraph)}\n${spokenText([paragraph], voice.rule, voice.respell, 'say')}`).join('\n\n');
 }
 
-export function Output({ paragraphs, language, view, form, stele }: OutputProps) {
+export function Output({ paragraphs, language, view, form, stele, title }: OutputProps) {
   const voice = voiceOf(language);
   const shown = voice ? view : 'written';
   const separator = form === 'inscription' ? '\n' : '\n\n';
+  const [reading, setReading] = useState(false);
+  const readButton = useRef<HTMLButtonElement>(null);
   return (
     <section className="output" aria-label="Generated text">
       <div className="output-bar">
         <p className="word-count">{countDocWords(paragraphs).toLocaleString('en')} words</p>
-        <Actions copyText={viewText(paragraphs, shown, voice, separator)} steleText={writtenText(paragraphs, separator)} stele={stele} />
+        <Actions copyText={viewText(paragraphs, shown, voice, separator)} steleText={writtenText(paragraphs, separator)} stele={stele}>
+          <button ref={readButton} type="button" onClick={() => setReading(true)}>
+            Read aloud
+          </button>
+        </Actions>
       </div>
-      {voice && shown !== 'written' && 'voicing' in language && language.voicing && (
-        <aside className="voicing">
-          <strong>How to say it:</strong> {language.voicing}
-        </aside>
+      {voice && shown !== 'written' && <Voicing language={language} />}
+      <TextPage paragraphs={paragraphs} view={shown} voice={voice} form={form} />
+      {reading && (
+        <ReadAloud
+          paragraphs={paragraphs}
+          language={language}
+          voice={voice}
+          form={form}
+          title={title}
+          // Reading aloud is what "say it" is for; "both" and the written text are a click away.
+          initialView={voice ? (shown === 'both' ? 'both' : 'say') : 'written'}
+          onClose={() => {
+            setReading(false);
+            readButton.current?.focus();
+          }}
+        />
       )}
-      <article className={`page view-${shown} form-${form}`}>
-        {paragraphs.map((paragraph, i) => (
-          <p key={i}>
-            {paragraph.speaker && (
-              <>
-                <span className="speaker">{renderParagraph({ sentences: [paragraph.speaker] }, shown, voice)}</span>{' '}
-              </>
-            )}
-            {renderParagraph({ sentences: paragraph.sentences }, shown, voice)}
-          </p>
-        ))}
-      </article>
     </section>
+  );
+}
+
+function Voicing({ language }: { language: Language }) {
+  if (!('voicing' in language) || !language.voicing) return null;
+  return (
+    <aside className="voicing">
+      <strong>How to say it:</strong> {language.voicing}
+    </aside>
+  );
+}
+
+interface TextPageProps {
+  paragraphs: DocParagraph[];
+  view: View;
+  voice: Voice | null;
+  form: Form;
+  className?: string;
+}
+
+/** The text as a page, in the view asked for. */
+function TextPage({ paragraphs, view, voice, form, className = 'page' }: TextPageProps) {
+  return (
+    <article className={`${className} view-${view} form-${form}`}>
+      {paragraphs.map((paragraph, i) => (
+        <p key={i}>
+          {paragraph.speaker && (
+            <>
+              <span className="speaker">{renderParagraph({ sentences: [paragraph.speaker] }, view, voice)}</span>{' '}
+            </>
+          )}
+          {renderParagraph({ sentences: paragraph.sentences }, view, voice)}
+        </p>
+      ))}
+    </article>
+  );
+}
+
+const READ_VIEWS: readonly { view: View; label: string }[] = [
+  { view: 'say', label: 'Say it' },
+  { view: 'both', label: 'Both' },
+  { view: 'written', label: 'Written' },
+];
+
+/** Type sizes for reading at the table, in rem. */
+const SIZES = [1.25, 1.5, 1.8, 2.2, 2.7, 3.3] as const;
+
+interface ReadAloudProps {
+  paragraphs: DocParagraph[];
+  language: Language;
+  voice: Voice | null;
+  form: Form;
+  title: string;
+  initialView: View;
+  onClose: () => void;
+}
+
+/** The text in large type, for reading aloud at the table, with the language's tip for voicing it. */
+function ReadAloud({ paragraphs, language, voice, form, title, initialView, onClose }: ReadAloudProps) {
+  const id = useId();
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [view, setView] = useState<View>(initialView);
+  const [size, setSize] = useState(2);
+
+  useEffect(() => {
+    const element = dialog.current;
+    if (!element) return;
+    // A modal dialog keeps focus inside it, and closes on Escape.
+    if (typeof element.showModal === 'function') element.showModal();
+    else element.setAttribute('open', '');
+    return () => {
+      if (element.open && typeof element.close === 'function') element.close();
+    };
+  }, []);
+
+  return (
+    <dialog ref={dialog} className="read-aloud" aria-labelledby={`${id}-title`} onClose={onClose} onCancel={onClose}>
+      <div className="read-aloud-bar">
+        <h2 id={`${id}-title`}>{title}</h2>
+        {voice && (
+          <div className="segmented" role="radiogroup" aria-label="Show">
+            {READ_VIEWS.map((option) => (
+              <label key={option.view}>
+                <input type="radio" name={`${id}-view`} checked={view === option.view} onChange={() => setView(option.view)} />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        )}
+        <div className="read-aloud-size">
+          <button type="button" aria-label="Smaller text" disabled={size === 0} onClick={() => setSize(size - 1)}>
+            A−
+          </button>
+          <button type="button" aria-label="Larger text" disabled={size === SIZES.length - 1} onClick={() => setSize(size + 1)}>
+            A+
+          </button>
+        </div>
+        <button type="button" onClick={onClose}>
+          Close
+        </button>
+      </div>
+      {voice && view !== 'written' && <Voicing language={language} />}
+      <div style={{ fontSize: `${SIZES[size]}rem` }}>
+        <TextPage paragraphs={paragraphs} view={view} voice={voice} form={form} className="read-aloud-text" />
+      </div>
+    </dialog>
   );
 }
 
@@ -102,7 +216,15 @@ function Interlinear({ sentence, voice }: { sentence: DocSentence; voice: Voice 
 
 type Status = { message: string; failed?: boolean } | null;
 
-function Actions({ copyText, steleText, stele }: { copyText: string; steleText: string; stele: SteleOptions }) {
+interface ActionsProps {
+  copyText: string;
+  steleText: string;
+  stele: SteleOptions;
+  /** More actions, before the others. */
+  children?: ReactNode;
+}
+
+function Actions({ copyText, steleText, stele, children }: ActionsProps) {
   const [status, setStatus] = useState<Status>(null);
   const [link, setLink] = useState<string | null>(null);
   const trimmed = trimForStele(steleText).trimmed;
@@ -143,6 +265,7 @@ function Actions({ copyText, steleText, stele }: { copyText: string; steleText: 
       <span role="status" className="status">
         {status?.message ?? ''}
       </span>
+      {children}
       <button type="button" onClick={() => copy(copyText, 'Copied')}>
         Copy
       </button>
