@@ -165,8 +165,17 @@ function capitalized(tokens: Token[]): Token[] {
   return tokens.map((token, j) => (j === i ? { kind: 'word', text } : token));
 }
 
+/** Marks that can't start a line: what's left of a sentence begun elsewhere, or dots for a pause (". . . hver"). */
+function withoutLeadingMarks(tokens: Token[]): Token[] {
+  let start = 0;
+  while (start < tokens.length && (tokens[start].kind === 'space' || isPunct(tokens[start], /^[.,;:]$/u))) start++;
+  return tokens.slice(start);
+}
+
 function asLine(tokens: Token[], options: TokenizeOptions): Sentence {
-  return balanceQuotes({ tokens: capitalized(ended(tokens)) }, options);
+  const line = ended(withoutLeadingMarks(tokens));
+  // A line that starts with an ellipsis carries on from something unsaid: "…og svo fór hann."
+  return balanceQuotes({ tokens: line[0]?.text === '…' ? line : capitalized(line) }, options);
 }
 
 /** What a paragraph has someone say, if anything. */

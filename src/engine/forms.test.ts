@@ -26,6 +26,10 @@ describe('speechLines', () => {
     expect(speech('en', '“Well,” said he.', '“But so—” and she stopped.')).toEqual(['Well.', 'But so—']);
   });
 
+  it('starts a line at its first word, or at an ellipsis', () => {
+    expect(speech('is', '". . . . . hver er þar?" spurði hann.', '"…og svo fór hann."')).toEqual(['Hver er þar?', '…og svo fór hann.']);
+  });
+
   it('keeps a speech that runs on into the next paragraph', () => {
     expect(speech('en', '“It was a long time ago, and I was young.', '“Then I went to sea.”')).toEqual([
       'It was a long time ago, and I was young.',
