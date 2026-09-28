@@ -3,13 +3,14 @@
  * the source text, shared out between two to four speakers; an inscription's are the source's
  * short phrases, one to a line. Either can keep the source's order or be shuffled, like prose.
  */
-import { atBreak, balanceQuotes, MAX_LENGTH, refill, wordPool, type Arrangement, type Length } from './arrange';
+import { balanceQuotes, MAX_LENGTH, refill, wordPool, type Arrangement, type Length } from './arrange';
+import { namesOf } from './names';
 import { randomInt, shuffled, type Random } from './rng';
 import { countWords, type Corpus, type Paragraph, type PunctToken, type Sentence, type Token, type TokenizeOptions } from './tokenize';
 
-export type Form = 'prose' | 'conversation' | 'inscription';
+export type Form = 'prose' | 'conversation' | 'inscription' | 'names';
 
-export const FORMS: readonly Form[] = ['prose', 'conversation', 'inscription'];
+export const FORMS: readonly Form[] = ['prose', 'conversation', 'inscription', 'names'];
 
 export const SPEAKERS = { min: 2, max: 4 } as const;
 
@@ -189,22 +190,18 @@ function speechIn(paragraph: Paragraph, options: TokenizeOptions, speakers: Read
   return parts.length > 0 ? joined(parts) : null;
 }
 
-interface Pools {
-  speech: Sentence[];
-  phrases: Sentence[];
-  names: Names;
+/** A text's lines of speech, phrases or names, worked out once and kept with it. */
+function cached<T>(make: (corpus: Corpus) => T): (corpus: Corpus) => T {
+  const found = new WeakMap<Corpus, T>();
+  return (corpus) => {
+    if (!found.has(corpus)) found.set(corpus, make(corpus));
+    return found.get(corpus)!;
+  };
 }
 
-const pools = new WeakMap<Corpus, Pools>();
+const speechOf = cached((corpus) => speechLines(corpus));
+const phrasesOf = cached((corpus) => phraseLines(corpus));
 
-function poolsFor(corpus: Corpus): Pools {
-  let found = pools.get(corpus);
-  if (!found) {
-    found = { speech: speechLines(corpus), phrases: phraseLines(corpus), names: sourceNames(corpus) };
-    pools.set(corpus, found);
-  }
-  return found;
-}
 
 /** Every line of speech in the source, in order; its short sentences too, where it has little speech. */
 export function speechLines(corpus: Corpus): Sentence[] {
@@ -270,54 +267,6 @@ export function phraseLines(corpus: Corpus): Sentence[] {
   return [...phrases, ...chunks];
 }
 
-interface Names {
-  /** Capitalized words never written in lowercase ("Silver", "Athos"), most common first. */
-  people: string[];
-  /** Common longer words, capitalized, for a text with too few names. */
-  others: string[];
-}
-
-/** Words to name speakers with, in the language's words: the source's people, if it has enough. */
-function sourceNames(corpus: Corpus): Names {
-  const words = new Map<string, number>();
-  for (const paragraph of corpus.paragraphs) {
-    for (const { tokens } of paragraph.sentences) {
-      for (const token of tokens) if (token.kind === 'word') words.set(token.text.toLowerCase(), (words.get(token.text.toLowerCase()) ?? 0) + 1);
-    }
-  }
-  // The commonest word is an article in most languages: "the Hispaniola" is a ship.
-  const article = [...words].reduce((best, entry) => (entry[1] > best[1] ? entry : best), ['', 0])[0];
-
-  const counts = new Map<string, { count: number; afterArticle: number }>();
-  const lowercase = new Set<string>();
-  for (const paragraph of corpus.paragraphs) {
-    for (const { tokens } of paragraph.sentences) {
-      tokens.forEach((token, i) => {
-        if (token.kind !== 'word') return;
-        if (!/^\p{Lu}/u.test(token.text)) lowercase.add(token.text.toLowerCase());
-        if (!/^\p{Lu}\p{Ll}{2,}$/u.test(token.text) || atBreak(tokens, i)) return;
-        const seen = counts.get(token.text) ?? { count: 0, afterArticle: 0 };
-        seen.count++;
-        if (tokens[i - 2]?.kind === 'word' && tokens[i - 2].text.toLowerCase() === article) seen.afterArticle++;
-        counts.set(token.text, seen);
-      });
-    }
-  }
-  const people = [...counts]
-    .filter(([name, { count, afterArticle }]) => count >= 3 && afterArticle <= count / 4 && !lowercase.has(name.toLowerCase()))
-    .filter(([name]) => !corpus.options.abbreviations.has(name))
-    .sort((a, b) => b[1].count - a[1].count || a[0].localeCompare(b[0]))
-    .map(([name]) => name);
-  // Ordinary words only: a name turned down as a thing ("the Hispaniola") stays out.
-  const others = [...words]
-    .filter(([word]) => /^\p{L}{4,}$/u.test(word) && lowercase.has(word))
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([word]) => word.replace(/\p{L}/u, (letter) => letter.toUpperCase()))
-    .filter((word) => !people.includes(word))
-    .slice(0, 40);
-  return { people, others };
-}
-
 /** Lines from a pool until the length is reached: a number of lines, or of words. */
 function take(lines: Iterator<Sentence, never>, length: Length): Paragraph[] {
   const count = Math.min(MAX_LENGTH[length.unit], Math.max(0, Math.floor(length.count)));
@@ -351,7 +300,8 @@ export interface Conversation {
 
 /** Lines of speech between two to four speakers, no one speaking twice in a row. */
 export function conversation(corpus: Corpus, arrangement: Arrangement, length: Length, speakers: number, random: Random): Conversation {
-  const { speech, names } = poolsFor(corpus);
+  const speech = speechOf(corpus);
+  const names = namesOf(corpus);
   if (speech.length === 0) return { lines: [], order: [], names: [] };
   const lines = take(arranged(speech, corpus, arrangement, random), length);
   const count = Math.min(SPEAKERS.max, Math.max(SPEAKERS.min, Math.floor(speakers)));
@@ -379,7 +329,7 @@ export function conversation(corpus: Corpus, arrangement: Arrangement, length: L
 
 /** Short lines for an inscription. */
 export function inscription(corpus: Corpus, arrangement: Arrangement, length: Length, random: Random): Paragraph[] {
-  const { phrases } = poolsFor(corpus);
+  const phrases = phrasesOf(corpus);
   if (phrases.length === 0) return [];
   return take(arranged(phrases, corpus, arrangement, random), length);
 }

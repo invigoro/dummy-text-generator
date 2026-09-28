@@ -2,13 +2,17 @@ import { useId, useState, type Ref } from 'react';
 import type { Setting } from '../data/settings';
 import { ARRANGEMENTS, MAX_LENGTH, type Arrangement, type Length } from '../engine/arrange';
 import { FORMS, SPEAKERS, type Form } from '../engine/forms';
+import { NAME_KINDS, type NameKind } from '../engine/names';
 import type { LanguageDef } from '../engine/language';
 import { UNNAMED_LANGUAGE, UNTITLED_SETTING } from './customSettings';
 import { VIEWS, type View } from './urlState';
 
 type Order = { label: string; hint: string };
 
-/** How each form's text can be ordered. A conversation's or an inscription's lines have no paragraphs to shuffle. */
+/**
+ * How each form's text can be ordered. A conversation's or an inscription's lines have no
+ * paragraphs to shuffle, and names are made afresh, in no order.
+ */
 const ORDERS: Record<Form, Partial<Record<Arrangement, Order>>> = {
   prose: {
     original: { label: 'Original order', hint: 'A passage in the order it was written' },
@@ -26,18 +30,26 @@ const ORDERS: Record<Form, Partial<Record<Arrangement, Order>>> = {
     sentences: { label: 'Shuffle lines', hint: 'Phrases from all over the text' },
     words: { label: 'Shuffle words', hint: 'Short lines of jumbled words' },
   },
+  names: {},
 };
 
 const FORM_LABELS: Record<Form, { label: string; hint: string }> = {
   prose: { label: 'Prose', hint: 'Paragraphs, as in a letter or a book' },
   conversation: { label: 'Conversation', hint: 'Lines of speech, each after its speaker’s name' },
   inscription: { label: 'Inscription', hint: 'Short lines, for a stone, a sign or a seal' },
+  names: { label: 'Names', hint: 'Names for people or places, in the language’s own words' },
 };
+
+const NAME_KIND_LABELS: Record<NameKind, string> = { people: 'People', places: 'Places' };
 
 const VIEW_LABELS: Record<View, string> = { written: 'Written', say: 'Say it', both: 'Both', ipa: 'IPA' };
 
-/** What the length is counted in: a conversation or an inscription has lines, not paragraphs. */
-const unitName = (unit: Length['unit'], form: Form) => (unit === 'words' ? 'words' : form === 'prose' ? 'paragraphs' : 'lines');
+/** What the length is counted in: a conversation or an inscription has lines, not paragraphs, and names are counted as names. */
+function unitName(unit: Length['unit'], form: Form): string {
+  if (form === 'names') return 'names';
+  if (unit === 'words') return 'words';
+  return form === 'prose' ? 'paragraphs' : 'lines';
+}
 
 const SPEAKER_COUNTS = Array.from({ length: SPEAKERS.max - SPEAKERS.min + 1 }, (_, i) => SPEAKERS.min + i);
 
@@ -66,6 +78,8 @@ interface ControlsProps {
   onForm: (form: Form) => void;
   speakers: number;
   onSpeakers: (speakers: number) => void;
+  nameKind: NameKind;
+  onNameKind: (kind: NameKind) => void;
   arrangement: Arrangement;
   onArrangement: (arrangement: Arrangement) => void;
   length: Length;
@@ -155,32 +169,43 @@ export function Controls(props: ControlsProps) {
               ))}
             </select>
           )}
+          {form === 'names' && (
+            <select aria-label="Names of" value={props.nameKind} onChange={(event) => props.onNameKind(event.target.value as NameKind)}>
+              {NAME_KINDS.map((kind) => (
+                <option key={kind} value={kind}>
+                  {NAME_KIND_LABELS[kind]}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <small className="hint" id={`${id}-form-hint`}>
           {FORM_LABELS[form].hint}
         </small>
       </div>
 
-      <div className="field">
-        <label className="label" htmlFor={`${id}-order`}>
-          Order
-        </label>
-        <select
-          id={`${id}-order`}
-          aria-describedby={`${id}-order-hint`}
-          value={arrangement}
-          onChange={(event) => props.onArrangement(event.target.value as Arrangement)}
-        >
-          {ARRANGEMENTS.filter((value) => orders[value]).map((value) => (
-            <option key={value} value={value}>
-              {orders[value]!.label}
-            </option>
-          ))}
-        </select>
-        <small className="hint" id={`${id}-order-hint`}>
-          {orders[arrangement]!.hint}
-        </small>
-      </div>
+      {form !== 'names' && (
+        <div className="field">
+          <label className="label" htmlFor={`${id}-order`}>
+            Order
+          </label>
+          <select
+            id={`${id}-order`}
+            aria-describedby={`${id}-order-hint`}
+            value={arrangement}
+            onChange={(event) => props.onArrangement(event.target.value as Arrangement)}
+          >
+            {ARRANGEMENTS.filter((value) => orders[value]).map((value) => (
+              <option key={value} value={value}>
+                {orders[value]!.label}
+              </option>
+            ))}
+          </select>
+          <small className="hint" id={`${id}-order-hint`}>
+            {orders[arrangement]!.hint}
+          </small>
+        </div>
+      )}
 
       <fieldset>
         <legend className="label">Length</legend>
@@ -192,13 +217,17 @@ export function Controls(props: ControlsProps) {
             max={MAX_LENGTH[length.unit]}
             onChange={props.onCount}
           />
-          <select aria-label="Count in" value={length.unit} onChange={(event) => props.onUnit(event.target.value as Length['unit'])}>
-            {(['paragraphs', 'words'] as const).map((unit) => (
-              <option key={unit} value={unit}>
-                {unitName(unit, form)}
-              </option>
-            ))}
-          </select>
+          {form === 'names' ? (
+            <span className="unit">names</span>
+          ) : (
+            <select aria-label="Count in" value={length.unit} onChange={(event) => props.onUnit(event.target.value as Length['unit'])}>
+              {(['paragraphs', 'words'] as const).map((unit) => (
+                <option key={unit} value={unit}>
+                  {unitName(unit, form)}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
       </fieldset>
 

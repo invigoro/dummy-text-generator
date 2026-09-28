@@ -122,7 +122,8 @@ export function loadCorpus(id: string): Promise<Corpus> {
   if (!corpus) {
     corpus = Promise.resolve().then(async () => {
       const source = sourceText(id);
-      return withoutSlurs(tokenize(await source.load(), tokenizerFor(source.language)), source.language);
+      const corpus = withoutSlurs(tokenize(await source.load(), tokenizerFor(source.language)), source.language);
+      return { ...corpus, language: source.language };
     });
     // A failed download can be tried again.
     corpus.catch(() => loaded.delete(id));

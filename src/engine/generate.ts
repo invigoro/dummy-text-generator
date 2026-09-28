@@ -1,8 +1,11 @@
-import { arrange, type Arrangement, type Length } from './arrange';
-import type { DocParagraph, DocSentence } from './document';
+import { arrange, MAX_LENGTH, type Arrangement, type Length } from './arrange';
+import type { DocParagraph, DocSentence, DocWord } from './document';
 import { conversation, inscription, SPEAKERS, type Form } from './forms';
+import { stressRule, type Language } from './language';
+import { personNames, placeNames, type NameKind, type NameRecipe } from './names';
 import { mulberry32 } from './rng';
-import type { Corpus, Paragraph } from './tokenize';
+import { stressOf, type WordSounds } from './sounds/system';
+import type { Corpus, Paragraph, Token } from './tokenize';
 
 export interface GenerateOptions {
   arrangement: Arrangement;
@@ -13,6 +16,8 @@ export interface GenerateOptions {
   form?: Form;
   /** How many speakers a conversation has: two to four. */
   speakers?: number;
+  /** What the names form names: people or places. */
+  names?: NameKind;
 }
 
 export interface WordsOptions {
@@ -24,6 +29,8 @@ export interface WordsOptions {
 export interface TextSource {
   flow: Corpus;
   words(paragraphs: Paragraph[], options?: WordsOptions): DocParagraph[];
+  /** The language, for where a name made of two words is stressed. */
+  language?: Language;
 }
 
 export function generate(source: TextSource, options: GenerateOptions): DocParagraph[] {
@@ -34,6 +41,24 @@ export function generate(source: TextSource, options: GenerateOptions): DocParag
       return source.words(arrange(source.flow, arrangement, length, random));
     case 'inscription':
       return source.words(inscription(source.flow, arrangement, length, random), { opening: false });
+    case 'names': {
+      const count = Math.min(MAX_LENGTH.paragraphs, Math.max(0, Math.floor(length.count)));
+      // Two source names can come out as one (lorem ipsum has few words), so there are spares.
+      const spares = count * 3;
+      const recipes =
+        options.names === 'places' ? placeNames(source.flow, spares, random) : personNames(source.flow, spares, random);
+      const rule = source.language ? stressRule(source.language) : null;
+      const seen = new Set<string>();
+      return recipes
+        .map((recipe) => nameFrom(recipe, source, rule))
+        .filter((name) => {
+          const written = name.sentences.map((sentence) => sentence.tokens.map((token) => token.text).join('')).join(' ').toLowerCase();
+          if (seen.has(written)) return false;
+          seen.add(written);
+          return true;
+        })
+        .slice(0, count);
+    }
     case 'conversation': {
       const talk = conversation(source.flow, arrangement, length, options.speakers ?? SPEAKERS.min, random);
       const names = speakerNames(source, talk.names, Math.max(0, ...talk.order) + 1);
@@ -66,4 +91,36 @@ function speakerNames(source: TextSource, candidates: readonly string[], count: 
     names.push({ tokens: [{ kind: 'word', text: String.fromCharCode(65 + i) }, { kind: 'punct', text: ':' }] });
   }
   return names;
+}
+
+const SPACE: Token = { kind: 'space', text: ' ' };
+
+/** A source word in the language's words. */
+function wordOf(source: TextSource, word: string): DocWord {
+  const [paragraph] = source.words([{ sentences: [{ tokens: [{ kind: 'word', text: word }] }] }], { opening: false });
+  const found = paragraph?.sentences[0]?.tokens.find((token) => token.kind === 'word');
+  return found?.kind === 'word' ? found : { kind: 'word', text: word };
+}
+
+/**
+ * A name in the language's words. Two words made one run their syllables together, stressed by
+ * the language's rule: "Doumé" and "voren" make "Doumévoren", said as one word.
+ */
+function nameFrom(recipe: NameRecipe, source: TextSource, rule: ReturnType<typeof stressRule>): DocParagraph {
+  if (recipe.kind === 'words') {
+    const tokens = recipe.words.flatMap((word, i): Token[] => (i === 0 ? [{ kind: 'word', text: word }] : [SPACE, { kind: 'word', text: word }]));
+    const [paragraph] = source.words([{ sentences: [{ tokens }] }], { opening: false });
+    return { sentences: paragraph?.sentences ?? [] };
+  }
+  const [first, second] = recipe.words.map((word) => wordOf(source, word));
+  const hyphened = recipe.joiner === '-';
+  const joined = hyphened ? `${first.text}-${second.text}` : (first.text + second.text.toLowerCase()).replace(/\p{L}/u, (letter) => letter.toUpperCase());
+  // Where the two meet, no letter comes three times: "Pwll" and "lidd" make "Pwllidd".
+  const text = joined.replace(/(\p{L})\1\1+/gu, '$1$1');
+  let spoken: WordSounds[] | undefined;
+  if (first.spoken && second.spoken) {
+    const syllables = [...first.spoken, ...second.spoken].flatMap((part) => part.syllables);
+    spoken = hyphened ? [...first.spoken, ...second.spoken] : [{ syllables, stress: rule ? stressOf(rule, syllables) : null }];
+  }
+  return { sentences: [{ tokens: [spoken ? { kind: 'word', text, spoken } : { kind: 'word', text }] }] };
 }

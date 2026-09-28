@@ -5,6 +5,7 @@
  */
 import { ARRANGEMENTS, MAX_LENGTH, type Arrangement, type Length } from '../engine/arrange';
 import { FORMS, SPEAKERS, type Form } from '../engine/forms';
+import { NAME_KINDS, type NameKind } from '../engine/names';
 
 export type View = 'written' | 'say' | 'both' | 'ipa';
 export const VIEWS: readonly View[] = ['written', 'say', 'both', 'ipa'];
@@ -19,6 +20,8 @@ export interface PageState {
   form: Form;
   /** How many speakers a conversation has. */
   speakers: number;
+  /** What the names form names. */
+  names: NameKind;
   /** A custom setting the choice belongs to, encoded, so the link works for anyone. */
   world?: string;
   /** Languages made in the builder that the page uses, encoded, for the same reason. */
@@ -69,6 +72,9 @@ export function readHash(hash: string, isChoice: (key: string) => boolean): Part
   const form = params.get('form');
   if (form && (FORMS as readonly string[]).includes(form)) state.form = form as Form;
 
+  const names = params.get('names');
+  if (names && (NAME_KINDS as readonly string[]).includes(names)) state.names = names as NameKind;
+
   const speakers = Number(params.get('speakers'));
   if (Number.isInteger(speakers) && speakers >= SPEAKERS.min && speakers <= SPEAKERS.max) state.speakers = speakers;
 
@@ -91,6 +97,7 @@ export function writeHash(state: PageState): string {
   });
   if (state.form !== 'prose') params.set('form', state.form);
   if (state.form === 'conversation') params.set('speakers', String(state.speakers));
+  if (state.form === 'names') params.set('names', state.names);
   if (state.world) params.set('world', state.world);
   if (state.made) params.set('made', state.made);
   // The slash in "dnd/elvish" reads better unescaped, and is safe in a fragment.

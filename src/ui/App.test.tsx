@@ -238,6 +238,26 @@ describe('Forms', () => {
     expect(await paragraphs()).toHaveLength(3);
   });
 
+  it('names people or places, a name to a line, counted as names', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await paragraphs();
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Form' }), 'names');
+    const people = await paragraphs();
+    expect(people).toHaveLength(12);
+    expect(screen.getByRole('spinbutton', { name: 'Number of names' })).toHaveValue(12);
+    expect(screen.queryByRole('combobox', { name: 'Order' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Count in' })).not.toBeInTheDocument();
+    expect(window.location.hash).toMatch(/&form=names&names=people$/);
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Names of' }), 'places');
+    const places = await paragraphs();
+    expect(places).not.toEqual(people);
+    expect(window.location.hash).toMatch(/&form=names&names=places$/);
+    await user.click(screen.getByRole('button', { name: 'Copy' }));
+    expect(await navigator.clipboard.readText()).toBe(places.join('\n'));
+  });
+
   it('starts from a conversation in the URL', async () => {
     window.history.replaceState(null, '', '/#lang=dnd/orc&order=original&len=6p&seed=9&view=written&form=conversation&speakers=4');
     const { container } = render(<App />);

@@ -38,13 +38,16 @@ function viewText(paragraphs: DocParagraph[], view: View, voice: Voice | null, s
 export function Output({ paragraphs, language, view, form, stele, title }: OutputProps) {
   const voice = voiceOf(language);
   const shown = voice ? view : 'written';
-  const separator = form === 'inscription' ? '\n' : '\n\n';
+  // An inscription's lines and a list of names go one to a line.
+  const separator = form === 'inscription' || form === 'names' ? '\n' : '\n\n';
   const [reading, setReading] = useState(false);
   const readButton = useRef<HTMLButtonElement>(null);
   return (
     <section className="output" aria-label="Generated text">
       <div className="output-bar">
-        <p className="word-count">{countDocWords(paragraphs).toLocaleString('en')} words</p>
+        <p className="word-count">
+          {form === 'names' ? `${paragraphs.length} names` : `${countDocWords(paragraphs).toLocaleString('en')} words`}
+        </p>
         <Actions copyText={viewText(paragraphs, shown, voice, separator)} steleText={writtenText(paragraphs, separator)} stele={stele}>
           <button ref={readButton} type="button" onClick={() => setReading(true)}>
             Read aloud

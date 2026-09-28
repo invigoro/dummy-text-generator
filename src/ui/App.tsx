@@ -3,6 +3,7 @@ import { LANGUAGES, type LoadedLanguage } from '../data/languages';
 import { DEFAULT_CHOICE, findChoice, SETTINGS, type Setting } from '../data/settings';
 import type { Arrangement, Length } from '../engine/arrange';
 import { SPEAKERS, type Form } from '../engine/forms';
+import type { NameKind } from '../engine/names';
 import { generate } from '../engine/generate';
 import { isSpoken, type LanguageDef } from '../engine/language';
 import { randomSeed } from '../engine/rng';
@@ -69,6 +70,8 @@ const DEFAULT_COUNTS: Counts = {
   prose: { paragraphs: 3, words: 200 },
   conversation: { paragraphs: 8, words: 120 },
   inscription: { paragraphs: 4, words: 20 },
+  // Names are counted as names, whatever the unit.
+  names: { paragraphs: 12, words: 12 },
 };
 
 function withCount(counts: Counts, form: Form, length: Length): Counts {
@@ -93,6 +96,7 @@ function initialState(): Initial {
       view: 'written',
       form,
       speakers: SPEAKERS.min,
+      names: 'people',
       ...state,
     },
   };
@@ -118,6 +122,7 @@ export default function App() {
   const [form, setForm] = useState<Form>(initial.state.form);
   const [counts, setCounts] = useState<Counts>(() => withCount(DEFAULT_COUNTS, initial.state.form, initial.state.length));
   const [speakers, setSpeakers] = useState(initial.state.speakers);
+  const [nameKind, setNameKind] = useState<NameKind>(initial.state.names);
   const [seed, setSeed] = useState(initial.state.seed);
   const [view, setView] = useState<View>(initial.state.view);
 
@@ -139,13 +144,15 @@ export default function App() {
   const [frozen, setFrozen] = useState<LanguageDef | null>(null);
   const language = useLanguage(panel === 'languages' && frozen ? frozen : current);
   const count = counts[form][unit];
+  // Names are counted as names, so they always go by the first count.
+  const shownUnit: Length['unit'] = form === 'names' ? 'paragraphs' : unit;
 
   const text = useMemo(
     () =>
       language.status === 'ready'
-        ? generate(language.loaded, { arrangement, length: { unit, count }, seed, form, speakers })
+        ? generate(language.loaded, { arrangement, length: { unit: shownUnit, count }, seed, form, speakers, names: nameKind })
         : null,
-    [language, arrangement, unit, count, seed, form, speakers],
+    [language, arrangement, shownUnit, count, seed, form, speakers, nameKind],
   );
 
   useEffect(() => saveCustomSettings(custom), [custom]);
@@ -157,7 +164,7 @@ export default function App() {
   const world = setting && isCustomSetting(setting) ? encodeSetting(setting) : undefined;
   const needed = new Set([found.choice.language, ...(setting?.choices.map((choice) => choice.language) ?? [])]);
   const madeNeeded = made.filter((def) => needed.has(def.id));
-  const length: Length = { unit, count };
+  const length: Length = { unit: shownUnit, count };
   const hash = writeHash({
     choice: found.key,
     arrangement,
@@ -166,6 +173,7 @@ export default function App() {
     view,
     form,
     speakers,
+    names: nameKind,
     world,
     made: madeNeeded.length > 0 ? encodeLanguages(madeNeeded) : undefined,
   });
@@ -191,6 +199,7 @@ export default function App() {
         setCounts((current) => withCount(current, newForm, newLength));
       }
       if (state.speakers) setSpeakers(state.speakers);
+      if (state.names) setNameKind(state.names);
       if (state.seed !== undefined) setSeed(state.seed);
       if (state.view) setView(state.view);
     };
@@ -253,11 +262,13 @@ export default function App() {
           onForm={setForm}
           speakers={speakers}
           onSpeakers={setSpeakers}
+          nameKind={nameKind}
+          onNameKind={setNameKind}
           arrangement={arrangement}
           onArrangement={setArrangement}
           length={length}
           onUnit={setUnit}
-          onCount={(newCount) => setCounts((current) => withCount(current, form, { unit, count: newCount }))}
+          onCount={(newCount) => setCounts((current) => withCount(current, form, { unit: shownUnit, count: newCount }))}
           seed={seed}
           onReroll={() => setSeed(randomSeed())}
         />

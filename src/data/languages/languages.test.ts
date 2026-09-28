@@ -42,6 +42,22 @@ describe.each(LANGUAGES.map((def) => [def.name, def] as const))('%s', (_, def) =
     }
   });
 
+  it('names people and places, none twice', async () => {
+    const loaded = await loadLanguage(def.id);
+    for (const names of ['people', 'places'] as const) {
+      const doc = generate(loaded, { arrangement: 'sentences', length: { unit: 'paragraphs', count: 8 }, seed: 6, form: 'names', names });
+      const written = doc.map(paragraphText);
+      expect(written, names).toHaveLength(8);
+      expect(new Set(written).size, names).toBe(8);
+      for (const name of written) {
+        // Abyssal can start a name with a catch in the throat, written as an apostrophe.
+        expect(name).toMatch(/^['’]?\p{Lu}/u);
+        expect(name).not.toMatch(/[.,;:!?«»“”"]/u);
+        expect(name).not.toMatch(IPA_ONLY);
+      }
+    }
+  });
+
   it('is the same every time for the same seed', async () => {
     const loaded = await loadLanguage(def.id);
     const options = { arrangement: 'sentences', length: { unit: 'paragraphs', count: 4 }, seed: 12 } as const;

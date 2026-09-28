@@ -5,7 +5,12 @@ import { readHash, worldInHash, writeHash, type PageState } from './urlState';
 const isChoice = (key: string) => ['dnd/elvish', 'real/latin'].includes(key);
 
 /** What a prose page's hash holds: prose, and the speakers it doesn't need, go without saying. */
-const inHash = (page: PageState) => ({ ...page, form: page.form === 'prose' ? undefined : page.form, speakers: page.form === 'conversation' ? page.speakers : undefined });
+const inHash = (page: PageState) => ({
+  ...page,
+  form: page.form === 'prose' ? undefined : page.form,
+  speakers: page.form === 'conversation' ? page.speakers : undefined,
+  names: page.form === 'names' ? page.names : undefined,
+});
 
 const state: PageState = {
   choice: 'dnd/elvish',
@@ -15,6 +20,7 @@ const state: PageState = {
   view: 'both',
   form: 'prose',
   speakers: 2,
+  names: 'people',
 };
 
 describe('writeHash and readHash', () => {
@@ -32,8 +38,11 @@ describe('writeHash and readHash', () => {
   it('carry a conversation and its speakers, and leave both out for prose', () => {
     const talk = { ...state, form: 'conversation', speakers: 3 } as const;
     expect(writeHash(talk)).toBe('#lang=dnd/elvish&order=sentences&len=3p&seed=123456&view=both&form=conversation&speakers=3');
-    expect(readHash(writeHash(talk), isChoice)).toEqual(talk);
+    expect(readHash(writeHash(talk), isChoice)).toEqual(inHash(talk));
     expect(writeHash({ ...state, form: 'inscription' })).toMatch(/&form=inscription$/);
+    const places = { ...state, form: 'names', names: 'places' } as const;
+    expect(writeHash(places)).toMatch(/&form=names&names=places$/);
+    expect(readHash(writeHash(places), isChoice)).toEqual(inHash(places));
     expect(readHash('#form=song&speakers=9', isChoice)).toEqual({});
   });
 

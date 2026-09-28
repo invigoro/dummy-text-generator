@@ -36,6 +36,8 @@ export interface Corpus {
   paragraphs: Paragraph[];
   /** The rules the text was split with, which also say how its quotation marks pair up. */
   options: TokenizeOptions;
+  /** The text's language, as a BCP 47 tag, where it's known: how it names people and places. */
+  language?: string;
 }
 
 export interface TokenizeOptions {
