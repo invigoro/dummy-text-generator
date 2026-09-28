@@ -28,3 +28,5 @@ and license text.
   Double hyphens become em dashes, and the underscores marking italics are removed. Ship names
   printed in capitals (for italics) become "Hispaniola", "Walrus", "Royal Fortune" and
   "Cassandra". Words in capitals for emphasis get ordinary case.
+- **When loading:** three sentences containing slurs are left out (see
+  [`src/engine/blocklist.ts`](src/engine/blocklist.ts)). The file itself is the full text.

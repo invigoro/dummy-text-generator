@@ -12,7 +12,7 @@ jobs:
 The generated text must flow like the real language, every source text must be in the public
 domain, and the site must be static, hosted on GitHub Pages.
 
-**Current phase:** Phase 0. See [Milestones](#milestones).
+**Current phase:** Phase 1. Phase 0 is done. See [Milestones](#milestones).
 
 ## The approach
 
@@ -228,7 +228,8 @@ src/
 
 ## Milestones
 
-**Phase 0: Setup and deploy.**
+**Phase 0: Setup and deploy.** *(done; a slur filter for real text came forward from Phase 2,
+so the live site never shows one)*
 - Replace Create React App with Vite, and delete the boilerplate.
 - A tokenizer that splits text into paragraphs, sentences and words. It knows "Mr." doesn't end a
   sentence, and keeps each quotation's marks together.
@@ -256,7 +257,8 @@ src/
 - conversation mode (two to four speakers, lines taken from quoted speech in the source texts),
   and a short-inscription length
 - a tuning page showing sample words and statistics for each sound system
-- a blocklist, so it never hands you a real swear word to read aloud
+- the blocklist extended to invented words, so the generator never hands you a real swear word or
+  slur to read aloud. Real text already leaves out any sentence containing a slur.
 
 **Phase 3: Build-your-own languages.**
 - the language builder described [above](#build-your-own-languages), with live samples
