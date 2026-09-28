@@ -47,6 +47,15 @@ paragraph lengths, punctuation and word lengths, and replaces every word.
 
 ## Latin
 
+### Lorem ipsum
+
+- **Author:** after Cicero, *De finibus bonorum et malorum* 1.32–33 (45 BC)
+- **File:** [`src/data/corpora/la/lorem-ipsum.txt`](src/data/corpora/la/lorem-ipsum.txt)
+- **From:** typed in. The file holds the classic passage typesetters have used since at least the
+  1500s ("Lorem ipsum dolor sit amet…"), and the two passages of Cicero it scrambles, as they're
+  commonly reproduced.
+- **Used for:** the words of the Lorem ipsum language, laid on the flow of *De Bello Gallico*.
+
 ### De Bello Gallico, books I–IV
 
 - **Author:** Julius Caesar (100–44 BC)

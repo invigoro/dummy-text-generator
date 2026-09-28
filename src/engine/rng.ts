@@ -15,6 +15,16 @@ export function mulberry32(seed: number): Random {
   };
 }
 
+/** A 32-bit hash of a string (FNV-1a), to seed things that must come out the same every time. */
+export function hashString(text: string): number {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
 /** A fresh random 32-bit seed, for "reroll" buttons. */
 export function randomSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0];

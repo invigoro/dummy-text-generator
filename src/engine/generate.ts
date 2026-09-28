@@ -1,6 +1,7 @@
 import { arrange, type Arrangement, type Length } from './arrange';
+import type { DocParagraph } from './document';
 import { mulberry32 } from './rng';
-import { countWords, renderParagraph, type Corpus } from './tokenize';
+import type { Corpus, Paragraph } from './tokenize';
 
 export interface GenerateOptions {
   arrangement: Arrangement;
@@ -9,20 +10,12 @@ export interface GenerateOptions {
   seed: number;
 }
 
-export interface GeneratedText {
-  paragraphs: string[];
-  words: number;
+/** Where a language's text comes from: a flow to arrange, and a way to put it in the language's words. */
+export interface TextSource {
+  flow: Corpus;
+  words(paragraphs: Paragraph[]): DocParagraph[];
 }
 
-export function generate(corpus: Corpus, options: GenerateOptions): GeneratedText {
-  const paragraphs = arrange(corpus, options.arrangement, options.length, mulberry32(options.seed));
-  return {
-    paragraphs: paragraphs.map(renderParagraph),
-    words: paragraphs.reduce((count, paragraph) => count + countWords(paragraph.sentences), 0),
-  };
-}
-
-/** The text as plain text, with a blank line between paragraphs. */
-export function plainText(text: GeneratedText): string {
-  return text.paragraphs.join('\n\n');
+export function generate(source: TextSource, options: GenerateOptions): DocParagraph[] {
+  return source.words(arrange(source.flow, options.arrangement, options.length, mulberry32(options.seed)));
 }

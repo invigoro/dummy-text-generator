@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
-import { plainText, type GeneratedText } from '../engine/generate';
+import { countDocWords, paragraphText, writtenText, type DocParagraph } from '../engine/document';
 
-export function Output({ text }: { text: GeneratedText }) {
+export function Output({ paragraphs }: { paragraphs: DocParagraph[] }) {
   return (
     <section className="output" aria-label="Generated text">
       <div className="output-bar">
-        <p className="word-count">{text.words.toLocaleString('en')} words</p>
-        <CopyButton text={plainText(text)} />
+        <p className="word-count">{countDocWords(paragraphs).toLocaleString('en')} words</p>
+        <CopyButton text={writtenText(paragraphs)} />
       </div>
       <article className="page">
-        {text.paragraphs.map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
+        {paragraphs.map((paragraph, i) => (
+          <p key={i}>{paragraphText(paragraph)}</p>
         ))}
       </article>
     </section>

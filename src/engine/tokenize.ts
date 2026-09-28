@@ -56,6 +56,11 @@ export interface TokenizeOptions {
    * « can open a whole exchange of lines that each start with a dash, the mark goes ('drop').
    */
   strayCloser?: 'open' | 'drop';
+  /**
+   * Which side of an apostrophe a short elided word sits on: before it in French ("l’homme",
+   * "qu’il"), after it in English ("don’t", "he’ll").
+   */
+  elision?: 'before' | 'after';
 }
 
 export const ENGLISH: TokenizeOptions = {
@@ -67,6 +72,7 @@ export const ENGLISH: TokenizeOptions = {
     ['"', '"'],
   ],
   elisions: new Set(['em', 'tis', 'twas', 'twere', 'twill', 'twould', 'un', 'ere', 'n', 'cept', 'bout']),
+  elision: 'after',
 };
 
 const FRENCH: TokenizeOptions = {
@@ -78,6 +84,7 @@ const FRENCH: TokenizeOptions = {
   ],
   elisions: new Set(),
   strayCloser: 'drop',
+  elision: 'before',
 };
 
 const LATIN: TokenizeOptions = {

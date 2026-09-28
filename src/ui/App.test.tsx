@@ -25,10 +25,10 @@ async function paragraphs() {
 }
 
 describe('App', () => {
-  it('shows the site name and where the text comes from', () => {
+  it('shows the site name and where the text comes from', async () => {
     render(<App />);
     expect(screen.getByRole('heading', { level: 1, name: 'Dummy Text Generator' })).toBeInTheDocument();
-    expect(screen.getByText('Treasure Island')).toBeInTheDocument();
+    expect(await screen.findByText('Treasure Island')).toBeInTheDocument();
   });
 
   it('starts with three paragraphs of shuffled sentences', async () => {

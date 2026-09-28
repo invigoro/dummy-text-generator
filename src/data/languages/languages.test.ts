@@ -1,0 +1,73 @@
+import { describe, expect, it } from 'vitest';
+import { ARRANGEMENTS } from '../../engine/arrange';
+import { isOffensive } from '../../engine/blocklist';
+import { countDocWords, spokenText, writtenText, type DocWord } from '../../engine/document';
+import { generate } from '../../engine/generate';
+import { stressRule } from '../../engine/language';
+import { LANGUAGES, loadLanguage } from './index';
+
+/** Sound symbols that belong in IPA, never in a language's own spelling. */
+const IPA_ONLY = /[ʁʒʃɲŋəɛɔøɑɐʊɪʌɥʎɬçχɣθːˈ̃]/u;
+
+describe.each(LANGUAGES.map((def) => [def.name, def] as const))('%s', (_, def) => {
+  it('writes text in every arrangement, as long as asked for', async () => {
+    const loaded = await loadLanguage(def.id);
+    for (const arrangement of ARRANGEMENTS) {
+      const doc = generate(loaded, { arrangement, length: { unit: 'words', count: 300 }, seed: 5 });
+      expect(countDocWords(doc)).toBeGreaterThanOrEqual(300);
+      expect(writtenText(doc)).not.toMatch(IPA_ONLY);
+    }
+  });
+
+  it('is the same every time for the same seed', async () => {
+    const loaded = await loadLanguage(def.id);
+    const options = { arrangement: 'sentences', length: { unit: 'paragraphs', count: 4 }, seed: 12 } as const;
+    expect(writtenText(generate(loaded, options))).toBe(writtenText(generate(loaded, options)));
+  });
+
+  it('says every word in plain letters, with stress in capitals', async () => {
+    const loaded = await loadLanguage(def.id);
+    const rule = stressRule(loaded.language);
+    if (!rule || loaded.language.kind === 'real') return;
+    const doc = generate(loaded, { arrangement: 'sentences', length: { unit: 'words', count: 600 }, seed: 3 });
+    const say = spokenText(doc, rule, loaded.language.respell, 'say');
+    expect(say).toMatch(/\p{Lu}/u);
+    // Letters, hyphens and apostrophes; plain punctuation; numbers left as they were.
+    expect(say).not.toMatch(/[^a-zA-Z0-9'\-\s.,;:!?…—–“”()]/u);
+  });
+
+  it('never invents an offensive word', async () => {
+    const loaded = await loadLanguage(def.id);
+    // Real words aren't invented: lorem ipsum's "cum" is Latin for "with".
+    if (loaded.language.kind !== 'invented') return;
+    const doc = generate(loaded, { arrangement: 'words', length: { unit: 'words', count: 5000 }, seed: 8 });
+    const { respell } = loaded.language;
+    for (const paragraph of doc) {
+      for (const sentence of paragraph.sentences) {
+        for (const token of sentence.tokens.filter((t): t is DocWord => t.kind === 'word' && !!t.spoken)) {
+          const said = token.spoken!.map((word) => respell.say(word, null)).join('');
+          expect(isOffensive(token.text, said, loaded.source.language), token.text).toBe(false);
+        }
+      }
+    }
+  });
+});
+
+describe('French', () => {
+  it('uses guillemets and a no-break space before ! ? : ;', async () => {
+    const loaded = await loadLanguage('french');
+    const text = writtenText(generate(loaded, { arrangement: 'original', length: { unit: 'words', count: 3000 }, seed: 1 }));
+    expect(text).toMatch(/« /u);
+    expect(text).not.toMatch(/\S[!?;:]/u);
+  });
+});
+
+describe('Lorem ipsum', () => {
+  it('always starts the classic way', async () => {
+    const loaded = await loadLanguage('lorem-ipsum');
+    for (const seed of [1, 2, 3]) {
+      const text = writtenText(generate(loaded, { arrangement: 'sentences', length: { unit: 'paragraphs', count: 2 }, seed }));
+      expect(text.startsWith('Lorem ipsum dolor sit amet, consectetur adipiscing elit. ')).toBe(true);
+    }
+  });
+});

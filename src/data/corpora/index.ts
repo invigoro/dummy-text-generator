@@ -40,6 +40,14 @@ export const SOURCE_TEXTS: readonly SourceText[] = [
     load: () => import('./la/de-bello-gallico.txt?raw').then((module) => module.default),
   },
   {
+    id: 'la-lorem-ipsum',
+    language: 'la',
+    title: 'Lorem ipsum',
+    author: 'after Cicero',
+    date: '45 BC',
+    load: () => import('./la/lorem-ipsum.txt?raw').then((module) => module.default),
+  },
+  {
     id: 'is-saefarinn',
     language: 'is',
     title: 'Sæfarinn',
