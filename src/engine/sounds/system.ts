@@ -24,10 +24,11 @@ export interface WordSounds {
 /**
  * Where stress falls: on a word's first, second-to-last or last syllable; on the last syllable of
  * each phrase, as in French; by the Latin rule (the second-to-last syllable if it's heavy,
- * otherwise the one before); or by the Spanish rule (second-to-last after a vowel, n or s,
- * otherwise last).
+ * otherwise the one before); by the Spanish rule (second-to-last after a vowel, n or s,
+ * otherwise last); or by the Portuguese one (last when it's nasal or ends in r or l, otherwise
+ * the one before).
  */
-export type StressRule = 'initial' | 'penultimate' | 'final' | 'phrase' | 'latin' | 'spanish';
+export type StressRule = 'initial' | 'penultimate' | 'final' | 'phrase' | 'latin' | 'spanish' | 'portuguese';
 
 export interface SoundsDef {
   /**
@@ -187,6 +188,11 @@ export function stressOf(rule: StressRule, syllables: readonly Syllable[]): numb
       const coda = syllables[n - 1].coda;
       const last = coda[coda.length - 1];
       return coda.length === 0 || last === 'n' || last === 's' ? Math.max(0, n - 2) : n - 1;
+    }
+    case 'portuguese': {
+      const { nucleus, coda } = syllables[n - 1];
+      const heavyEnd = coda.some((sound) => sound === 'ɾ' || sound === 'l' || sound === 'r') || nucleus.normalize('NFD').includes('̃');
+      return heavyEnd ? n - 1 : Math.max(0, n - 2);
     }
   }
 }

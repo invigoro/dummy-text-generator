@@ -6,8 +6,8 @@ import { generate } from '../../engine/generate';
 import { stressRule } from '../../engine/language';
 import { LANGUAGES, loadLanguage } from './index';
 
-/** Sound symbols that belong in IPA, never in a language's own spelling. */
-const IPA_ONLY = /[ʁʒʃɲŋəɛɔøɑɐʊɪʌɥʎɬçχɣθːˈ̃]/u;
+/** Sound symbols that belong in IPA, never in a language's own spelling (ç is a letter too, so it's not here). */
+const IPA_ONLY = /[ʁʒʃɲŋəɛɔøɑɐʊɪʌɥʎɬχɣθːˈ̃]/u;
 
 describe.each(LANGUAGES.map((def) => [def.name, def] as const))('%s', (_, def) => {
   it('writes text in every arrangement, as long as asked for', async () => {

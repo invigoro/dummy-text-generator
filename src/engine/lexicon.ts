@@ -74,15 +74,20 @@ interface Entry {
   vowelFirst: boolean;
 }
 
-/** How often each word appears in the corpus, and what the lexicon needs to know about it. */
-function survey(corpus: Corpus, language: string): Map<string, Entry> {
+/** How often each word appears in the corpus, what the lexicon needs to know about it, and its clitics. */
+function survey(corpus: Corpus, language: string): { entries: Map<string, Entry>; clitics: Set<string> } {
   const entries = new Map<string, Entry>();
+  const clitics = new Set<string>();
   for (const paragraph of corpus.paragraphs) {
     for (const sentence of paragraph.sentences) {
       for (const token of sentence.tokens) {
         if (token.kind !== 'word') continue;
         for (const piece of pieces(token.text, corpus.options.elision)) {
-          if (piece.kind !== 'part' || piece.clitic) continue;
+          if (piece.kind !== 'part') continue;
+          if (piece.clitic) {
+            clitics.add(piece.text.toLowerCase());
+            continue;
+          }
           const key = piece.text.toLowerCase();
           const entry = entries.get(key);
           if (entry) {
@@ -95,7 +100,7 @@ function survey(corpus: Corpus, language: string): Map<string, Entry> {
       }
     }
   }
-  return entries;
+  return { entries, clitics };
 }
 
 const ATTEMPTS = 12;
@@ -111,8 +116,12 @@ export class Lexicon {
   constructor(language: InventedLanguage, corpus: Corpus, sourceLanguage: string) {
     this.language = language;
     this.sourceLanguage = sourceLanguage;
-    const entries = [...survey(corpus, sourceLanguage)].sort(([a, x], [b, y]) => y.count - x.count || (a < b ? -1 : 1));
-    for (const [key, entry] of entries) this.words.set(key, this.invent(key, entry));
+    const { entries, clitics } = survey(corpus, sourceLanguage);
+    // Clitics first, so words that follow one can be checked with it: "n’" and "azi" are fine
+    // apart, but not together.
+    for (const clitic of [...clitics].sort()) this.clitic(clitic);
+    const ordered = [...entries].sort(([a, x], [b, y]) => y.count - x.count || (a < b ? -1 : 1));
+    for (const [key, entry] of ordered) this.words.set(key, this.invent(key, entry));
   }
 
   /** The invented word for a source word (any case). */
@@ -145,7 +154,7 @@ export class Lexicon {
       const sounds = inventWord(system, mulberry32(seed), { syllables: entry.syllables, vowelFirst: entry.vowelFirst });
       const spelling = spell(sounds, rules, mulberry32(seed ^ 0x5bd1e995));
       const said = respell.say(sounds, sounds.stress);
-      if (isOffensive(spelling, said, this.sourceLanguage)) continue;
+      if (isOffensive(spelling, said, this.sourceLanguage) || (entry.vowelFirst && this.offensiveAfterClitic(spelling, sounds))) continue;
       candidate = { spelling, sounds };
       // Two words that look alike would blur the vocabulary, though a few short ones may share.
       if (!this.taken.has(spelling)) break;
@@ -156,6 +165,16 @@ export class Lexicon {
     return word;
   }
 
+  /** Whether any known clitic in front of the word makes it offensive, written or said. */
+  private offensiveAfterClitic(spelling: string, sounds: WordSounds): boolean {
+    for (const clitic of this.clitics.values()) {
+      const [first, ...rest] = sounds.syllables;
+      const joined = { ...sounds, syllables: [{ ...first, onset: [...clitic.consonants, ...first.onset] }, ...rest] };
+      if (isOffensive(clitic.spelling + spelling, this.language.respell.say(joined, joined.stress), this.sourceLanguage)) return true;
+    }
+    return false;
+  }
+
   private inventClitic(key: string): InventedClitic {
     const { system, rules, id } = this.language;
     for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
@@ -163,10 +182,11 @@ export class Lexicon {
       const syllable = inventWord(system, mulberry32(seed), { syllables: 1 }).syllables[0];
       const consonants = syllable.onset.length > 0 ? syllable.onset : syllable.coda;
       if (consonants.length !== 1) continue;
-      // Spell the consonant as it would be before "a", then drop the a.
+      // Spell the consonant as it would be before "a", then drop the a. A spelling that keeps a
+      // vowel letter (Italian soft g is "gi" before a) won't do: clitics are l', d', m', c'.
       const written = spell({ syllables: [{ onset: consonants, nucleus: 'a', coda: [] }], stress: null }, rules, mulberry32(seed));
       const spelling = written.replace(/[aàâáä]+$/u, '');
-      if (spelling) return { spelling, consonants };
+      if (spelling && !/[aeiouyàâáäéèêíìîóòôúùû]/iu.test(spelling)) return { spelling, consonants };
     }
     return { spelling: 'l', consonants: ['l'] };
   }

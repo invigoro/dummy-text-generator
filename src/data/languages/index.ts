@@ -5,13 +5,50 @@ import { Lexicon } from '../../engine/lexicon';
 import { tokenizeParagraph, tokenizerFor, type Paragraph } from '../../engine/tokenize';
 import { Vocabulary } from '../../engine/vocabulary';
 import { loadCorpus, sourceText, type SourceText } from '../corpora';
+import abyssal from './abyssal';
+import draconic from './draconic';
 import english from './english';
+import englishInvented from './english-invented';
+import enochian from './enochian';
+import finnish from './finnish';
 import french from './french';
+import german from './german';
+import infernal from './infernal';
+import italian from './italian';
 import latin from './latin';
 import loremIpsum from './lorem-ipsum';
+import oldEnglish from './old-english';
 import oldNorse from './old-norse';
+import orcish from './orcish';
+import portuguese from './portuguese';
+import { aquan, auran, ignan, terran } from './primordial';
+import spanish from './spanish';
+import welsh from './welsh';
 
-export const LANGUAGES: readonly LanguageDef[] = [english, french, latin, loremIpsum, oldNorse];
+export const LANGUAGES: readonly LanguageDef[] = [
+  english,
+  englishInvented,
+  french,
+  spanish,
+  portuguese,
+  italian,
+  german,
+  latin,
+  loremIpsum,
+  finnish,
+  welsh,
+  oldEnglish,
+  oldNorse,
+  enochian,
+  orcish,
+  draconic,
+  infernal,
+  abyssal,
+  aquan,
+  auran,
+  ignan,
+  terran,
+];
 
 export function languageDef(id: string): LanguageDef {
   const def = LANGUAGES.find((language) => language.id === id);
