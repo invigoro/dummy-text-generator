@@ -2,19 +2,49 @@ import { useId, useState, type Ref } from 'react';
 import type { Setting } from '../data/settings';
 import { languageDef } from '../data/languages';
 import { ARRANGEMENTS, MAX_LENGTH, type Arrangement, type Length } from '../engine/arrange';
+import { FORMS, SPEAKERS, type Form } from '../engine/forms';
 import { UNNAMED_LANGUAGE, UNTITLED_SETTING } from './customSettings';
 import { VIEWS, type View } from './urlState';
 
-const ORDERS: Record<Arrangement, { label: string; hint: string }> = {
-  original: { label: 'Original order', hint: 'A passage in the order it was written' },
-  paragraphs: { label: 'Shuffle paragraphs', hint: 'Whole paragraphs from all over the text' },
-  sentences: { label: 'Shuffle sentences', hint: 'Sentences regrouped into new paragraphs' },
-  words: { label: 'Shuffle words', hint: 'Nonsense with the rhythm and punctuation of prose' },
+type Order = { label: string; hint: string };
+
+/** How each form's text can be ordered. A conversation's or an inscription's lines have no paragraphs to shuffle. */
+const ORDERS: Record<Form, Partial<Record<Arrangement, Order>>> = {
+  prose: {
+    original: { label: 'Original order', hint: 'A passage in the order it was written' },
+    paragraphs: { label: 'Shuffle paragraphs', hint: 'Whole paragraphs from all over the text' },
+    sentences: { label: 'Shuffle sentences', hint: 'Sentences regrouped into new paragraphs' },
+    words: { label: 'Shuffle words', hint: 'Nonsense with the rhythm and punctuation of prose' },
+  },
+  conversation: {
+    original: { label: 'Original order', hint: 'An exchange in the order it was written' },
+    sentences: { label: 'Shuffle lines', hint: 'Lines from all over the text' },
+    words: { label: 'Shuffle words', hint: 'Nonsense with the rhythm of speech' },
+  },
+  inscription: {
+    original: { label: 'Original order', hint: 'Phrases in the order they were written' },
+    sentences: { label: 'Shuffle lines', hint: 'Phrases from all over the text' },
+    words: { label: 'Shuffle words', hint: 'Short lines of jumbled words' },
+  },
+};
+
+const FORM_LABELS: Record<Form, { label: string; hint: string }> = {
+  prose: { label: 'Prose', hint: 'Paragraphs, as in a letter or a book' },
+  conversation: { label: 'Conversation', hint: 'Lines of speech, each after its speaker’s name' },
+  inscription: { label: 'Inscription', hint: 'Short lines, for a stone, a sign or a seal' },
 };
 
 const VIEW_LABELS: Record<View, string> = { written: 'Written', say: 'Say it', both: 'Both', ipa: 'IPA' };
 
-const UNITS: Record<Length['unit'], string> = { paragraphs: 'paragraphs', words: 'words' };
+/** What the length is counted in: a conversation or an inscription has lines, not paragraphs. */
+const unitName = (unit: Length['unit'], form: Form) => (unit === 'words' ? 'words' : form === 'prose' ? 'paragraphs' : 'lines');
+
+const SPEAKER_COUNTS = Array.from({ length: SPEAKERS.max - SPEAKERS.min + 1 }, (_, i) => SPEAKERS.min + i);
+
+/** The arrangement as the form offers it: its lines' "Shuffle lines" stands in for shuffled paragraphs. */
+export function shownArrangement(arrangement: Arrangement, form: Form): Arrangement {
+  return ORDERS[form][arrangement] ? arrangement : 'sentences';
+}
 
 interface ControlsProps {
   /** Every setting to choose from: built-in, the person's own, and any from a shared link. */
@@ -28,6 +58,10 @@ interface ControlsProps {
   spoken: boolean;
   view: View;
   onView: (view: View) => void;
+  form: Form;
+  onForm: (form: Form) => void;
+  speakers: number;
+  onSpeakers: (speakers: number) => void;
   arrangement: Arrangement;
   onArrangement: (arrangement: Arrangement) => void;
   length: Length;
@@ -46,7 +80,9 @@ function optionLabel(name: string, language: string): string {
 
 export function Controls(props: ControlsProps) {
   const id = useId();
-  const { length } = props;
+  const { length, form } = props;
+  const orders = ORDERS[form];
+  const arrangement = shownArrangement(props.arrangement, form);
   return (
     <div className="controls">
       <div className="field">
@@ -86,23 +122,55 @@ export function Controls(props: ControlsProps) {
       )}
 
       <div className="field">
+        <label className="label" htmlFor={`${id}-form`}>
+          Form
+        </label>
+        <div className="row">
+          <select
+            id={`${id}-form`}
+            aria-describedby={`${id}-form-hint`}
+            value={form}
+            onChange={(event) => props.onForm(event.target.value as Form)}
+          >
+            {FORMS.map((value) => (
+              <option key={value} value={value}>
+                {FORM_LABELS[value].label}
+              </option>
+            ))}
+          </select>
+          {form === 'conversation' && (
+            <select aria-label="Speakers" value={props.speakers} onChange={(event) => props.onSpeakers(Number(event.target.value))}>
+              {SPEAKER_COUNTS.map((count) => (
+                <option key={count} value={count}>
+                  {count} speakers
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+        <small className="hint" id={`${id}-form-hint`}>
+          {FORM_LABELS[form].hint}
+        </small>
+      </div>
+
+      <div className="field">
         <label className="label" htmlFor={`${id}-order`}>
           Order
         </label>
         <select
           id={`${id}-order`}
           aria-describedby={`${id}-order-hint`}
-          value={props.arrangement}
+          value={arrangement}
           onChange={(event) => props.onArrangement(event.target.value as Arrangement)}
         >
-          {ARRANGEMENTS.map((arrangement) => (
-            <option key={arrangement} value={arrangement}>
-              {ORDERS[arrangement].label}
+          {ARRANGEMENTS.filter((value) => orders[value]).map((value) => (
+            <option key={value} value={value}>
+              {orders[value]!.label}
             </option>
           ))}
         </select>
         <small className="hint" id={`${id}-order-hint`}>
-          {ORDERS[props.arrangement].hint}
+          {orders[arrangement]!.hint}
         </small>
       </div>
 
@@ -110,16 +178,16 @@ export function Controls(props: ControlsProps) {
         <legend className="label">Length</legend>
         <div className="length">
           <CountInput
-            key={length.unit}
-            label={`Number of ${UNITS[length.unit]}`}
+            key={`${form}-${length.unit}`}
+            label={`Number of ${unitName(length.unit, form)}`}
             value={length.count}
             max={MAX_LENGTH[length.unit]}
             onChange={props.onCount}
           />
           <select aria-label="Count in" value={length.unit} onChange={(event) => props.onUnit(event.target.value as Length['unit'])}>
-            {Object.entries(UNITS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
+            {(['paragraphs', 'words'] as const).map((unit) => (
+              <option key={unit} value={unit}>
+                {unitName(unit, form)}
               </option>
             ))}
           </select>

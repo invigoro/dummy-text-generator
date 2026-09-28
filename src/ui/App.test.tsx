@@ -172,6 +172,65 @@ describe('App', () => {
   });
 });
 
+const speakerNames = (container: HTMLElement) => [...container.querySelectorAll('.speaker')].map((speaker) => speaker.textContent);
+
+describe('Forms', () => {
+  it('writes a conversation, each line after its speaker, and keeps it in the URL', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<App />);
+    await paragraphs();
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Form' }), 'conversation');
+    expect(await paragraphs()).toHaveLength(8);
+    expect(screen.getByRole('spinbutton', { name: 'Number of lines' })).toHaveValue(8);
+    expect(new Set(speakerNames(container)).size).toBe(2);
+    expect(window.location.hash).toMatch(/&form=conversation&speakers=2$/);
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Speakers' }), '3');
+    expect(new Set(speakerNames(container)).size).toBe(3);
+    // Lines have no paragraphs to shuffle.
+    const order = screen.getByRole('combobox', { name: 'Order' });
+    expect(within(order).queryByRole('option', { name: 'Shuffle paragraphs' })).not.toBeInTheDocument();
+    expect(order).toHaveValue('sentences');
+    expect(within(order).getByRole('option', { name: 'Shuffle lines' })).toBeInTheDocument();
+  });
+
+  it('shows each speaker’s name in the view chosen', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<App />);
+    await paragraphs();
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Form' }), 'conversation');
+    const [written] = speakerNames(container);
+    await user.click(screen.getByRole('radio', { name: 'Say it' }));
+    const [said] = speakerNames(container);
+    expect(said).not.toBe(written);
+    expect(said).toMatch(/^[a-zA-Z'-]+:$/);
+  });
+
+  it('writes an inscription in short lines, copied one to a line', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await paragraphs();
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Form' }), 'inscription');
+    const lines = await paragraphs();
+    expect(lines).toHaveLength(4);
+    await user.click(screen.getByRole('button', { name: 'Copy' }));
+    expect(await navigator.clipboard.readText()).toBe(lines.join('\n'));
+    expect(window.location.hash).toMatch(/&form=inscription$/);
+    // Back to prose, with prose's own length.
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Form' }), 'prose');
+    expect(await paragraphs()).toHaveLength(3);
+  });
+
+  it('starts from a conversation in the URL', async () => {
+    window.history.replaceState(null, '', '/#lang=dnd/orc&order=original&len=6p&seed=9&view=written&form=conversation&speakers=4');
+    const { container } = render(<App />);
+    expect(await paragraphs()).toHaveLength(6);
+    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveValue('conversation');
+    expect(screen.getByRole('combobox', { name: 'Speakers' })).toHaveValue('4');
+    expect(new Set(speakerNames(container)).size).toBe(4);
+  });
+});
+
 const colonial = sanitizeSetting({
   id: 'my-colonial',
   name: 'Colonial',

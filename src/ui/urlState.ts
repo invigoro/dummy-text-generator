@@ -1,8 +1,10 @@
 /**
  * The page's settings in its URL, so a link recreates the exact text:
- * #lang=dnd/elvish&order=sentences&len=3p&seed=123456&view=both
+ * #lang=dnd/elvish&order=sentences&len=3p&seed=123456&view=both, with &form=conversation&speakers=3
+ * for anything but prose.
  */
 import { ARRANGEMENTS, MAX_LENGTH, type Arrangement, type Length } from '../engine/arrange';
+import { FORMS, SPEAKERS, type Form } from '../engine/forms';
 
 export type View = 'written' | 'say' | 'both' | 'ipa';
 export const VIEWS: readonly View[] = ['written', 'say', 'both', 'ipa'];
@@ -14,6 +16,9 @@ export interface PageState {
   length: Length;
   seed: number;
   view: View;
+  form: Form;
+  /** How many speakers a conversation has. */
+  speakers: number;
   /** A custom setting the choice belongs to, encoded, so the link works for anyone. */
   world?: string;
 }
@@ -50,6 +55,12 @@ export function readHash(hash: string, isChoice: (key: string) => boolean): Part
   const view = params.get('view');
   if (view && (VIEWS as readonly string[]).includes(view)) state.view = view as View;
 
+  const form = params.get('form');
+  if (form && (FORMS as readonly string[]).includes(form)) state.form = form as Form;
+
+  const speakers = Number(params.get('speakers'));
+  if (Number.isInteger(speakers) && speakers >= SPEAKERS.min && speakers <= SPEAKERS.max) state.speakers = speakers;
+
   const world = worldInHash(hash);
   if (world) state.world = world;
 
@@ -64,6 +75,8 @@ export function writeHash(state: PageState): string {
     seed: String(state.seed),
     view: state.view,
   });
+  if (state.form !== 'prose') params.set('form', state.form);
+  if (state.form === 'conversation') params.set('speakers', String(state.speakers));
   if (state.world) params.set('world', state.world);
   // The slash in "dnd/elvish" reads better unescaped, and is safe in a fragment.
   return `#${params.toString().replace(/%2F/gi, '/')}`;

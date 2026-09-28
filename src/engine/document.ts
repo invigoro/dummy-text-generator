@@ -25,6 +25,8 @@ export interface DocSentence {
 
 export interface DocParagraph {
   sentences: DocSentence[];
+  /** In a conversation, who says it: their name and a colon, in the language. */
+  speaker?: DocSentence;
 }
 
 /** Real words, as they are. */
@@ -175,12 +177,13 @@ export function sentenceText(sentence: DocSentence): string {
 }
 
 export function paragraphText(paragraph: DocParagraph): string {
-  return paragraph.sentences.map(sentenceText).join(' ');
+  const text = paragraph.sentences.map(sentenceText).join(' ');
+  return paragraph.speaker ? `${sentenceText(paragraph.speaker)} ${text}` : text;
 }
 
-/** The written text: a blank line between paragraphs. */
-export function writtenText(paragraphs: readonly DocParagraph[]): string {
-  return paragraphs.map(paragraphText).join('\n\n');
+/** The written text: a blank line between paragraphs, or a line break between an inscription's lines. */
+export function writtenText(paragraphs: readonly DocParagraph[], separator = '\n\n'): string {
+  return paragraphs.map(paragraphText).join(separator);
 }
 
 export function countDocWords(paragraphs: readonly DocParagraph[]): number {
@@ -233,15 +236,21 @@ function plainPunctuation(token: DocToken): string {
 }
 
 /** The "say it" or IPA line for every paragraph. */
-export function spokenText(paragraphs: readonly DocParagraph[], rule: StressRule, respell: Respeller, form: keyof SaidWord): string {
+export function spokenText(
+  paragraphs: readonly DocParagraph[],
+  rule: StressRule,
+  respell: Respeller,
+  form: keyof SaidWord,
+  separator = '\n\n',
+): string {
+  const spoken = (sentence: DocSentence) => {
+    const said = sayWords(sentence, rule, respell);
+    return sentence.tokens.map((token, i) => said[i]?.[form] ?? plainPunctuation(token)).join('');
+  };
   return paragraphs
-    .map((paragraph) =>
-      paragraph.sentences
-        .map((sentence) => {
-          const said = sayWords(sentence, rule, respell);
-          return sentence.tokens.map((token, i) => said[i]?.[form] ?? plainPunctuation(token)).join('');
-        })
-        .join(' '),
-    )
-    .join('\n\n');
+    .map((paragraph) => {
+      const text = paragraph.sentences.map(spoken).join(' ');
+      return paragraph.speaker ? `${spoken(paragraph.speaker)} ${text}` : text;
+    })
+    .join(separator);
 }

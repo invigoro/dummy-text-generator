@@ -4,31 +4,44 @@ import { readHash, worldInHash, writeHash, type PageState } from './urlState';
 
 const isChoice = (key: string) => ['dnd/elvish', 'real/latin'].includes(key);
 
+/** What a prose page's hash holds: prose, and the speakers it doesn't need, go without saying. */
+const inHash = (page: PageState) => ({ ...page, form: page.form === 'prose' ? undefined : page.form, speakers: page.form === 'conversation' ? page.speakers : undefined });
+
 const state: PageState = {
   choice: 'dnd/elvish',
   arrangement: 'sentences',
   length: { unit: 'paragraphs', count: 3 },
   seed: 123456,
   view: 'both',
+  form: 'prose',
+  speakers: 2,
 };
 
 describe('writeHash and readHash', () => {
   it('write a readable hash and read it back', () => {
     const hash = writeHash(state);
     expect(hash).toBe('#lang=dnd/elvish&order=sentences&len=3p&seed=123456&view=both');
-    expect(readHash(hash, isChoice)).toEqual(state);
+    expect(readHash(hash, isChoice)).toEqual(inHash(state));
   });
 
   it('keep word counts', () => {
     const words = { ...state, length: { unit: 'words', count: 250 } } as const;
-    expect(readHash(writeHash(words), isChoice)).toEqual(words);
+    expect(readHash(writeHash(words), isChoice)).toEqual(inHash(words));
+  });
+
+  it('carry a conversation and its speakers, and leave both out for prose', () => {
+    const talk = { ...state, form: 'conversation', speakers: 3 } as const;
+    expect(writeHash(talk)).toBe('#lang=dnd/elvish&order=sentences&len=3p&seed=123456&view=both&form=conversation&speakers=3');
+    expect(readHash(writeHash(talk), isChoice)).toEqual(talk);
+    expect(writeHash({ ...state, form: 'inscription' })).toMatch(/&form=inscription$/);
+    expect(readHash('#form=song&speakers=9', isChoice)).toEqual({});
   });
 
   it('carry a custom setting last, and only when there is one', () => {
     const custom = { ...state, choice: 'my-world/renan', world: 'eyJpZCI6Im15LXdvcmxkIn0' };
     const hash = writeHash(custom);
     expect(hash).toBe('#lang=my-world/renan&order=sentences&len=3p&seed=123456&view=both&world=eyJpZCI6Im15LXdvcmxkIn0');
-    expect(readHash(hash, () => true)).toEqual(custom);
+    expect(readHash(hash, () => true)).toEqual(inHash(custom));
   });
 });
 

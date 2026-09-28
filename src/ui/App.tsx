@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { LoadedLanguage } from '../data/languages';
 import { DEFAULT_CHOICE, findChoice, SETTINGS, type Setting } from '../data/settings';
 import type { Arrangement, Length } from '../engine/arrange';
+import { SPEAKERS, type Form } from '../engine/forms';
 import { generate } from '../engine/generate';
 import { isSpoken } from '../engine/language';
 import { randomSeed } from '../engine/rng';
@@ -27,18 +28,34 @@ interface Initial {
   state: PageState;
 }
 
+type Counts = Record<Form, Record<Length['unit'], number>>;
+
+/** Each form and unit keeps its own count, so switching to words doesn't ask for 3 words, or a conversation for 3 lines. */
+const DEFAULT_COUNTS: Counts = {
+  prose: { paragraphs: 3, words: 200 },
+  conversation: { paragraphs: 8, words: 120 },
+  inscription: { paragraphs: 4, words: 20 },
+};
+
+function withCount(counts: Counts, form: Form, length: Length): Counts {
+  return { ...counts, [form]: { ...counts[form], [length.unit]: length.count } };
+}
+
 function initialState(): Initial {
   const custom = loadCustomSettings();
   const { linked, state } = fromHash(window.location.hash, custom);
+  const form = state.form ?? 'prose';
   return {
     custom,
     shared: linked,
     state: {
       choice: DEFAULT_CHOICE,
       arrangement: 'sentences',
-      length: { unit: 'paragraphs', count: 3 },
+      length: { unit: 'paragraphs', count: DEFAULT_COUNTS[form].paragraphs },
       seed: randomSeed(),
       view: 'written',
+      form,
+      speakers: SPEAKERS.min,
       ...state,
     },
   };
@@ -55,30 +72,31 @@ export default function App() {
   const [choiceKey, setChoiceKey] = useState(initial.state.choice);
   const [arrangement, setArrangement] = useState<Arrangement>(initial.state.arrangement);
   const [unit, setUnit] = useState<Length['unit']>(initial.state.length.unit);
-  // Each unit keeps its own count, so switching to words doesn't ask for 3 words.
-  const [counts, setCounts] = useState<Record<Length['unit'], number>>(() => ({
-    paragraphs: 3,
-    words: 200,
-    [initial.state.length.unit]: initial.state.length.count,
-  }));
+  const [form, setForm] = useState<Form>(initial.state.form);
+  const [counts, setCounts] = useState<Counts>(() => withCount(DEFAULT_COUNTS, initial.state.form, initial.state.length));
+  const [speakers, setSpeakers] = useState(initial.state.speakers);
   const [seed, setSeed] = useState(initial.state.seed);
   const [view, setView] = useState<View>(initial.state.view);
 
   const settings = useMemo(() => [...SETTINGS, ...custom, ...(shared ? [shared] : [])], [custom, shared]);
   const found = findChoice(choiceKey, settings) ?? findChoice(DEFAULT_CHOICE)!;
   const language = useLanguage(found.choice.language);
-  const length: Length = { unit, count: counts[unit] };
+  const count = counts[form][unit];
 
   const text = useMemo(
-    () => (language.status === 'ready' ? generate(language.loaded, { arrangement, length: { unit, count: counts[unit] }, seed }) : null),
-    [language, arrangement, unit, counts, seed],
+    () =>
+      language.status === 'ready'
+        ? generate(language.loaded, { arrangement, length: { unit, count }, seed, form, speakers })
+        : null,
+    [language, arrangement, unit, count, seed, form, speakers],
   );
 
   useEffect(() => saveCustomSettings(custom), [custom]);
 
   // The URL always describes the page, custom setting included, so it can be bookmarked or shared.
   const world = isCustomSetting(found.setting) ? encodeSetting(found.setting) : undefined;
-  const hash = writeHash({ choice: found.key, arrangement, length, seed, view, world });
+  const length: Length = { unit, count };
+  const hash = writeHash({ choice: found.key, arrangement, length, seed, view, form, speakers, world });
   useEffect(() => {
     if (window.location.hash !== hash) window.history.replaceState(null, '', hash);
   }, [hash]);
@@ -91,13 +109,17 @@ export default function App() {
         setShared(linked);
         setBannerHidden(false);
       }
+      // A link leaves out the form for prose.
+      const newForm = state.form ?? 'prose';
+      setForm(newForm);
       if (state.choice) setChoiceKey(state.choice);
       if (state.arrangement) setArrangement(state.arrangement);
       if (state.length) {
-        const { unit: newUnit, count } = state.length;
-        setUnit(newUnit);
-        setCounts((current) => ({ ...current, [newUnit]: count }));
+        const newLength = state.length;
+        setUnit(newLength.unit);
+        setCounts((current) => withCount(current, newForm, newLength));
       }
+      if (state.speakers) setSpeakers(state.speakers);
       if (state.seed !== undefined) setSeed(state.seed);
       if (state.view) setView(state.view);
     };
@@ -138,11 +160,15 @@ export default function App() {
           spoken={language.status === 'ready' && isSpoken(language.loaded.language)}
           view={view}
           onView={setView}
+          form={form}
+          onForm={setForm}
+          speakers={speakers}
+          onSpeakers={setSpeakers}
           arrangement={arrangement}
           onArrangement={setArrangement}
           length={length}
           onUnit={setUnit}
-          onCount={(count) => setCounts((current) => ({ ...current, [unit]: count }))}
+          onCount={(newCount) => setCounts((current) => withCount(current, form, { unit, count: newCount }))}
           seed={seed}
           onReroll={() => setSeed(randomSeed())}
         />
@@ -181,7 +207,7 @@ export default function App() {
               </div>
             )}
             {text && language.status === 'ready' && (
-              <Output paragraphs={text} language={language.loaded.language} view={view} stele={found.choice.stele} />
+              <Output paragraphs={text} language={language.loaded.language} view={view} form={form} stele={found.choice.stele} />
             )}
           </>
         )}

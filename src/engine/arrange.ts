@@ -149,7 +149,7 @@ const capitalize = (word: string) => word.replace(/\p{L}/u, (letter) => letter.t
  * Whether the word at `index` comes at a break: the start of the sentence, of a quotation, or of
  * a new sentence inside a quotation. A capital there may only be because of where the word is.
  */
-function atBreak(tokens: readonly Token[], index: number): boolean {
+export function atBreak(tokens: readonly Token[], index: number): boolean {
   for (let i = index - 1; i >= 0; i--) {
     const token = tokens[i];
     if (token.kind === 'space') continue;
@@ -207,13 +207,13 @@ function wordStats(corpus: Corpus): WordStats {
 }
 
 /** Every word in the source once in a random order, then again in a new order. */
-function* wordPool(corpus: Corpus, random: Random): Generator<string, never> {
+export function* wordPool(corpus: Corpus, random: Random): Generator<string, never> {
   const { words } = wordStats(corpus);
   for (;;) yield* shuffled(words, random);
 }
 
 /** The sentence with the same punctuation and capitals, and every word replaced from the pool. */
-function refill(sentence: Sentence, words: Iterator<string, never>): Sentence {
+export function refill(sentence: Sentence, words: Iterator<string, never>): Sentence {
   return {
     tokens: sentence.tokens.map((token, i, tokens) => {
       if (token.kind !== 'word') return token;

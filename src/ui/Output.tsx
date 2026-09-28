@@ -8,6 +8,7 @@ import {
   type DocParagraph,
   type DocSentence,
 } from '../engine/document';
+import type { Form } from '../engine/forms';
 import { stressRule, type Language } from '../engine/language';
 import type { Respeller } from '../engine/respell';
 import type { StressRule } from '../engine/sounds/system';
@@ -19,6 +20,8 @@ interface OutputProps {
   language: Language;
   /** The view to show; ignored for a language without a "say it" line. */
   view: View;
+  /** Prose, a conversation (a speaker before each line) or an inscription (one short line each). */
+  form: Form;
   stele: SteleOptions;
 }
 
@@ -29,36 +32,48 @@ function voiceOf(language: Language): Voice | null {
   return rule && language.kind !== 'real' ? { rule, respell: language.respell } : null;
 }
 
-/** The text as the view shows it, for copying. "Both" puts each paragraph's "say it" line under it. */
-function viewText(paragraphs: DocParagraph[], view: View, voice: Voice | null): string {
-  if (!voice || view === 'written') return writtenText(paragraphs);
-  if (view === 'say' || view === 'ipa') return spokenText(paragraphs, voice.rule, voice.respell, view);
+/**
+ * The text as the view shows it, for copying: a blank line between paragraphs, or a line break
+ * between an inscription's lines. "Both" puts each paragraph's "say it" line under it.
+ */
+function viewText(paragraphs: DocParagraph[], view: View, voice: Voice | null, separator: string): string {
+  if (!voice || view === 'written') return writtenText(paragraphs, separator);
+  if (view === 'say' || view === 'ipa') return spokenText(paragraphs, voice.rule, voice.respell, view, separator);
   return paragraphs.map((paragraph) => `${paragraphText(paragraph)}\n${spokenText([paragraph], voice.rule, voice.respell, 'say')}`).join('\n\n');
 }
 
-export function Output({ paragraphs, language, view, stele }: OutputProps) {
+export function Output({ paragraphs, language, view, form, stele }: OutputProps) {
   const voice = voiceOf(language);
   const shown = voice ? view : 'written';
+  const separator = form === 'inscription' ? '\n' : '\n\n';
   return (
     <section className="output" aria-label="Generated text">
       <div className="output-bar">
         <p className="word-count">{countDocWords(paragraphs).toLocaleString('en')} words</p>
-        <Actions copyText={viewText(paragraphs, shown, voice)} steleText={writtenText(paragraphs)} stele={stele} />
+        <Actions copyText={viewText(paragraphs, shown, voice, separator)} steleText={writtenText(paragraphs, separator)} stele={stele} />
       </div>
       {voice && shown !== 'written' && 'voicing' in language && language.voicing && (
         <aside className="voicing">
           <strong>How to say it:</strong> {language.voicing}
         </aside>
       )}
-      <article className={`page view-${shown}`}>
+      <article className={`page view-${shown} form-${form}`}>
         {paragraphs.map((paragraph, i) => (
-          <p key={i}>{renderParagraph(paragraph, shown, voice)}</p>
+          <p key={i}>
+            {paragraph.speaker && (
+              <>
+                <span className="speaker">{renderParagraph({ sentences: [paragraph.speaker] }, shown, voice)}</span>{' '}
+              </>
+            )}
+            {renderParagraph({ sentences: paragraph.sentences }, shown, voice)}
+          </p>
         ))}
       </article>
     </section>
   );
 }
 
+/** A paragraph's sentences in the view. A speaker's name is shown on its own, before them. */
 function renderParagraph(paragraph: DocParagraph, view: View, voice: Voice | null): ReactNode {
   if (!voice || view === 'written') return paragraphText(paragraph);
   if (view === 'say' || view === 'ipa') return spokenText([paragraph], voice.rule, voice.respell, view);

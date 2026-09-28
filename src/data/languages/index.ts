@@ -1,5 +1,5 @@
 import { inventedWords, realWords, spokenSentence, vocabularyWords, type DocParagraph } from '../../engine/document';
-import type { TextSource } from '../../engine/generate';
+import type { TextSource, WordsOptions } from '../../engine/generate';
 import { compileLanguage, type Language, type LanguageDef } from '../../engine/language';
 import { Lexicon } from '../../engine/lexicon';
 import { tokenizeParagraph, tokenizerFor, type Paragraph } from '../../engine/tokenize';
@@ -96,9 +96,9 @@ async function build(def: LanguageDef): Promise<LoadedLanguage> {
         : null;
       return {
         ...base,
-        words: (paragraphs: Paragraph[]): DocParagraph[] => {
+        words: (paragraphs: Paragraph[], options: WordsOptions = {}): DocParagraph[] => {
           const converted = vocabularyWords(paragraphs, vocabulary, flow.options);
-          if (!opening || converted.length === 0) return converted;
+          if (!opening || options.opening === false || converted.length === 0) return converted;
           const [first, ...rest] = converted;
           return [{ sentences: [opening, ...first.sentences] }, ...rest];
         },

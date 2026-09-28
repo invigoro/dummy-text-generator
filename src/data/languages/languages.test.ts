@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ARRANGEMENTS } from '../../engine/arrange';
 import { isOffensive } from '../../engine/blocklist';
-import { countDocWords, spokenText, writtenText, type DocWord } from '../../engine/document';
+import { countDocWords, paragraphText, sentenceText, spokenText, writtenText, type DocWord } from '../../engine/document';
 import { generate } from '../../engine/generate';
 import { stressRule } from '../../engine/language';
 import { LANGUAGES, loadLanguage } from './index';
@@ -19,6 +19,29 @@ describe.each(LANGUAGES.map((def) => [def.name, def] as const))('%s', (_, def) =
     }
   });
 
+  it('writes a conversation, with its speakers named in the language', async () => {
+    const loaded = await loadLanguage(def.id);
+    for (const speakers of [2, 4]) {
+      const talk = generate(loaded, { arrangement: 'sentences', length: { unit: 'paragraphs', count: 10 }, seed: 4, form: 'conversation', speakers });
+      expect(talk).toHaveLength(10);
+      const names = talk.map((line) => sentenceText(line.speaker!));
+      expect(new Set(names).size).toBe(speakers);
+      names.forEach((name, i) => i > 0 && expect(name).not.toBe(names[i - 1]));
+      expect(writtenText(talk)).not.toMatch(IPA_ONLY);
+    }
+  });
+
+  it('writes an inscription in short lines without punctuation', async () => {
+    const loaded = await loadLanguage(def.id);
+    const lines = generate(loaded, { arrangement: 'sentences', length: { unit: 'paragraphs', count: 6 }, seed: 4, form: 'inscription' });
+    expect(lines).toHaveLength(6);
+    for (const line of lines) {
+      expect(countDocWords([line])).toBeGreaterThanOrEqual(2);
+      expect(countDocWords([line])).toBeLessThanOrEqual(7);
+      expect(paragraphText(line)).not.toMatch(/[.,;:!?«»“”„"]/u);
+    }
+  });
+
   it('is the same every time for the same seed', async () => {
     const loaded = await loadLanguage(def.id);
     const options = { arrangement: 'sentences', length: { unit: 'paragraphs', count: 4 }, seed: 12 } as const;
@@ -30,10 +53,14 @@ describe.each(LANGUAGES.map((def) => [def.name, def] as const))('%s', (_, def) =
     const rule = stressRule(loaded.language);
     if (!rule || loaded.language.kind === 'real') return;
     const doc = generate(loaded, { arrangement: 'sentences', length: { unit: 'words', count: 600 }, seed: 3 });
-    const say = spokenText(doc, rule, loaded.language.respell, 'say');
-    expect(say).toMatch(/\p{Lu}/u);
-    // Letters, hyphens and apostrophes; plain punctuation; numbers left as they were.
-    expect(say).not.toMatch(/[^a-zA-Z0-9'\-\s.,;:!?…—–“”()]/u);
+    const talk = generate(loaded, { arrangement: 'sentences', length: { unit: 'paragraphs', count: 10 }, seed: 3, form: 'conversation', speakers: 3 });
+    for (const text of [doc, talk]) {
+      const say = spokenText(text, rule, loaded.language.respell, 'say');
+      expect(say).toMatch(/\p{Lu}/u);
+      // Letters, hyphens and apostrophes; plain punctuation, and Spanish's ¿ ¡ to warn of a question
+      // or an exclamation to come; numbers left as they were.
+      expect(say).not.toMatch(/[^a-zA-Z0-9'\-\s.,;:!?¿¡…—–“”()]/u);
+    }
   });
 
   it('never invents an offensive word', async () => {
@@ -68,6 +95,14 @@ describe('Lorem ipsum', () => {
     for (const seed of [1, 2, 3]) {
       const text = writtenText(generate(loaded, { arrangement: 'sentences', length: { unit: 'paragraphs', count: 2 }, seed }));
       expect(text.startsWith('Lorem ipsum dolor sit amet, consectetur adipiscing elit. ')).toBe(true);
+    }
+  });
+
+  it('leaves its opening to prose', async () => {
+    const loaded = await loadLanguage('lorem-ipsum');
+    for (const form of ['conversation', 'inscription'] as const) {
+      const text = writtenText(generate(loaded, { arrangement: 'sentences', length: { unit: 'paragraphs', count: 3 }, seed: 1, form }));
+      expect(text).not.toMatch(/Lorem ipsum dolor sit amet/);
     }
   });
 });
