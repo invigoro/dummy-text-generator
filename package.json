@@ -9,9 +9,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && tsc -p scripts && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "import-gutenberg": "node scripts/import-gutenberg.ts"
   },
   "dependencies": {
     "react": "^19.3.0",
