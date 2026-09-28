@@ -105,7 +105,73 @@ const ICELANDIC: TokenizeOptions = {
   lowercaseInitials: true,
 };
 
-const TOKENIZERS: Readonly<Record<string, TokenizeOptions>> = { en: ENGLISH, fr: FRENCH, la: LATIN, is: ICELANDIC };
+const SPANISH: TokenizeOptions = {
+  abbreviations: new Set(['Sr', 'Sra', 'Srta', 'Sres', 'Dña', 'Ud', 'Uds', 'Vd', 'Vds', 'Dr', 'Sto', 'Sta']),
+  quotes: FRENCH.quotes,
+  elisions: new Set(),
+};
+
+const PORTUGUESE: TokenizeOptions = {
+  abbreviations: new Set(['Sr', 'Sra', 'Srs', 'Snr', 'Snra', 'Dr', 'Exc', 'Exma', 'Exmo', 'Sta', 'Sto', 'Mme', 'Ex']),
+  quotes: FRENCH.quotes,
+  elisions: new Set(),
+  // Older Portuguese elides like French: "d'Israel", "n'uma".
+  elision: 'before',
+};
+
+const ITALIAN: TokenizeOptions = {
+  abbreviations: new Set(['Sig', 'Sigg', 'Sigra', 'Dott', 'Prof', 'Don', 'Mons']),
+  quotes: FRENCH.quotes,
+  elisions: new Set(),
+  // "l'uomo", "dell'Adda", "un'altra".
+  elision: 'before',
+};
+
+const FINNISH: TokenizeOptions = {
+  abbreviations: new Set(['esim', 'ks', 'mm', 'n', 'ym', 'yms', 'jne']),
+  // Finnish opens and closes a quotation with the same mark: »Niin», sanoi hän.
+  quotes: [
+    ['»', '»'],
+    ['”', '”'],
+    ['"', '"'],
+  ],
+  elisions: new Set(),
+  lowercaseInitials: true,
+};
+
+const WELSH: TokenizeOptions = {
+  abbreviations: new Set(['Mr', 'Mrs', 'Dr', 'St', 'Parch']),
+  quotes: ENGLISH.quotes,
+  elisions: new Set(),
+  // "i’r", "a’r", "Cymru’n": the short word follows the apostrophe.
+  elision: 'after',
+};
+
+const GERMAN: TokenizeOptions = {
+  abbreviations: new Set(['Hr', 'Hrn', 'Fr', 'Frl', 'Dr', 'St', 'Nr', 'usw', 'bzw', 'vgl', 'ca']),
+  // German prints quotations »like this« or „like this“.
+  quotes: [
+    ['»', '«'],
+    ['„', '“'],
+    ['"', '"'],
+  ],
+  elisions: new Set(),
+  lowercaseInitials: true,
+  elision: 'after',
+};
+
+const TOKENIZERS: Readonly<Record<string, TokenizeOptions>> = {
+  en: ENGLISH,
+  fr: FRENCH,
+  la: LATIN,
+  is: ICELANDIC,
+  es: SPANISH,
+  pt: PORTUGUESE,
+  it: ITALIAN,
+  fi: FINNISH,
+  cy: WELSH,
+  de: GERMAN,
+};
 
 /** The options for text in a language, from its BCP 47 tag. English rules if there are none. */
 export function tokenizerFor(language: string): TokenizeOptions {

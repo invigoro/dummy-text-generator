@@ -92,6 +92,12 @@ describe('cleanGutenberg', () => {
     expect(() => cleanGutenberg(text, { endBefore: /^NOWHERE/ })).toThrow(/NOWHERE/);
   });
 
+  it('removes picture notes, and writes out superscripts and ligatures', () => {
+    expect(cleanGutenberg('[Illustrazione: renzo (pag. 22)]\n\nÁ porta de M.^{me} Levaillant, dos Medina-C[oe]li.')).toBe(
+      'Á porta de Mme Levaillant, dos Medina-Cœli.\n',
+    );
+  });
+
   it('puts back a missing space between sentences', () => {
     expect(cleanGutenberg('Legatos misit.Renuntiatum est.')).toBe('Legatos misit. Renuntiatum est.\n');
   });

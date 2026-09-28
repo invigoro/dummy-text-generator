@@ -21,7 +21,8 @@ function quoteDepth(sentence: Sentence, options: TokenizeOptions) {
 describe.each(SOURCE_TEXTS.map((source) => [source.id, source] as const))('%s', (id, source) => {
   it('is clean prose: no Project Gutenberg text, headings or markup', async () => {
     const text = await source.load();
-    expect(text).not.toMatch(/gutenberg|\*\*\*|--|_/i);
+    // (Manzoni's own "***" for names he keeps back is fine; Gutenberg's "*** START" markers aren't.)
+    expect(text).not.toMatch(/gutenberg|\*\*\* ?(?:START|END)|--|_/i);
     expect(text).not.toMatch(/\r|\n{3,}| {2,}/);
     expect(text.endsWith('\n')).toBe(true);
   });

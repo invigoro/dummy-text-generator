@@ -82,3 +82,73 @@ paragraph lengths, punctuation and word lengths, and replaces every word.
   numbers.
 - **Why this text:** it lends its flow to invented Old Norse. Project Gutenberg has no Old Norse or
   Icelandic sagas, and Icelandic is the closest living language to Old Norse.
+
+## Spanish
+
+### Don Quijote
+
+- **Author:** Miguel de Cervantes (1547–1616)
+- **Published:** 1605
+- **File:** [`src/data/corpora/es/don-quijote.txt`](src/data/corpora/es/don-quijote.txt)
+- **From:** Project Gutenberg eBook #2000, <https://www.gutenberg.org/ebooks/2000>
+- **Cleaning:** `npm run import-gutenberg -- es-don-quijote` keeps chapters I–XI (about 24,000
+  words) and removes the front matter, the prologue's verses and the chapter headings.
+
+## Portuguese
+
+### Os Maias
+
+- **Author:** Eça de Queirós (1845–1900)
+- **Published:** 1888
+- **File:** [`src/data/corpora/pt/os-maias.txt`](src/data/corpora/pt/os-maias.txt)
+- **From:** Project Gutenberg eBook #40409, <https://www.gutenberg.org/ebooks/40409>
+- **Cleaning:** `npm run import-gutenberg -- pt-os-maias` keeps chapters I–IV (about 32,000
+  words), removes the front matter and chapter numbers, and writes out the transcription's
+  superscripts ("M.^{me}" as "Mme") and ligatures ("[oe]" as "œ").
+
+## Italian
+
+### I promessi sposi
+
+- **Author:** Alessandro Manzoni (1785–1873)
+- **Published:** 1840, in its final form
+- **File:** [`src/data/corpora/it/promessi-sposi.txt`](src/data/corpora/it/promessi-sposi.txt)
+- **From:** Project Gutenberg eBook #45334, <https://www.gutenberg.org/ebooks/45334>
+- **Cleaning:** `npm run import-gutenberg -- it-promessi-sposi` keeps chapters I–VIII (about 44,000
+  words) and removes the front matter, the chapter headings and the notes where pictures were.
+
+## Finnish
+
+### Seitsemän veljestä
+
+- **Author:** Aleksis Kivi (1834–1872)
+- **Published:** 1870
+- **File:** [`src/data/corpora/fi/seitseman-veljesta.txt`](src/data/corpora/fi/seitseman-veljesta.txt)
+- **From:** Project Gutenberg eBook #11940, <https://www.gutenberg.org/ebooks/11940>
+- **Cleaning:** `npm run import-gutenberg -- fi-seitseman-veljesta` keeps chapters 1–5 (about
+  25,000 words) and removes the front matter, the chapter headings and the songs.
+
+## Welsh
+
+### Cartrefi Cymru
+
+- **Author:** Owen M. Edwards (1858–1920)
+- **Published:** 1896
+- **File:** [`src/data/corpora/cy/cartrefi-cymru.txt`](src/data/corpora/cy/cartrefi-cymru.txt)
+- **From:** Project Gutenberg eBook #3680, <https://www.gutenberg.org/ebooks/3680>
+- **Cleaning:** `npm run import-gutenberg -- cy-cartrefi-cymru` keeps the twelve essays and
+  removes the title pages, the contents, the headings, the indented verse and the notes at the
+  end.
+
+## German
+
+### Die Verwandlung
+
+- **Author:** Franz Kafka (1883–1924)
+- **Published:** 1915
+- **File:** [`src/data/corpora/de/verwandlung.txt`](src/data/corpora/de/verwandlung.txt)
+- **From:** Project Gutenberg eBook #22367, <https://www.gutenberg.org/ebooks/22367>
+- **Cleaning:** `npm run import-gutenberg -- de-verwandlung` removes the title page and the
+  chapter numbers.
+- **Why this text:** the Grimms' *Deutsche Sagen* was the first choice, but it includes
+  antisemitic legends, so it's not used even as a flow.

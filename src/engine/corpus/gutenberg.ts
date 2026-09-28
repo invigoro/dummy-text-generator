@@ -113,6 +113,11 @@ function isDropped(block: string[]): boolean {
 function cleanProse(text: string, capitals: Readonly<Record<string, string>>): string {
   const cleaned = text
     .replace(/\s+/g, ' ')
+    // Notes where a picture was: [Illustration: …], [Illustrazione: …]
+    .replace(/\[(?:Illustra|Ilustra|Picture|Image|Imagem|Bild|Gravura)[^\]]*\]/giu, '')
+    // Transcribers' conventions: superscripts (M.^{me} for Mme) and ligatures ([oe] for œ).
+    .replace(/\.?\^\{([^}]*)\}/g, '$1')
+    .replace(/\[(oe|OE|ae|AE)\]/g, (_, pair: string) => ({ oe: 'œ', OE: 'Œ', ae: 'æ', AE: 'Æ' })[pair]!)
     .replace(/ \*(?= |$)/g, '') // footnote markers
     .replace(/ ?-{2,} ?/g, '—')
     .replace(/_/g, '')

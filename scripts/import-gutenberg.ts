@@ -44,6 +44,46 @@ const RECIPES: Record<string, Recipe> = {
     // Skips the title pages, which end just before chapter I.
     startAt: /^I\.$/,
   },
+  'es-don-quijote': {
+    url: 'https://www.gutenberg.org/cache/epub/2000/pg2000.txt',
+    output: 'src/data/corpora/es/don-quijote.txt',
+    // The first eleven chapters, after the prologue and the dedicatory verses.
+    startAt: /^Capítulo primero\./,
+    endBefore: /^Capítulo XII\./,
+  },
+  'pt-os-maias': {
+    url: 'https://www.gutenberg.org/cache/epub/40409/pg40409.txt',
+    output: 'src/data/corpora/pt/os-maias.txt',
+    // The first four chapters.
+    startAt: /^I$/,
+    endBefore: /^V$/,
+  },
+  'it-promessi-sposi': {
+    url: 'https://www.gutenberg.org/cache/epub/45334/pg45334.txt',
+    output: 'src/data/corpora/it/promessi-sposi.txt',
+    // The first eight chapters.
+    startAt: /^\s+CAPITOLO PRIMO\.$/,
+    endBefore: /^\s+CAPITOLO IX\.$/,
+  },
+  'fi-seitseman-veljesta': {
+    url: 'https://www.gutenberg.org/cache/epub/11940/pg11940.txt',
+    output: 'src/data/corpora/fi/seitseman-veljesta.txt',
+    // The first five chapters.
+    startAt: /^ENSIMMÄINEN LUKU$/,
+    endBefore: /^KUUDES LUKU$/,
+  },
+  'cy-cartrefi-cymru': {
+    url: 'https://www.gutenberg.org/cache/epub/3680/pg3680.txt',
+    output: 'src/data/corpora/cy/cartrefi-cymru.txt',
+    // The twelve essays, without the title pages, the contents or the notes after them.
+    startAt: /^DOLWAR FECHAN\.$/,
+    endBefore: /^NODIADAU\.$/,
+  },
+  'de-verwandlung': {
+    url: 'https://www.gutenberg.org/cache/epub/22367/pg22367.txt',
+    output: 'src/data/corpora/de/verwandlung.txt',
+    startAt: /^I\.$/,
+  },
 };
 
 const [id, file] = process.argv.slice(2);
