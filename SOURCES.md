@@ -44,6 +44,8 @@ paragraph lengths, punctuation and word lengths, and replaces every word.
 - **From:** Project Gutenberg eBook #13951, <https://www.gutenberg.org/ebooks/13951>
 - **Cleaning:** `npm run import-gutenberg -- fr-trois-mousquetaires` keeps chapters I–XV (about
   56,000 words) and removes the preface, the chapter headings and the underscores marking italics.
+  It closes up the space this edition leaves where a compound broke across a line in print
+  ("lui- même" as "lui-même").
 
 ## Latin
 
@@ -62,9 +64,9 @@ paragraph lengths, punctuation and word lengths, and replaces every word.
 - **Written:** about 58–50 BC
 - **File:** [`src/data/corpora/la/de-bello-gallico.txt`](src/data/corpora/la/de-bello-gallico.txt)
 - **From:** Project Gutenberg eBook #218, <https://www.gutenberg.org/ebooks/218>
-- **Cleaning:** `npm run import-gutenberg -- la-de-bello-gallico` removes the book headings and the
-  square brackets the edition puts round passages it doubts (the words stay), and puts back one
-  missing space between sentences.
+- **Cleaning:** `npm run import-gutenberg -- la-de-bello-gallico` removes the book headings, and the
+  square brackets and percent signs the edition puts round passages and words it doubts (the words
+  stay). It puts back one missing space between sentences.
 
 ## Icelandic
 
@@ -104,7 +106,7 @@ paragraph lengths, punctuation and word lengths, and replaces every word.
 - **From:** Project Gutenberg eBook #40409, <https://www.gutenberg.org/ebooks/40409>
 - **Cleaning:** `npm run import-gutenberg -- pt-os-maias` keeps chapters I–IV (about 32,000
   words), removes the front matter and chapter numbers, and writes out the transcription's
-  superscripts ("M.^{me}" as "Mme") and ligatures ("[oe]" as "œ").
+  superscripts ("M.^{me}" as "Mme", "sr.^a" as "sra") and ligatures ("[oe]" as "œ").
 
 ## Italian
 
