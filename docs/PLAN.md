@@ -1,6 +1,6 @@
-# Dummy Text Generator implementation plan
+# Jabberwock implementation plan
 
-Dummy Text Generator writes "lorem ipsum" for tabletop games: text in real and fantasy languages
+Jabberwock writes "lorem ipsum" for tabletop games: text in real and fantasy languages
 that nobody at the table can understand, but that looks and sounds like a real language. It does two
 jobs:
 
@@ -200,8 +200,9 @@ place to update. A plain `#text=` parameter in Stele would remove the coupling a
   [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) on every push to `master`. The
   workflow runs the tests and the type check before deploying. Pushes to other branches run the
   same checks without deploying ([`.github/workflows/test.yml`](../.github/workflows/test.yml)).
-  Vite uses a relative `base`, so the same build works at `invigoro.github.io/dummy-text-generator/`,
-  locally, or on a custom domain.
+  The site is served at `jabberwock.invigoro.me`, set as the custom domain in the repository's
+  Pages settings. Vite uses a relative `base`, so the same build works there, at
+  `invigoro.github.io/dummy-text-generator/`, or locally.
 - **Node 24**, pinned in `.nvmrc` and used by CI. Anything from 22.12 up works locally.
 - **The generator is plain TypeScript** (`src/engine/`) with no React in it. The same seed always
   gives the same text, which is what makes tests and share links possible.

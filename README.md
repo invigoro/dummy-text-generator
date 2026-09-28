@@ -1,11 +1,11 @@
-# Dummy Text Generator
+# Jabberwock
 
 Lorem ipsum for tabletop games: text in real and fantasy languages that nobody at the table can
 understand, but that looks and sounds like a real language. Use it for the filler on a handout, the
 words of an inscription, or NPC speech a game master can read aloud without knowing the language.
 It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a weathered object.
 
-**Live site:** https://invigoro.github.io/dummy-text-generator/
+**Live site:** https://jabberwock.invigoro.me/
 
 ## Using it
 

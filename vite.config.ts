@@ -3,8 +3,8 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  // Relative asset URLs, so the same build works at invigoro.github.io/dummy-text-generator/,
-  // under `vite preview`, or on a custom domain later.
+  // Relative asset URLs, so the same build works at jabberwock.invigoro.me, at
+  // invigoro.github.io/dummy-text-generator/, or under `vite preview`.
   base: './',
   plugins: [react()],
   test: {

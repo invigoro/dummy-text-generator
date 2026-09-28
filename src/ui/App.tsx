@@ -239,7 +239,7 @@ export default function App() {
     <div className="app">
       <aside className="panel">
         <header className="brand">
-          <h1>Dummy Text Generator</h1>
+          <h1>Jabberwock</h1>
           <p>Lorem ipsum for tabletop games</p>
         </header>
 

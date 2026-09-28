@@ -35,7 +35,7 @@ const language = () => screen.getByRole('combobox', { name: 'Language' });
 describe('App', () => {
   it('starts with Elvish, in invented French, and credits its flow', async () => {
     render(<App />);
-    expect(screen.getByRole('heading', { level: 1, name: 'Dummy Text Generator' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Jabberwock' })).toBeInTheDocument();
     expect(await paragraphs()).toHaveLength(3);
     expect(language()).toHaveValue('dnd/elvish');
     expect(screen.getByText('Les Trois Mousquetaires')).toBeInTheDocument();
