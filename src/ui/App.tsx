@@ -133,7 +133,11 @@ export default function App() {
     [made, custom, shared, known],
   );
   const found = findChoice(choiceKey, settings) ?? findChoice(DEFAULT_CHOICE)!;
-  const language = useLanguage(known.get(found.choice.language)!);
+  const current = known.get(found.choice.language)!;
+  // While the builder is open, the page keeps the language as it was, rather than building it
+  // afresh (over the whole of its flow text) at every change; it catches up once the builder closes.
+  const [frozen, setFrozen] = useState<LanguageDef | null>(null);
+  const language = useLanguage(panel === 'languages' && frozen ? frozen : current);
   const count = counts[form][unit];
 
   const text = useMemo(
@@ -236,7 +240,10 @@ export default function App() {
           editButton={editButton}
           onEditSettings={() => setPanel('settings')}
           buildButton={buildButton}
-          onBuild={() => setPanel('languages')}
+          onBuild={() => {
+            setFrozen(current);
+            setPanel('languages');
+          }}
           choice={found.key}
           onChoice={setChoiceKey}
           spoken={language.status === 'ready' && isSpoken(language.loaded.language)}

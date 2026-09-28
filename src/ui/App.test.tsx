@@ -481,6 +481,21 @@ describe('Your own languages', () => {
     expect(loadCustomLanguages()).toEqual([changed]);
   });
 
+  it('writes in a language as it was changed, once the builder closes', async () => {
+    const user = userEvent.setup();
+    saveCustomLanguages([grukk]);
+    window.history.replaceState(null, '', '/#lang=mine/my-grukk-abcde');
+    render(<App />);
+    const before = await paragraphs();
+    await user.click(buildButton());
+    const vowels = screen.getByRole('textbox', { name: 'Sounds in class V' });
+    await user.clear(vowels);
+    await user.type(vowels, 'i:3 e');
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+    await waitFor(async () => expect(await paragraphs()).not.toEqual(before));
+    expect((await paragraphs()).join(' ')).not.toMatch(/[ao]/);
+  });
+
   it('lets a setting of yours use a language of yours', async () => {
     saveCustomLanguages([grukk]);
     saveCustomSettings([sanitizeSetting({ id: 'my-world', name: 'My world', choices: [{ name: 'Orcish tongue', language: 'my-grukk-abcde' }] })!]);
