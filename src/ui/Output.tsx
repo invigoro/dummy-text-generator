@@ -11,6 +11,7 @@ import {
 import type { Form } from '../engine/forms';
 import { voiceOf, type Language, type Voice } from '../engine/language';
 import { steleLink, trimForStele, type SteleOptions } from '../engine/stele';
+import { Listen } from './Listen';
 import type { View } from './urlState';
 
 interface OutputProps {
@@ -42,13 +43,16 @@ export function Output({ paragraphs, language, view, form, stele, title }: Outpu
   const separator = form === 'inscription' || form === 'names' ? '\n' : '\n\n';
   const [reading, setReading] = useState(false);
   const readButton = useRef<HTMLButtonElement>(null);
+  const written = writtenText(paragraphs, separator);
+  const said = voice ? spokenText(paragraphs, voice.rule, voice.respell, 'say', separator) : null;
   return (
     <section className="output" aria-label="Generated text">
       <div className="output-bar">
         <p className="word-count">
           {form === 'names' ? `${paragraphs.length} names` : `${countDocWords(paragraphs).toLocaleString('en')} words`}
         </p>
-        <Actions copyText={viewText(paragraphs, shown, voice, separator)} steleText={writtenText(paragraphs, separator)} stele={stele}>
+        <Actions copyText={viewText(paragraphs, shown, voice, separator)} steleText={written} stele={stele}>
+          <Listen languageId={language.id} written={written} said={said} />
           <button ref={readButton} type="button" onClick={() => setReading(true)}>
             Read aloud
           </button>
@@ -65,6 +69,7 @@ export function Output({ paragraphs, language, view, form, stele, title }: Outpu
           title={title}
           // Reading aloud is what "say it" is for; "both" and the written text are a click away.
           initialView={voice ? (shown === 'both' ? 'both' : 'say') : 'written'}
+          listen={<Listen languageId={language.id} written={written} said={said} />}
           onClose={() => {
             setReading(false);
             readButton.current?.focus();
@@ -126,11 +131,13 @@ interface ReadAloudProps {
   form: Form;
   title: string;
   initialView: View;
+  /** A button to hear it read, where the browser can. */
+  listen: ReactNode;
   onClose: () => void;
 }
 
 /** The text in large type, for reading aloud at the table, with the language's tip for voicing it. */
-function ReadAloud({ paragraphs, language, voice, form, title, initialView, onClose }: ReadAloudProps) {
+function ReadAloud({ paragraphs, language, voice, form, title, initialView, listen, onClose }: ReadAloudProps) {
   const id = useId();
   const dialog = useRef<HTMLDialogElement>(null);
   const [view, setView] = useState<View>(initialView);
@@ -169,6 +176,7 @@ function ReadAloud({ paragraphs, language, voice, form, title, initialView, onCl
             A+
           </button>
         </div>
+        {listen}
         <button type="button" onClick={onClose}>
           Close
         </button>

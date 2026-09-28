@@ -553,6 +553,79 @@ describe('Your own languages', () => {
   });
 });
 
+describe('Listening', () => {
+  interface Utterance {
+    text: string;
+    lang: string;
+    voice: { name: string; lang: string } | null;
+    rate: number;
+    onend?: () => void;
+    onerror?: () => void;
+  }
+
+  /** A stand-in for the browser's speech, with the voices given; what it's asked to say. */
+  function speech(voices: { name: string; lang: string }[]) {
+    const spoken: Utterance[] = [];
+    const synth = { speak: vi.fn((utterance: Utterance) => spoken.push(utterance)), cancel: vi.fn(), getVoices: () => voices };
+    Object.defineProperty(window, 'speechSynthesis', { value: synth, configurable: true });
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', {
+      value: class {
+        text: string;
+        lang = '';
+        voice = null;
+        rate = 1;
+        constructor(text: string) {
+          this.text = text;
+        }
+      },
+      configurable: true,
+    });
+    return { spoken, synth };
+  }
+
+  afterEach(() => {
+    delete (window as { speechSynthesis?: unknown }).speechSynthesis;
+    delete (window as { SpeechSynthesisUtterance?: unknown }).SpeechSynthesisUtterance;
+  });
+
+  const voices = [
+    { name: 'Amélie', lang: 'fr-FR' },
+    { name: 'Daniel', lang: 'en-GB' },
+  ];
+
+  it('reads Elvish in a French voice, from its written text, until stopped', async () => {
+    const user = userEvent.setup();
+    const { spoken, synth } = speech(voices);
+    render(<App />);
+    const [first] = await paragraphs();
+    await user.click(screen.getByRole('button', { name: 'Listen' }));
+    expect(spoken[0].voice?.name).toBe('Amélie');
+    expect(first.startsWith(spoken[0].text.slice(0, 12))).toBe(true);
+    expect(screen.getByRole('button', { name: 'Stop' })).toHaveAttribute('aria-pressed', 'true');
+    await user.click(screen.getByRole('button', { name: 'Stop' }));
+    expect(synth.cancel).toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Listen' })).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('reads Orc from its "say it" line, in an English voice', async () => {
+    const user = userEvent.setup();
+    const { spoken } = speech(voices);
+    window.history.replaceState(null, '', '/#lang=dnd/orc');
+    render(<App />);
+    await paragraphs();
+    await user.click(screen.getByRole('button', { name: 'Listen' }));
+    expect(spoken[0].voice?.name).toBe('Daniel');
+    expect(spoken[0].text).toBe(spoken[0].text.toLowerCase());
+    expect(screen.getByRole('button', { name: 'Stop' })).toHaveAttribute('title', 'Read from the “say it” line by Daniel');
+  });
+
+  it('leaves the button out where the browser can’t speak', async () => {
+    render(<App />);
+    await paragraphs();
+    expect(screen.queryByRole('button', { name: 'Listen' })).not.toBeInTheDocument();
+  });
+});
+
 describe('Reading aloud', () => {
   it('shows the text in large type, how to say it first, and closes back to the page', async () => {
     const user = userEvent.setup();

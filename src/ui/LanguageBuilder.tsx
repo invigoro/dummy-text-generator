@@ -18,6 +18,7 @@ import {
   type CustomLanguageDef,
 } from './customLanguages';
 import { slug, uniqueId } from './customSettings';
+import { Listen } from './Listen';
 
 interface LanguageBuilderProps {
   /** Your languages, which this edits. */
@@ -460,9 +461,12 @@ function LanguageEditor({ saved, onSave, onUse, onExport, onDelete }: LanguageEd
       <aside className="builder-preview" aria-label={`Samples of ${saved.name}`}>
         <div className="editor-bar">
           <h3>Samples</h3>
-          <button type="button" onClick={() => setSeed(seed + 1)}>
-            Others
-          </button>
+          <div className="sample-actions">
+            {samples?.passage && <Listen languageId={saved.id} written={samples.passage.written} said={samples.passage.say} />}
+            <button type="button" onClick={() => setSeed(seed + 1)}>
+              Others
+            </button>
+          </div>
         </div>
         {samples ? (
           <>

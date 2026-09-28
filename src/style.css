@@ -935,3 +935,8 @@ details.part[open] > summary {
     border-radius: 0;
   }
 }
+
+.sample-actions {
+  display: flex;
+  gap: 0.4rem;
+}
