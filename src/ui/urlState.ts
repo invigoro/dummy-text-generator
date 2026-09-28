@@ -1,0 +1,58 @@
+/**
+ * The page's settings in its URL, so a link recreates the exact text:
+ * #lang=dnd/elvish&order=sentences&len=3p&seed=123456&view=both
+ */
+import { ARRANGEMENTS, MAX_LENGTH, type Arrangement, type Length } from '../engine/arrange';
+
+export type View = 'written' | 'say' | 'both' | 'ipa';
+export const VIEWS: readonly View[] = ['written', 'say', 'both', 'ipa'];
+
+export interface PageState {
+  /** A setting and language choice: "dnd/elvish". */
+  choice: string;
+  arrangement: Arrangement;
+  length: Length;
+  seed: number;
+  view: View;
+}
+
+const UNIT_LETTERS: Record<Length['unit'], string> = { paragraphs: 'p', words: 'w' };
+
+/** Whatever valid settings the hash holds. Anything missing or malformed is left out. */
+export function readHash(hash: string, isChoice: (key: string) => boolean): Partial<PageState> {
+  const params = new URLSearchParams(hash.replace(/^#/, ''));
+  const state: Partial<PageState> = {};
+
+  const choice = params.get('lang');
+  if (choice && isChoice(choice)) state.choice = choice;
+
+  const order = params.get('order');
+  if (order && (ARRANGEMENTS as readonly string[]).includes(order)) state.arrangement = order as Arrangement;
+
+  const length = /^(\d{1,6})([pw])$/.exec(params.get('len') ?? '');
+  if (length) {
+    const unit = length[2] === 'p' ? 'paragraphs' : 'words';
+    const count = Number(length[1]);
+    if (count >= 1) state.length = { unit, count: Math.min(MAX_LENGTH[unit], count) };
+  }
+
+  const seed = /^\d{1,10}$/.exec(params.get('seed') ?? '');
+  if (seed && Number(seed[0]) < 2 ** 32) state.seed = Number(seed[0]);
+
+  const view = params.get('view');
+  if (view && (VIEWS as readonly string[]).includes(view)) state.view = view as View;
+
+  return state;
+}
+
+export function writeHash(state: PageState): string {
+  const params = new URLSearchParams({
+    lang: state.choice,
+    order: state.arrangement,
+    len: `${state.length.count}${UNIT_LETTERS[state.length.unit]}`,
+    seed: String(state.seed),
+    view: state.view,
+  });
+  // The slash in "dnd/elvish" reads better unescaped, and is safe in a fragment.
+  return `#${params.toString().replace(/%2F/gi, '/')}`;
+}

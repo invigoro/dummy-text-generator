@@ -1,56 +1,108 @@
 import { useId, useState } from 'react';
+import { SETTINGS } from '../data/settings';
+import { languageDef } from '../data/languages';
 import { ARRANGEMENTS, MAX_LENGTH, type Arrangement, type Length } from '../engine/arrange';
+import { VIEWS, type View } from './urlState';
 
 const ORDERS: Record<Arrangement, { label: string; hint: string }> = {
-  original: { label: 'Original order', hint: 'A passage as the author wrote it' },
-  paragraphs: { label: 'Shuffle paragraphs', hint: 'Whole paragraphs from all over the book' },
+  original: { label: 'Original order', hint: 'A passage in the order it was written' },
+  paragraphs: { label: 'Shuffle paragraphs', hint: 'Whole paragraphs from all over the text' },
   sentences: { label: 'Shuffle sentences', hint: 'Sentences regrouped into new paragraphs' },
   words: { label: 'Shuffle words', hint: 'Nonsense with the rhythm and punctuation of prose' },
 };
 
+const VIEW_LABELS: Record<View, string> = { written: 'Written', say: 'Say it', both: 'Both', ipa: 'IPA' };
+
 const UNITS: Record<Length['unit'], string> = { paragraphs: 'paragraphs', words: 'words' };
 
 interface ControlsProps {
+  choice: string;
+  onChoice: (key: string) => void;
+  /** Whether the language has a "say it" line, and so a choice of views. */
+  spoken: boolean;
+  view: View;
+  onView: (view: View) => void;
   arrangement: Arrangement;
   onArrangement: (arrangement: Arrangement) => void;
   length: Length;
   onUnit: (unit: Length['unit']) => void;
   onCount: (count: number) => void;
+  seed: number;
   onReroll: () => void;
 }
 
-export function Controls({ arrangement, onArrangement, length, onUnit, onCount, onReroll }: ControlsProps) {
+/** "Elvish (French)" where the name isn't the language's own. */
+function optionLabel(name: string, language: string): string {
+  const own = languageDef(language).name;
+  return name === own ? name : `${name} (${own})`;
+}
+
+export function Controls(props: ControlsProps) {
   const id = useId();
+  const { length } = props;
   return (
     <div className="controls">
-      <fieldset>
-        <legend>Order</legend>
-        {ARRANGEMENTS.map((value) => (
-          <label key={value} className="choice">
-            <input
-              type="radio"
-              name={`${id}-order`}
-              value={value}
-              checked={arrangement === value}
-              onChange={() => onArrangement(value)}
-            />
-            <span>{ORDERS[value].label}</span>
-            <small>{ORDERS[value].hint}</small>
-          </label>
-        ))}
-      </fieldset>
+      <label className="field">
+        <span className="label">Language</span>
+        <select value={props.choice} onChange={(event) => props.onChoice(event.target.value)}>
+          {SETTINGS.map((setting) => (
+            <optgroup key={setting.id} label={setting.name}>
+              {setting.choices.map((choice) => (
+                <option key={choice.id} value={`${setting.id}/${choice.id}`}>
+                  {optionLabel(choice.name, choice.language)}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </label>
+
+      {props.spoken && (
+        <fieldset>
+          <legend className="label">Show</legend>
+          <div className="segmented">
+            {VIEWS.map((view) => (
+              <label key={view}>
+                <input type="radio" name={`${id}-view`} value={view} checked={props.view === view} onChange={() => props.onView(view)} />
+                <span>{VIEW_LABELS[view]}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
+      <div className="field">
+        <label className="label" htmlFor={`${id}-order`}>
+          Order
+        </label>
+        <select
+          id={`${id}-order`}
+          aria-describedby={`${id}-order-hint`}
+          value={props.arrangement}
+          onChange={(event) => props.onArrangement(event.target.value as Arrangement)}
+        >
+          {ARRANGEMENTS.map((arrangement) => (
+            <option key={arrangement} value={arrangement}>
+              {ORDERS[arrangement].label}
+            </option>
+          ))}
+        </select>
+        <small className="hint" id={`${id}-order-hint`}>
+          {ORDERS[props.arrangement].hint}
+        </small>
+      </div>
 
       <fieldset>
-        <legend>Length</legend>
+        <legend className="label">Length</legend>
         <div className="length">
           <CountInput
             key={length.unit}
             label={`Number of ${UNITS[length.unit]}`}
             value={length.count}
             max={MAX_LENGTH[length.unit]}
-            onChange={onCount}
+            onChange={props.onCount}
           />
-          <select aria-label="Count in" value={length.unit} onChange={(event) => onUnit(event.target.value as Length['unit'])}>
+          <select aria-label="Count in" value={length.unit} onChange={(event) => props.onUnit(event.target.value as Length['unit'])}>
             {Object.entries(UNITS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
@@ -60,9 +112,14 @@ export function Controls({ arrangement, onArrangement, length, onUnit, onCount, 
         </div>
       </fieldset>
 
-      <button type="button" className="reroll" onClick={onReroll}>
-        <span aria-hidden="true">🎲</span> Reroll
-      </button>
+      <div className="reroll-row">
+        <button type="button" className="reroll" onClick={props.onReroll}>
+          <span aria-hidden="true">🎲</span> Reroll
+        </button>
+        <span className="seed" title="The same seed and settings always give the same text">
+          Seed {props.seed}
+        </span>
+      </div>
     </div>
   );
 }

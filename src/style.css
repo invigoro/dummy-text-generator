@@ -8,6 +8,8 @@
   --hover: #ebe2d0;
   --accent: #8a3b1f;
   --accent-ink: #fffaf2;
+  --tip: #f7ecd5;
+  --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
   color: var(--ink);
@@ -24,6 +26,7 @@
     --hover: #322a24;
     --accent: #e0885f;
     --accent-ink: #1b1714;
+    --tip: #2e2620;
   }
 }
 
@@ -73,19 +76,20 @@ a {
 
 .brand h1 {
   margin: 0;
-  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+  font-family: var(--serif);
   font-size: 1.9rem;
   line-height: 1.15;
 }
 
-.brand p,
-.source {
+.brand p {
   margin: 0.25rem 0 0;
   color: var(--muted);
 }
 
 .source {
-  font-size: 0.9rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 /* Controls */
@@ -93,7 +97,7 @@ a {
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.1rem;
 }
 
 fieldset {
@@ -103,8 +107,13 @@ fieldset {
   border: 0;
 }
 
-legend {
-  margin-bottom: 0.4rem;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
   padding: 0;
   font-size: 0.75rem;
   font-weight: 650;
@@ -113,52 +122,20 @@ legend {
   color: var(--muted);
 }
 
-.choice {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  column-gap: 0.6rem;
-  align-items: baseline;
-  margin: 0 -0.5rem;
-  padding: 0.35rem 0.5rem;
-  border-radius: 6px;
-  cursor: pointer;
+legend.label {
+  margin-bottom: 0.35rem;
 }
 
-.choice:hover {
-  background: var(--hover);
-}
-
-.choice input {
-  margin: 0;
-  accent-color: var(--accent);
-}
-
-.choice small {
-  grid-column: 2;
+.hint {
   font-size: 0.85rem;
   line-height: 1.35;
   color: var(--muted);
 }
 
-/* On a phone the text should start on the first screen, so the hints go. */
-@media (max-width: 52rem) {
-  .choice small {
-    display: none;
-  }
-}
-
-.length {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.length input {
-  width: 6.5rem;
-}
-
 input,
 select,
-button {
+button,
+a.button {
   font: inherit;
   color: var(--ink);
   background: var(--page);
@@ -171,22 +148,85 @@ select {
   padding: 0.4rem 0.55rem;
 }
 
-button {
+button,
+a.button {
   padding: 0.45rem 0.95rem;
   cursor: pointer;
+  text-decoration: none;
 }
 
-button:hover {
+button:hover,
+a.button:hover {
   background: var(--hover);
 }
 
-:is(button, input, select, a):focus-visible {
+a.button[aria-disabled='true'] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+:is(button, input, select, a):focus-visible,
+.segmented input:focus-visible + span {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
+/* Written / Say it / Both / IPA */
+.segmented {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.segmented label {
+  flex: 1;
+  cursor: pointer;
+}
+
+.segmented label + label {
+  border-left: 1px solid var(--line);
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented span {
+  display: block;
+  padding: 0.4rem 0.3rem;
+  text-align: center;
+  font-size: 0.9rem;
+  background: var(--page);
+}
+
+.segmented label:hover span {
+  background: var(--hover);
+}
+
+.segmented input:checked + span {
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+
+.length {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.length input {
+  width: 6.5rem;
+}
+
+.reroll-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .reroll {
-  align-self: flex-start;
   color: var(--accent-ink);
   background: var(--accent);
   border-color: var(--accent);
@@ -195,6 +235,12 @@ button:hover {
 .reroll:hover {
   background: var(--accent);
   filter: brightness(1.1);
+}
+
+.seed {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
 }
 
 .about {
@@ -225,14 +271,15 @@ button:hover {
 /* The generated text */
 
 .output {
-  max-width: 44rem;
+  max-width: 46rem;
 }
 
 .output-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem 1rem;
   margin-bottom: 0.75rem;
 }
 
@@ -242,20 +289,29 @@ button:hover {
   color: var(--muted);
 }
 
-.copy {
+.actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
-.copy-status {
+.status {
   font-size: 0.9rem;
   color: var(--muted);
 }
 
+.voicing {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  background: var(--tip);
+  border-radius: 8px;
+}
+
 .page {
   padding: 2rem 2.25rem;
-  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+  font-family: var(--serif);
   font-size: 1.125rem;
   line-height: 1.7;
   background: var(--page);
@@ -269,11 +325,46 @@ button:hover {
 .page p {
   margin: 0 0 1em;
   text-wrap: pretty;
-  hyphens: auto;
 }
 
 .page p:last-child {
   margin-bottom: 0;
+}
+
+.view-written p {
+  hyphens: auto;
+}
+
+/* The "say it" and IPA lines are read, not admired: plain type, a little more room. */
+.view-say,
+.view-ipa {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.view-ipa {
+  font-family: 'Charis SIL', 'Doulos SIL', 'Gentium Plus', 'Noto Serif', 'Segoe UI', serif;
+}
+
+/* Both: each word with its "say it" form underneath. */
+.view-both p {
+  line-height: 2.6;
+}
+
+.view-both ruby {
+  ruby-position: under;
+  -webkit-ruby-position: after;
+}
+
+.view-both rt {
+  /* Room either side, so neighbouring "say it" forms don't run together. It only widens a word
+     whose "say it" form is the wider of the two, so punctuation stays tight against short words. */
+  padding-inline: 0.3em;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.6em;
+  letter-spacing: 0.01em;
+  color: var(--muted);
 }
 
 @media (max-width: 52rem) {

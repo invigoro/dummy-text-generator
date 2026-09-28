@@ -1,49 +1,149 @@
-import { useEffect, useState } from 'react';
-import { countDocWords, paragraphText, writtenText, type DocParagraph } from '../engine/document';
+import { Fragment, useEffect, useState, type ReactNode } from 'react';
+import {
+  countDocWords,
+  paragraphText,
+  sayWords,
+  spokenText,
+  writtenText,
+  type DocParagraph,
+  type DocSentence,
+} from '../engine/document';
+import { stressRule, type Language } from '../engine/language';
+import type { Respeller } from '../engine/respell';
+import type { StressRule } from '../engine/sounds/system';
+import { steleLink, trimForStele, type SteleOptions } from '../engine/stele';
+import type { View } from './urlState';
 
-export function Output({ paragraphs }: { paragraphs: DocParagraph[] }) {
+interface OutputProps {
+  paragraphs: DocParagraph[];
+  language: Language;
+  /** The view to show; ignored for a language without a "say it" line. */
+  view: View;
+  stele: SteleOptions;
+}
+
+type Voice = { rule: StressRule; respell: Respeller };
+
+function voiceOf(language: Language): Voice | null {
+  const rule = stressRule(language);
+  return rule && language.kind !== 'real' ? { rule, respell: language.respell } : null;
+}
+
+/** The text as the view shows it, for copying. "Both" puts each paragraph's "say it" line under it. */
+function viewText(paragraphs: DocParagraph[], view: View, voice: Voice | null): string {
+  if (!voice || view === 'written') return writtenText(paragraphs);
+  if (view === 'say' || view === 'ipa') return spokenText(paragraphs, voice.rule, voice.respell, view);
+  return paragraphs.map((paragraph) => `${paragraphText(paragraph)}\n${spokenText([paragraph], voice.rule, voice.respell, 'say')}`).join('\n\n');
+}
+
+export function Output({ paragraphs, language, view, stele }: OutputProps) {
+  const voice = voiceOf(language);
+  const shown = voice ? view : 'written';
   return (
     <section className="output" aria-label="Generated text">
       <div className="output-bar">
         <p className="word-count">{countDocWords(paragraphs).toLocaleString('en')} words</p>
-        <CopyButton text={writtenText(paragraphs)} />
+        <Actions copyText={viewText(paragraphs, shown, voice)} steleText={writtenText(paragraphs)} stele={stele} />
       </div>
-      <article className="page">
+      {voice && shown !== 'written' && 'voicing' in language && language.voicing && (
+        <aside className="voicing">
+          <strong>How to say it:</strong> {language.voicing}
+        </aside>
+      )}
+      <article className={`page view-${shown}`}>
         {paragraphs.map((paragraph, i) => (
-          <p key={i}>{paragraphText(paragraph)}</p>
+          <p key={i}>{renderParagraph(paragraph, shown, voice)}</p>
         ))}
       </article>
     </section>
   );
 }
 
-function CopyButton({ text }: { text: string }) {
-  const [status, setStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
+function renderParagraph(paragraph: DocParagraph, view: View, voice: Voice | null): ReactNode {
+  if (!voice || view === 'written') return paragraphText(paragraph);
+  if (view === 'say' || view === 'ipa') return spokenText([paragraph], voice.rule, voice.respell, view);
+  return paragraph.sentences.map((sentence, i) => (
+    <Fragment key={i}>
+      {i > 0 && ' '}
+      <Interlinear sentence={sentence} voice={voice} />
+    </Fragment>
+  ));
+}
+
+/** Each word with its "say it" form in small type underneath. */
+function Interlinear({ sentence, voice }: { sentence: DocSentence; voice: Voice }) {
+  const said = sayWords(sentence, voice.rule, voice.respell);
+  return sentence.tokens.map((token, i) =>
+    token.kind === 'word' && said[i] ? (
+      <ruby key={i}>
+        {token.text}
+        <rt>{said[i]!.say}</rt>
+      </ruby>
+    ) : (
+      <Fragment key={i}>{token.text}</Fragment>
+    ),
+  );
+}
+
+type Status = { message: string; failed?: boolean } | null;
+
+function Actions({ copyText, steleText, stele }: { copyText: string; steleText: string; stele: SteleOptions }) {
+  const [status, setStatus] = useState<Status>(null);
+  const [link, setLink] = useState<string | null>(null);
+  const trimmed = trimForStele(steleText).trimmed;
 
   useEffect(() => {
-    if (status === 'idle') return;
-    const timer = setTimeout(() => setStatus('idle'), 2500);
+    if (!status) return;
+    const timer = setTimeout(() => setStatus(null), 2500);
     return () => clearTimeout(timer);
   }, [status]);
 
-  async function copy() {
+  useEffect(() => {
+    let current = true;
+    steleLink(steleText, stele).then(
+      (url) => {
+        if (current) setLink(url);
+      },
+      () => {
+        if (current) setLink(null);
+      },
+    );
+    return () => {
+      current = false;
+    };
+  }, [steleText, stele]);
+
+  async function copy(text: string, done: string) {
     try {
       await navigator.clipboard.writeText(text);
-      setStatus('copied');
+      setStatus({ message: done });
     } catch {
       // No clipboard access (an insecure page, or permission refused).
-      setStatus('failed');
+      setStatus({ message: 'Couldn’t copy. Select the text and copy it instead.', failed: true });
     }
   }
 
   return (
-    <div className="copy">
-      <span role="status" className="copy-status">
-        {status === 'copied' ? 'Copied' : status === 'failed' ? 'Couldn’t copy. Select the text and copy it instead.' : ''}
+    <div className="actions">
+      <span role="status" className="status">
+        {status?.message ?? ''}
       </span>
-      <button type="button" onClick={copy}>
+      <button type="button" onClick={() => copy(copyText, 'Copied')}>
         Copy
       </button>
+      <button type="button" onClick={() => copy(window.location.href, 'Link copied')}>
+        Share link
+      </button>
+      <a
+        className="button"
+        href={link ?? undefined}
+        aria-disabled={!link}
+        target="_blank"
+        rel="noopener"
+        title={trimmed ? 'Stele keeps the first 4,000 characters' : 'Make it into an inscription or a document in Stele'}
+      >
+        Open in Stele
+      </a>
     </div>
   );
 }
