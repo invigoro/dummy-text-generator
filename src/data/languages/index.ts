@@ -65,14 +65,32 @@ export interface LoadedLanguage extends TextSource {
 
 const loaded = new Map<string, Promise<LoadedLanguage>>();
 
-export function loadLanguage(id: string): Promise<LoadedLanguage> {
-  let language = loaded.get(id);
-  if (!language) {
-    language = Promise.resolve().then(() => build(languageDef(id)));
-    language.catch(() => loaded.delete(id));
-    loaded.set(id, language);
+/** How many languages made in the builder stay loaded; each version of one is a language of its own. */
+const MADE_KEPT = 6;
+
+/**
+ * A language ready to write in: a built-in one by its id, or any language by its definition, as
+ * one made in the builder is. A definition is known by its whole content, so an edited language
+ * is built afresh.
+ */
+export function loadLanguage(language: string | LanguageDef): Promise<LoadedLanguage> {
+  const key = typeof language === 'string' ? language : languageKey(language);
+  let found = loaded.get(key);
+  if (!found) {
+    const def = typeof language === 'string' ? languageDef(language) : language;
+    found = Promise.resolve().then(() => build(def));
+    found.catch(() => loaded.delete(key));
+    loaded.set(key, found);
+    // Maps keep their order, so the oldest made languages are the first keys with a definition.
+    const made = [...loaded.keys()].filter((known) => known.startsWith('{'));
+    for (const old of made.slice(0, Math.max(0, made.length - MADE_KEPT))) loaded.delete(old);
   }
-  return language;
+  return found;
+}
+
+/** What identifies a language: a built-in one's id, or the whole of any other's definition. */
+export function languageKey(def: LanguageDef): string {
+  return LANGUAGES.includes(def) ? def.id : JSON.stringify(def);
 }
 
 async function build(def: LanguageDef): Promise<LoadedLanguage> {

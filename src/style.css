@@ -136,6 +136,7 @@ legend.label {
 
 input,
 select,
+textarea,
 button,
 a.button,
 label.button {
@@ -147,8 +148,17 @@ label.button {
 }
 
 input,
-select {
+select,
+textarea {
   padding: 0.4rem 0.55rem;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.muted {
+  color: var(--muted);
 }
 
 button,
@@ -188,6 +198,13 @@ button.link:hover {
   text-decoration-thickness: 2px;
 }
 
+.links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+
 button.quiet {
   background: none;
   border-color: transparent;
@@ -216,7 +233,7 @@ a.button[aria-disabled='true'] {
   pointer-events: none;
 }
 
-:is(button, input, select, a):focus-visible,
+:is(button, input, select, textarea, a, summary):focus-visible,
 .segmented input:focus-visible + span,
 label.button:has(:focus-visible) {
   outline: 2px solid var(--accent);
@@ -587,5 +604,236 @@ label.button:has(:focus-visible) {
   .choices li + li {
     padding-top: 0.5rem;
     border-top: 1px solid var(--line);
+  }
+}
+
+/* The language builder */
+
+.builder {
+  max-width: 62rem;
+}
+
+.choose-language {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.choose-language button[aria-pressed='true'] {
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.builder-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 17rem;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.builder-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.builder-state {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.problem,
+.builder-state.problem {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--danger);
+}
+
+.part {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.9rem 1.1rem 1.1rem;
+  background: var(--page);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.part > legend,
+details.part > summary {
+  padding: 0 0.3rem;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+details.part > summary,
+.palette > summary {
+  cursor: pointer;
+}
+
+details.part[open] > summary {
+  margin-bottom: 0.25rem;
+}
+
+.part .hint,
+.part p {
+  margin: 0;
+}
+
+.part code,
+.code,
+.symbol {
+  font-family: 'Charis SIL', 'Doulos SIL', 'Gentium Plus', 'Noto Serif', 'Segoe UI', serif;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.classes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.classes li {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.class-name {
+  text-align: center;
+  font-weight: 650;
+}
+
+.classes button,
+.rule-actions button {
+  padding-inline: 0.6rem;
+}
+
+.part > button {
+  align-self: flex-start;
+}
+
+.palette > summary {
+  color: var(--accent);
+}
+
+.palette-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.palette-group button {
+  padding: 0.2rem 0.45rem;
+  font-size: 0.85rem;
+}
+
+.palette-group .symbol {
+  font-size: 1.05rem;
+}
+
+.rules-scroll {
+  overflow-x: auto;
+}
+
+.rules {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.rules th {
+  padding: 0 0.25rem 0.25rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rules td {
+  padding: 0.15rem 0.25rem;
+}
+
+.rules input,
+.rules select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.3rem 0.4rem;
+}
+
+.rule-actions {
+  white-space: nowrap;
+}
+
+.builder-preview {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  padding: 1rem;
+  background: var(--page);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.builder-preview h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+}
+
+.sample-words {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.15rem 1rem;
+  margin: 0.75rem 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.95rem;
+}
+
+.sample-words li span:first-child {
+  font-family: var(--serif);
+}
+
+.sample-passage {
+  margin: 0 0 0.75rem;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.sample-passage.muted {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.85rem;
+}
+
+/* Samples above the form once there's no room beside it. */
+@media (max-width: 80rem) {
+  .builder-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .builder-preview {
+    position: static;
+    order: -1;
+    max-height: none;
   }
 }

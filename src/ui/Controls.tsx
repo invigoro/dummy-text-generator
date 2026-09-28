@@ -1,8 +1,8 @@
 import { useId, useState, type Ref } from 'react';
 import type { Setting } from '../data/settings';
-import { languageDef } from '../data/languages';
 import { ARRANGEMENTS, MAX_LENGTH, type Arrangement, type Length } from '../engine/arrange';
 import { FORMS, SPEAKERS, type Form } from '../engine/forms';
+import type { LanguageDef } from '../engine/language';
 import { UNNAMED_LANGUAGE, UNTITLED_SETTING } from './customSettings';
 import { VIEWS, type View } from './urlState';
 
@@ -49,9 +49,13 @@ export function shownArrangement(arrangement: Arrangement, form: Form): Arrangem
 interface ControlsProps {
   /** Every setting to choose from: built-in, the person's own, and any from a shared link. */
   settings: readonly Setting[];
-  /** The button that opens the settings editor, to return to when it closes. */
+  /** Every language there is, built in or made, by id. */
+  languages: ReadonlyMap<string, LanguageDef>;
+  /** The buttons that open the settings editor and the builder, to return to when they close. */
   editButton?: Ref<HTMLButtonElement>;
   onEditSettings: () => void;
+  buildButton?: Ref<HTMLButtonElement>;
+  onBuild: () => void;
   choice: string;
   onChoice: (key: string) => void;
   /** Whether the language has a "say it" line, and so a choice of views. */
@@ -72,10 +76,9 @@ interface ControlsProps {
 }
 
 /** "Elvish (French)" where the name isn't the language's own. */
-function optionLabel(name: string, language: string): string {
-  const own = languageDef(language).name;
+function optionLabel(name: string, own: string | undefined): string {
   const shown = name.trim() || UNNAMED_LANGUAGE;
-  return shown === own ? shown : `${shown} (${own})`;
+  return !own || shown === own ? shown : `${shown} (${own})`;
 }
 
 export function Controls(props: ControlsProps) {
@@ -96,15 +99,20 @@ export function Controls(props: ControlsProps) {
               <optgroup key={setting.id} label={setting.name.trim() || UNTITLED_SETTING}>
                 {setting.choices.map((choice) => (
                   <option key={choice.id} value={`${setting.id}/${choice.id}`}>
-                    {optionLabel(choice.name, choice.language)}
+                    {optionLabel(choice.name, props.languages.get(choice.language)?.name)}
                   </option>
                 ))}
               </optgroup>
             ))}
         </select>
-        <button ref={props.editButton} type="button" className="link" onClick={props.onEditSettings}>
-          Name your own world’s languages…
-        </button>
+        <div className="links">
+          <button ref={props.editButton} type="button" className="link" onClick={props.onEditSettings}>
+            Name your own world’s languages…
+          </button>
+          <button ref={props.buildButton} type="button" className="link" onClick={props.onBuild}>
+            Build a language of your own…
+          </button>
+        </div>
       </div>
 
       {props.spoken && (

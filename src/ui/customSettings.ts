@@ -61,19 +61,27 @@ function sanitizeStele(value: unknown, language: string): SteleOptions {
   return stele;
 }
 
+const BUILT_IN = new Set(LANGUAGES.map((language) => language.id));
+
+/**
+ * Whether a setting can name a language: a built-in one, or one made in the builder ("my-…"). A
+ * made language that's missing, deleted or not yet loaded from a link, is kept all the same, and
+ * the page leaves it out until it's there.
+ */
+const isLanguageId = (id: unknown): id is string => typeof id === 'string' && (BUILT_IN.has(id) || /^my-[a-z0-9-]{1,70}$/.test(id));
+
 /** A valid custom setting from untrusted data (storage, a file, a link), or null. */
 export function sanitizeSetting(data: unknown): Setting | null {
   if (!data || typeof data !== 'object') return null;
   const input = data as Record<string, unknown>;
   if (!Array.isArray(input.choices)) return null;
   const name = cleanName(input.name, UNTITLED_SETTING);
-  const known = new Set(LANGUAGES.map((language) => language.id));
   const ids = new Set<string>();
   const choices: LanguageChoice[] = [];
   for (const item of input.choices.slice(0, MAX_CHOICES)) {
     if (!item || typeof item !== 'object') continue;
     const { id: given, name: choiceName, language, stele } = item as Record<string, unknown>;
-    if (typeof language !== 'string' || !known.has(language)) continue;
+    if (!isLanguageId(language)) continue;
     const cleaned = cleanName(choiceName, UNNAMED_LANGUAGE);
     // A language keeps its id when renamed, so links to it still work.
     const id = uniqueId(typeof given === 'string' && ID.test(given) ? given : slug(cleaned), ids);

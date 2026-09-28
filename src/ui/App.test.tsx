@@ -2,7 +2,10 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { LANGUAGES } from '../data/languages';
+import type { InventedLanguageDef } from '../engine/language';
 import App from './App';
+import { encodeLanguages, loadCustomLanguages, newLanguage, saveCustomLanguages } from './customLanguages';
 import { encodeSetting, loadCustomSettings, sanitizeSetting, saveCustomSettings } from './customSettings';
 
 // Seeds come in a fixed sequence, so every run shows the same text.
@@ -386,5 +389,117 @@ describe('Your own settings', () => {
     expect(screen.getByRole('textbox', { name: 'Setting name' })).toHaveValue('Colonial');
     await user.upload(input, new File(['{"not": "a setting"}'], 'other.json', { type: 'application/json' }));
     expect(await screen.findByText('That file isn’t a setting exported from here.')).toBeInTheDocument();
+  });
+});
+
+const orcish = LANGUAGES.find((def): def is InventedLanguageDef => def.id === 'orcish')!;
+const grukk = { ...newLanguage(orcish, new Set()), id: 'my-grukk-abcde', name: 'Grukk' };
+const buildButton = () => screen.getByRole('button', { name: 'Build a language of your own…' });
+
+describe('Your own languages', () => {
+  it('builds a language from a built-in one, writes in it, and keeps it for next time', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await paragraphs();
+    await user.click(buildButton());
+    expect(screen.getByRole('heading', { name: 'Your languages' })).toHaveFocus();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Start from' }), 'orcish');
+    await user.click(screen.getByRole('button', { name: '+ New language' }));
+    expect(screen.getByText('Made “New Orcish”.')).toBeInTheDocument();
+    const name = screen.getByRole('textbox', { name: 'Name' });
+    await user.clear(name);
+    await user.type(name, 'Grukk');
+    expect(await screen.findByRole('complementary', { name: 'Samples of Grukk' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Write in Grukk' }));
+    expect(buildButton()).toHaveFocus();
+    const [saved] = loadCustomLanguages();
+    expect(saved.name).toBe('Grukk');
+    expect(language()).toHaveValue(`mine/${saved.id}`);
+    expect(await paragraphs()).toHaveLength(3);
+    expect(screen.getByText(/Words invented in the builder/)).toBeInTheDocument();
+    // The link carries the language, so it works for anyone.
+    expect(window.location.hash).toMatch(/&made=[\w-]+$/);
+
+    cleanup();
+    window.history.replaceState(null, '', '/');
+    render(<App />);
+    await paragraphs();
+    expect(within(screen.getByRole('group', { name: 'Your languages' })).getByRole('option', { name: 'Grukk' })).toBeInTheDocument();
+  });
+
+  it('says what’s wrong with a language, and keeps the last version that worked', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await paragraphs();
+    await user.click(buildButton());
+    await user.click(screen.getByRole('button', { name: '+ New language' }));
+    const vowels = screen.getByRole('textbox', { name: 'Sounds in class V' });
+    await user.type(vowels, ' ʘ');
+    expect(screen.getByText('Not saved yet: Unknown sound "ʘ"')).toBeInTheDocument();
+    expect(loadCustomLanguages()[0].sounds.classes.V).toBe('a e i o u');
+    expect(screen.getByText('Samples come back once the language works again.')).toBeInTheDocument();
+    await user.type(vowels, '{Backspace}{Backspace}');
+    expect(screen.getByText('Saved. Every change is kept as you go.')).toBeInTheDocument();
+  });
+
+  it('adds sounds from the palette to the class last typed in', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await paragraphs();
+    await user.click(buildButton());
+    await user.click(screen.getByRole('button', { name: '+ New language' }));
+    await user.click(screen.getByRole('textbox', { name: 'Sounds in class F' }));
+    await user.click(screen.getByText('Sounds to choose from'));
+    await user.click(within(screen.getByRole('group', { name: 'Consonants' })).getByRole('button', { name: /^x/ }));
+    expect(screen.getByRole('textbox', { name: 'Sounds in class F' })).toHaveValue('n s r l x');
+    expect(loadCustomLanguages()[0].sounds.classes.F).toBe('n s r l x');
+  });
+
+  it('opens a link that brings a made language, and offers to save it', async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, '', `/#lang=mine/my-grukk-abcde&made=${encodeLanguages([grukk])}`);
+    render(<App />);
+    expect(await paragraphs()).toHaveLength(3);
+    expect(language()).toHaveValue('mine/my-grukk-abcde');
+    expect(banner()).toHaveTextContent('This link brings a language made in the builder: Grukk.');
+    await user.click(within(banner()!).getByRole('button', { name: 'Save it here' }));
+    expect(banner()).not.toBeInTheDocument();
+    expect(loadCustomLanguages()).toEqual([grukk]);
+  });
+
+  it('shows a link’s different version of one of your languages, and can save it over yours', async () => {
+    const user = userEvent.setup();
+    saveCustomLanguages([grukk]);
+    const changed = { ...grukk, voicing: 'Growl it.' };
+    window.history.replaceState(null, '', `/#lang=mine/my-grukk-abcde&made=${encodeLanguages([changed])}`);
+    render(<App />);
+    await paragraphs();
+    expect(banner()).toHaveTextContent('It’s a different version of one of yours.');
+    await user.click(within(banner()!).getByRole('button', { name: 'Save it over yours' }));
+    expect(loadCustomLanguages()).toEqual([changed]);
+  });
+
+  it('lets a setting of yours use a language of yours', async () => {
+    saveCustomLanguages([grukk]);
+    saveCustomSettings([sanitizeSetting({ id: 'my-world', name: 'My world', choices: [{ name: 'Orcish tongue', language: 'my-grukk-abcde' }] })!]);
+    render(<App />);
+    await paragraphs();
+    expect(within(screen.getByRole('group', { name: 'My world' })).getByRole('option', { name: 'Orcish tongue (Grukk)' })).toBeInTheDocument();
+  });
+
+  it('deletes a language, with a way to undo it, and leaves it out of the menus', async () => {
+    const user = userEvent.setup();
+    saveCustomLanguages([grukk]);
+    render(<App />);
+    await paragraphs();
+    await user.click(buildButton());
+    await user.click(screen.getByRole('button', { name: 'Delete language' }));
+    expect(screen.getByText('Deleted “Grukk”.')).toBeInTheDocument();
+    expect(loadCustomLanguages()).toEqual([]);
+    expect(screen.queryByRole('group', { name: 'Your languages' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(loadCustomLanguages()).toEqual([grukk]);
   });
 });

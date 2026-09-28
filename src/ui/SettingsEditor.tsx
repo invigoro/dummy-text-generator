@@ -1,37 +1,64 @@
-import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
-import { LANGUAGES } from '../data/languages';
+import { createContext, useContext, useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import type { LanguageChoice, Setting } from '../data/settings';
+import type { LanguageDef } from '../engine/language';
+import { isCustomLanguage } from './customLanguages';
 import { defaultStele, sanitizeSetting, slug, uniqueId, UNNAMED_LANGUAGE, UNTITLED_SETTING } from './customSettings';
 
 interface SettingsEditorProps {
   /** The custom settings, which this edits. */
   settings: readonly Setting[];
+  /** Every language a setting can use: built in, then made in the builder. */
+  languages: readonly LanguageDef[];
   /** Ids already in use, built-in ones included. */
   takenIds: ReadonlySet<string>;
   onChange: (settings: Setting[]) => void;
   onClose: () => void;
 }
 
+const Languages = createContext<readonly LanguageDef[]>([]);
+
 /** Real English is the source text itself; every other language is invented words. */
-const LANGUAGE_OPTIONS = LANGUAGES.map((language) => ({
-  id: language.id,
-  label: language.kind === 'real' ? `${language.name} (the real text)` : language.name,
-}));
+const label = (language: LanguageDef) => (language.kind === 'real' ? `${language.name} (the real text)` : language.name);
 
 function LanguageSelect({ value, onChange }: { value: string; onChange: (language: string) => void }) {
+  const languages = useContext(Languages);
+  const builtIn = languages.filter((language) => !isCustomLanguage(language.id));
+  const made = languages.filter((language) => isCustomLanguage(language.id));
   return (
     <select aria-label="Written as" value={value} onChange={(event) => onChange(event.target.value)}>
-      {LANGUAGE_OPTIONS.map((language) => (
+      {!languages.some((language) => language.id === value) && (
+        <option value={value} disabled>
+          A language that isn’t here
+        </option>
+      )}
+      {builtIn.map((language) => (
         <option key={language.id} value={language.id}>
-          {language.label}
+          {label(language)}
         </option>
       ))}
+      {made.length > 0 && (
+        <optgroup label="Your languages">
+          {made.map((language) => (
+            <option key={language.id} value={language.id}>
+              {language.name}
+            </option>
+          ))}
+        </optgroup>
+      )}
     </select>
   );
 }
 
 /** Name the languages of your own game world. */
-export function SettingsEditor({ settings, takenIds, onChange, onClose }: SettingsEditorProps) {
+export function SettingsEditor({ languages, ...props }: SettingsEditorProps) {
+  return (
+    <Languages.Provider value={languages}>
+      <Editor {...props} />
+    </Languages.Provider>
+  );
+}
+
+function Editor({ settings, takenIds, onChange, onClose }: Omit<SettingsEditorProps, 'languages'>) {
   const id = useId();
   const file = useRef<HTMLInputElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);

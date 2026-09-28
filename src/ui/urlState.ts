@@ -21,13 +21,24 @@ export interface PageState {
   speakers: number;
   /** A custom setting the choice belongs to, encoded, so the link works for anyone. */
   world?: string;
+  /** Languages made in the builder that the page uses, encoded, for the same reason. */
+  made?: string;
 }
 
-/** The encoded custom setting a hash carries, if any, before anything is checked against it. */
-export function worldInHash(hash: string): string | undefined {
-  const world = new URLSearchParams(hash.replace(/^#/, '')).get('world');
-  return world && /^[\w-]{1,20000}$/.test(world) ? world : undefined;
+/**
+ * An encoded value a hash carries, if any, before anything is checked against it. A fragment never
+ * reaches a server, so only the browser limits its length.
+ */
+function encodedInHash(hash: string, name: string, longest: number): string | undefined {
+  const value = new URLSearchParams(hash.replace(/^#/, '')).get(name);
+  return value && value.length <= longest && /^[\w-]+$/.test(value) ? value : undefined;
 }
+
+/** The encoded custom setting a hash carries, if any. */
+export const worldInHash = (hash: string) => encodedInHash(hash, 'world', 20_000);
+
+/** The encoded made languages a hash carries, if any: a language with many spelling rules runs long. */
+export const madeInHash = (hash: string) => encodedInHash(hash, 'made', 60_000);
 
 const UNIT_LETTERS: Record<Length['unit'], string> = { paragraphs: 'p', words: 'w' };
 
@@ -64,6 +75,9 @@ export function readHash(hash: string, isChoice: (key: string) => boolean): Part
   const world = worldInHash(hash);
   if (world) state.world = world;
 
+  const made = madeInHash(hash);
+  if (made) state.made = made;
+
   return state;
 }
 
@@ -78,6 +92,7 @@ export function writeHash(state: PageState): string {
   if (state.form !== 'prose') params.set('form', state.form);
   if (state.form === 'conversation') params.set('speakers', String(state.speakers));
   if (state.world) params.set('world', state.world);
+  if (state.made) params.set('made', state.made);
   // The slash in "dnd/elvish" reads better unescaped, and is safe in a fragment.
   return `#${params.toString().replace(/%2F/gi, '/')}`;
 }

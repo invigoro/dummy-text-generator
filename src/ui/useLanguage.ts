@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { loadLanguage, type LoadedLanguage } from '../data/languages';
+import { languageKey, loadLanguage, type LoadedLanguage } from '../data/languages';
+import type { LanguageDef } from '../engine/language';
 
 export type LanguageState =
   | { status: 'loading' }
@@ -7,14 +8,16 @@ export type LanguageState =
   | { status: 'failed'; retry: () => void };
 
 /** A language, loaded in the background: its flow text fetched and its vocabulary built. */
-export function useLanguage(id: string): LanguageState {
+export function useLanguage(def: LanguageDef): LanguageState {
   const [state, setState] = useState<LanguageState>({ status: 'loading' });
   const [attempt, setAttempt] = useState(0);
+  // A made language is a new object on every render; its content says whether it changed.
+  const key = languageKey(def);
 
   useEffect(() => {
     let current = true;
     setState({ status: 'loading' });
-    loadLanguage(id).then(
+    loadLanguage(def).then(
       (loaded) => {
         if (current) setState({ status: 'ready', loaded });
       },
@@ -25,7 +28,7 @@ export function useLanguage(id: string): LanguageState {
     return () => {
       current = false;
     };
-  }, [id, attempt]);
+  }, [key, attempt]);
 
   return state;
 }

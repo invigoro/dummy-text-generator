@@ -1,30 +1,64 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { LoadedLanguage } from '../data/languages';
+import { LANGUAGES, type LoadedLanguage } from '../data/languages';
 import { DEFAULT_CHOICE, findChoice, SETTINGS, type Setting } from '../data/settings';
 import type { Arrangement, Length } from '../engine/arrange';
 import { SPEAKERS, type Form } from '../engine/forms';
 import { generate } from '../engine/generate';
-import { isSpoken } from '../engine/language';
+import { isSpoken, type LanguageDef } from '../engine/language';
 import { randomSeed } from '../engine/rng';
 import { Controls } from './Controls';
+import {
+  decodeLanguages,
+  encodeLanguages,
+  isCustomLanguage,
+  languagesSetting,
+  loadCustomLanguages,
+  saveCustomLanguages,
+  withLinked,
+  YOUR_LANGUAGES,
+  type CustomLanguageDef,
+} from './customLanguages';
 import { encodeSetting, isCustomSetting, loadCustomSettings, saveCustomSettings, settingFromLink, uniqueId } from './customSettings';
+import { LanguageBuilder } from './LanguageBuilder';
 import { Output } from './Output';
 import { SettingsEditor } from './SettingsEditor';
 import { useLanguage } from './useLanguage';
-import { readHash, worldInHash, writeHash, type PageState, type View } from './urlState';
+import { madeInHash, readHash, worldInHash, writeHash, type PageState, type View } from './urlState';
 
-/** What a link asks for, and the custom setting it brings if that isn't among `own` already. */
-function fromHash(hash: string, own: readonly Setting[]): { linked: Setting | null; state: Partial<PageState> } {
+/** Your languages, with a link's in place of yours where they differ. */
+function merged(own: readonly CustomLanguageDef[], shared: readonly CustomLanguageDef[]): CustomLanguageDef[] {
+  return [...own.filter((mine) => !shared.some((def) => def.id === mine.id)), ...shared];
+}
+
+/** Every setting there is to choose from: built in, your languages, your settings and a link's. */
+function allSettings(made: readonly CustomLanguageDef[], custom: readonly Setting[], shared: Setting | null): Setting[] {
+  return [...SETTINGS, ...(made.length > 0 ? [languagesSetting(made)] : []), ...custom, ...(shared ? [shared] : [])];
+}
+
+interface FromHash {
+  /** A custom setting the link brings that isn't among yours. */
+  linked: Setting | null;
+  /** Made languages the link brings that you don't have as they are. */
+  linkedLanguages: CustomLanguageDef[];
+  state: Partial<PageState>;
+}
+
+/** What a link asks for, and the custom setting and languages it brings. */
+function fromHash(hash: string, own: readonly Setting[], ownLanguages: readonly CustomLanguageDef[]): FromHash {
+  const made = madeInHash(hash);
+  const { shared: linkedLanguages } = withLinked(ownLanguages, made ? decodeLanguages(made) : []);
   const link = settingFromLink(worldInHash(hash), own);
-  const settings = [...SETTINGS, ...own, ...(link.setting ? [link.setting] : [])];
+  const settings = allSettings(merged(ownLanguages, linkedLanguages), own, link.setting);
   const state = readHash(hash, (key) => !!findChoice(link.choice(key), settings));
   if (state.choice) state.choice = link.choice(state.choice);
-  return { linked: link.setting, state };
+  return { linked: link.setting, linkedLanguages, state };
 }
 
 interface Initial {
   custom: Setting[];
+  languages: CustomLanguageDef[];
   shared: Setting | null;
+  sharedLanguages: CustomLanguageDef[];
   state: PageState;
 }
 
@@ -43,11 +77,14 @@ function withCount(counts: Counts, form: Form, length: Length): Counts {
 
 function initialState(): Initial {
   const custom = loadCustomSettings();
-  const { linked, state } = fromHash(window.location.hash, custom);
+  const languages = loadCustomLanguages();
+  const { linked, linkedLanguages, state } = fromHash(window.location.hash, custom, languages);
   const form = state.form ?? 'prose';
   return {
     custom,
+    languages,
     shared: linked,
+    sharedLanguages: linkedLanguages,
     state: {
       choice: DEFAULT_CHOICE,
       arrangement: 'sentences',
@@ -61,14 +98,20 @@ function initialState(): Initial {
   };
 }
 
+/** What the main area shows: the text, or one of the editors in its place. */
+type Panel = 'text' | 'settings' | 'languages';
+
 export default function App() {
   const [initial] = useState(initialState);
   const [custom, setCustom] = useState<Setting[]>(initial.custom);
-  // A setting that came with a link, until it's saved or the page closes.
+  const [languages, setLanguages] = useState<CustomLanguageDef[]>(initial.languages);
+  // A setting and languages that came with a link, until they're saved or the page closes.
   const [shared, setShared] = useState<Setting | null>(initial.shared);
+  const [sharedLanguages, setSharedLanguages] = useState<CustomLanguageDef[]>(initial.sharedLanguages);
   const [bannerHidden, setBannerHidden] = useState(false);
-  const [editing, setEditing] = useState(false);
+  const [panel, setPanel] = useState<Panel>('text');
   const editButton = useRef<HTMLButtonElement>(null);
+  const buildButton = useRef<HTMLButtonElement>(null);
   const [choiceKey, setChoiceKey] = useState(initial.state.choice);
   const [arrangement, setArrangement] = useState<Arrangement>(initial.state.arrangement);
   const [unit, setUnit] = useState<Length['unit']>(initial.state.length.unit);
@@ -78,9 +121,19 @@ export default function App() {
   const [seed, setSeed] = useState(initial.state.seed);
   const [view, setView] = useState<View>(initial.state.view);
 
-  const settings = useMemo(() => [...SETTINGS, ...custom, ...(shared ? [shared] : [])], [custom, shared]);
+  const made = useMemo(() => merged(languages, sharedLanguages), [languages, sharedLanguages]);
+  const known = useMemo(() => new Map<string, LanguageDef>([...LANGUAGES, ...made].map((def) => [def.id, def])), [made]);
+  // A choice whose language isn't here (deleted, or never sent) is left out until it is.
+  const settings = useMemo(
+    () =>
+      allSettings(made, custom, shared).map((setting) => ({
+        ...setting,
+        choices: setting.choices.filter((choice) => known.has(choice.language)),
+      })),
+    [made, custom, shared, known],
+  );
   const found = findChoice(choiceKey, settings) ?? findChoice(DEFAULT_CHOICE)!;
-  const language = useLanguage(found.choice.language);
+  const language = useLanguage(known.get(found.choice.language)!);
   const count = counts[form][unit];
 
   const text = useMemo(
@@ -92,11 +145,26 @@ export default function App() {
   );
 
   useEffect(() => saveCustomSettings(custom), [custom]);
+  useEffect(() => saveCustomLanguages(languages), [languages]);
 
-  // The URL always describes the page, custom setting included, so it can be bookmarked or shared.
-  const world = isCustomSetting(found.setting) ? encodeSetting(found.setting) : undefined;
+  // The URL always describes the page, custom setting and made languages included, so it can be
+  // bookmarked or shared, and works for anyone.
+  const setting = [...custom, ...(shared ? [shared] : [])].find((own) => own.id === found.setting.id);
+  const world = setting && isCustomSetting(setting) ? encodeSetting(setting) : undefined;
+  const needed = new Set([found.choice.language, ...(setting?.choices.map((choice) => choice.language) ?? [])]);
+  const madeNeeded = made.filter((def) => needed.has(def.id));
   const length: Length = { unit, count };
-  const hash = writeHash({ choice: found.key, arrangement, length, seed, view, form, speakers, world });
+  const hash = writeHash({
+    choice: found.key,
+    arrangement,
+    length,
+    seed,
+    view,
+    form,
+    speakers,
+    world,
+    made: madeNeeded.length > 0 ? encodeLanguages(madeNeeded) : undefined,
+  });
   useEffect(() => {
     if (window.location.hash !== hash) window.history.replaceState(null, '', hash);
   }, [hash]);
@@ -104,11 +172,10 @@ export default function App() {
   // A link pasted into the address bar of an open page changes only the hash.
   useEffect(() => {
     const apply = () => {
-      const { linked, state } = fromHash(window.location.hash, shared ? [...custom, shared] : custom);
-      if (linked) {
-        setShared(linked);
-        setBannerHidden(false);
-      }
+      const { linked, linkedLanguages, state } = fromHash(window.location.hash, shared ? [...custom, shared] : custom, made);
+      if (linked) setShared(linked);
+      if (linkedLanguages.length > 0) setSharedLanguages((current) => merged(current, linkedLanguages));
+      if (linked || linkedLanguages.length > 0) setBannerHidden(false);
       // A link leaves out the form for prose.
       const newForm = state.form ?? 'prose';
       setForm(newForm);
@@ -125,22 +192,34 @@ export default function App() {
     };
     window.addEventListener('hashchange', apply);
     return () => window.removeEventListener('hashchange', apply);
-  }, [custom, shared]);
+  }, [custom, shared, made]);
 
   // A shared setting's id counts as taken too, so a new setting can't take it before it's saved.
-  const takenIds = new Set(settings.map((setting) => setting.id));
+  const takenIds = new Set(settings.map((own) => own.id));
 
   function saveShared() {
-    if (!shared) return;
-    const id = uniqueId(shared.id, new Set([...SETTINGS, ...custom].map((setting) => setting.id)));
-    setCustom([...custom, { ...shared, id }]);
-    if (found.setting === shared) setChoiceKey(`${id}/${found.choice.id}`);
-    setShared(null);
+    if (sharedLanguages.length > 0) {
+      setLanguages(merged(languages, sharedLanguages));
+      setSharedLanguages([]);
+    }
+    if (shared) {
+      const id = uniqueId(shared.id, new Set([...SETTINGS, ...custom].map((own) => own.id)));
+      setCustom([...custom, { ...shared, id }]);
+      if (found.setting.id === shared.id) setChoiceKey(`${id}/${found.choice.id}`);
+      setShared(null);
+    }
   }
 
-  function closeEditor() {
-    setEditing(false);
-    editButton.current?.focus();
+  function closePanel() {
+    const returnTo = panel === 'settings' ? editButton : buildButton;
+    setPanel('text');
+    returnTo.current?.focus();
+  }
+
+  /** Writes in a made language: it's chosen, and the builder closes. */
+  function chooseMade(id: string) {
+    setChoiceKey(`${YOUR_LANGUAGES}/${id}`);
+    closePanel();
   }
 
   return (
@@ -153,8 +232,11 @@ export default function App() {
 
         <Controls
           settings={settings}
+          languages={known}
           editButton={editButton}
-          onEditSettings={() => setEditing(true)}
+          onEditSettings={() => setPanel('settings')}
+          buildButton={buildButton}
+          onBuild={() => setPanel('languages')}
           choice={found.key}
           onChoice={setChoiceKey}
           spoken={language.status === 'ready' && isSpoken(language.loaded.language)}
@@ -178,24 +260,14 @@ export default function App() {
       </aside>
 
       <main className="stage">
-        {shared && !bannerHidden && !editing && (
-          <div className="banner" role="region" aria-label="Shared setting">
-            <p>
-              This link brings a setting, <strong>{shared.name}</strong>, with its own names for languages.
-            </p>
-            <div className="banner-actions">
-              <button type="button" onClick={saveShared}>
-                Save it to your settings
-              </button>
-              <button type="button" className="quiet" onClick={() => setBannerHidden(true)}>
-                Not now
-              </button>
-            </div>
-          </div>
+        {(shared || sharedLanguages.length > 0) && !bannerHidden && panel === 'text' && (
+          <SharedBanner setting={shared} languages={sharedLanguages} yours={languages} onSave={saveShared} onHide={() => setBannerHidden(true)} />
         )}
-        {editing ? (
-          <SettingsEditor settings={custom} takenIds={takenIds} onChange={setCustom} onClose={closeEditor} />
-        ) : (
+        {panel === 'settings' && (
+          <SettingsEditor settings={custom} languages={[...known.values()]} takenIds={takenIds} onChange={setCustom} onClose={closePanel} />
+        )}
+        {panel === 'languages' && <LanguageBuilder languages={languages} onChange={setLanguages} onUse={chooseMade} onClose={closePanel} />}
+        {panel === 'text' && (
           <>
             {language.status === 'loading' && <p className="message">Loading…</p>}
             {language.status === 'failed' && (
@@ -218,6 +290,58 @@ export default function App() {
   );
 }
 
+/** A list of names: "Grukk", "Grukk and Zeth", "Grukk, Zeth and Ool". */
+function listed(names: readonly string[]) {
+  return names.map((name, i) => (
+    <span key={name}>
+      {i > 0 && (i === names.length - 1 ? ' and ' : ', ')}
+      <strong>{name}</strong>
+    </span>
+  ));
+}
+
+interface SharedBannerProps {
+  setting: Setting | null;
+  languages: readonly CustomLanguageDef[];
+  /** Your own languages, to tell a new language from a different version of one of yours. */
+  yours: readonly CustomLanguageDef[];
+  onSave: () => void;
+  onHide: () => void;
+}
+
+/** What a link brings that isn't saved here, and a way to save it. */
+function SharedBanner({ setting, languages, yours, onSave, onHide }: SharedBannerProps) {
+  const changed = languages.some((def) => yours.some((mine) => mine.id === def.id));
+  const names = languages.map((def) => def.name);
+  const kind = languages.length === 1 ? 'a language' : 'languages';
+  return (
+    <div className="banner" role="region" aria-label="Shared setting">
+      <p>
+        {setting && (
+          <>
+            This link brings a setting, <strong>{setting.name}</strong>, with its own names for languages
+            {languages.length > 0 ? <>, and {kind} made in the builder: {listed(names)}.</> : '.'}
+          </>
+        )}
+        {!setting && (
+          <>
+            This link brings {kind} made in the builder: {listed(names)}.
+          </>
+        )}
+        {changed && ' It’s a different version of one of yours.'}
+      </p>
+      <div className="banner-actions">
+        <button type="button" onClick={onSave}>
+          {setting && languages.length === 0 ? 'Save it to your settings' : changed ? 'Save it over yours' : 'Save it here'}
+        </button>
+        <button type="button" className="quiet" onClick={onHide}>
+          Not now
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /** Where the text comes from, and that it's in the public domain. */
 function Credit({ loaded }: { loaded: LoadedLanguage }) {
   const { language, source } = loaded;
@@ -229,7 +353,11 @@ function Credit({ loaded }: { loaded: LoadedLanguage }) {
   return (
     <p className="source">
       {language.kind === 'real' && <>From {work}, in the public domain.</>}
-      {language.kind === 'invented' && <>Invented words, with the flow of {work}, in the public domain.</>}
+      {language.kind === 'invented' && (
+        <>
+          {isCustomLanguage(language.id) ? 'Words invented in the builder' : 'Invented words'}, with the flow of {work}, in the public domain.
+        </>
+      )}
       {language.kind === 'vocabulary' && <>{language.name}’s own words, with the flow of {work}.</>}
     </p>
   );
