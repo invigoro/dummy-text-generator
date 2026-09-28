@@ -26,6 +26,8 @@ interface Naming {
   articles?: readonly string[];
   /** Words before a place's name: "to Bristol", "à Paris". */
   toPlaces?: readonly string[];
+  /** Words for kinds of place, before a place's name with or without a "de" or "of": "rue Férou", "château de Meung". */
+  kindsOfPlace?: readonly string[];
   /** Words that go between a person's names: the "de" of "Cyrano de Bergerac". */
   particles?: readonly string[];
   /** Words written with a capital that aren't anyone's name: titles, and words for God. */
@@ -45,6 +47,7 @@ const NAMING: Readonly<Record<string, Naming>> = {
   en: {
     articles: ['the', 'a', 'an'],
     toPlaces: ['to', 'in', 'at', 'from', 'into'],
+    kindsOfPlace: ['town', 'city', 'port', 'island', 'river', 'bay', 'street', 'county', 'village'],
     notNames: [
       ...['god', 'providence', 'bible', 'lord', 'sir', 'captain', 'doctor', 'squire', 'mister', 'madam', 'heaven'],
       ...['english', 'french', 'spanish', 'dutch', 'portuguese', 'irish', 'scotch', 'indian', 'christian'],
@@ -55,8 +58,9 @@ const NAMING: Readonly<Record<string, Naming>> = {
   fr: {
     articles: ['le', 'la', 'les', 'l', 'un', 'une', 'des', 'du'],
     toPlaces: ['à', 'en', 'au', 'aux', 'vers'],
+    kindsOfPlace: ['rue', 'ville', 'château', 'route', 'porte', 'pont', 'faubourg', 'hôtel', 'place', 'quai', 'abbaye', 'couvent', 'province', 'forêt', 'village'],
     particles: ['de'],
-    notNames: ['sire', 'monseigneur', 'éminence', 'excellence', 'milord', 'majesté', 'altesse', 'dieu', 'monsieur', 'madame', 'mademoiselle', 'seigneur'],
+    notNames: ['sire', 'monseigneur', 'éminence', 'excellence', 'milord', 'majesté', 'altesse', 'dieu', 'monsieur', 'madame', 'mademoiselle', 'seigneur', 'ier'],
     after: ['ville', 'mont', 'bourg', 'court', 'val'],
     before: ['saint', 'mont', 'port', 'val', 'sainte'],
     joiner: '-',
@@ -65,6 +69,7 @@ const NAMING: Readonly<Record<string, Naming>> = {
   es: {
     articles: ['el', 'la', 'los', 'las', 'un', 'una'],
     toPlaces: ['en', 'a', 'hacia', 'desde'],
+    kindsOfPlace: ['ciudad', 'villa', 'calle', 'río', 'pueblo', 'reino', 'castillo', 'sierra', 'puerto'],
     particles: ['de'],
     notNames: ['dios', 'señor', 'señora', 'don', 'doña', 'san', 'santa', 'vuestra', 'merced'],
     before: ['villa', 'puerto', 'monte', 'san', 'valle', 'sierra', 'santa'],
@@ -150,6 +155,8 @@ export const namesOf = cached((corpus: Corpus): Names => {
   const commonest = [...words].reduce((best, entry) => (entry[1] > best[1] ? entry : best), ['', 0])[0];
   const articles = new Set(naming.articles ?? [commonest]);
   const toPlaces = new Set(naming.toPlaces ?? []);
+  const kindsOfPlace = new Set(naming.kindsOfPlace ?? []);
+  const particles = new Set([...(naming.particles ?? []), 'of']);
   const notNames = new Set(naming.notNames ?? []);
 
   const counts = new Map<string, { count: number; afterArticle: number; afterPlace: number }>();
@@ -162,9 +169,11 @@ export const namesOf = cached((corpus: Corpus): Names => {
         if (!/^\p{Lu}\p{Ll}{2,}$/u.test(token.text) || atBreak(tokens, i)) return;
         const seen = counts.get(token.text) ?? { count: 0, afterArticle: 0, afterPlace: 0 };
         seen.count++;
-        const before = tokens[i - 2]?.kind === 'word' ? tokens[i - 2].text.toLowerCase() : '';
+        const wordBack = (n: number) => (tokens[i - 2 * n]?.kind === 'word' ? tokens[i - 2 * n].text.toLowerCase() : '');
+        const before = wordBack(1);
         if (articles.has(before)) seen.afterArticle++;
-        if (toPlaces.has(before)) seen.afterPlace++;
+        // "to Bristol", "rue Férou", "château de Meung"
+        if (toPlaces.has(before) || kindsOfPlace.has(before) || (particles.has(before) && kindsOfPlace.has(wordBack(2)))) seen.afterPlace++;
         counts.set(token.text, seen);
       });
     }
