@@ -9,15 +9,31 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
 
 ## Using it
 
-- **Pick an order:** a passage in its original order, or paragraphs, sentences or words shuffled
-  from all over the book. Shuffled words make no sense but keep the rhythm and punctuation of
-  prose.
-- **Set the length** in paragraphs or words. The text always stops at the end of a sentence.
-- 🎲 **Reroll** for new text. **Copy** puts it on the clipboard with a blank line between
-  paragraphs, ready to paste into Stele or anywhere else.
+- **Pick a language:** a real one (English, French, Latin, lorem ipsum, Old Norse), or one of a
+  game's, such as D&D's Elvish (invented French) or Dwarvish (invented Old Norse). Apart from
+  English, the words are invented. The text flows like the real language, with its rhythm, its
+  punctuation and its short words turning up everywhere, but nobody can understand it, not even
+  someone who speaks the language. The same word always comes out the same, so a language keeps
+  its vocabulary from one session to the next.
+- **Show it written, or how to say it:**
+  - "Say it" respells every word for English readers, with the stressed syllable in capitals
+    ("lay-RAHN").
+  - "Both" puts that under each word.
+  - "IPA" is there for anyone who reads it.
 
-For now the text is English, from *Treasure Island* (1883). Invented words in other languages,
-and a pronunciation guide for reading them aloud, come next: see the [plan](docs/PLAN.md).
+  Each language comes with a tip for voicing it.
+- **Pick an order:** a passage in its original order, or paragraphs, sentences or words shuffled
+  from all over the source text. Shuffled words keep the rhythm and punctuation of prose.
+- **Set the length** in paragraphs or words. The text always stops at the end of a sentence.
+- 🎲 **Reroll** for new text. The seed is shown beside it: the same seed and settings always give
+  the same text.
+- **Take it away:**
+  - **Copy** copies the text as it's shown.
+  - **Share link** copies a link that recreates it exactly.
+  - **Open in Stele** puts it on an object: parchment for Elvish, runes on granite for Dwarvish,
+    Roman lettering on marble for Latin.
+
+Every text the words and flow come from is in the public domain.
 
 ## Development
 

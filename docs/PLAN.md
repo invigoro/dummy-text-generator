@@ -12,7 +12,7 @@ jobs:
 The generated text must flow like the real language, every source text must be in the public
 domain, and the site must be static, hosted on GitHub Pages.
 
-**Current phase:** Phase 1. Phase 0 is done. See [Milestones](#milestones).
+**Current phase:** Phase 2. Phases 0 and 1 are done. See [Milestones](#milestones).
 
 ## The approach
 
@@ -212,18 +212,24 @@ public/                          # copied as-is (favicon)
 src/
   main.tsx · style.css           # app entry and styles
   engine/                        # the generator: no React, no DOM
-    rng.ts                       # seeded PRNG and shuffling
-    tokenize.ts                  # paragraphs → sentences → words and punctuation
+    rng.ts                       # seeded PRNG, shuffling, string hashing
+    tokenize.ts                  # paragraphs → sentences → words and punctuation, per language
     arrange.ts                   # original order, or shuffled paragraphs, sentences or words
-    generate.ts                  # source text + options → output paragraphs
+    generate.ts                  # flow text + options → a document in the language's words
     corpus/gutenberg.ts          # the cleaning steps behind scripts/import-gutenberg.ts
-    sounds/ · spelling/ · respell/ · relexify.ts   # (planned) invented words and "say it"
-    stele.ts                     # (planned) Open in Stele links
+    sounds/                      # phonemes, sound systems, and inventing words from them
+    spelling.ts · respell.ts     # sounds → the language's spelling; sounds → "say it" and IPA
+    language.ts                  # the three kinds of language: invented, vocabulary, real
+    lexicon.ts · vocabulary.ts   # one invented (or lorem ipsum) word per source word, for good
+    document.ts                  # the output: words with their sounds; written, "say it", IPA
+    g2p/latin.ts                 # how written Latin is said, for lorem ipsum
+    blocklist.ts                 # slurs and swear words, kept out of real and invented text
+    stele.ts                     # Open in Stele links
   data/
     corpora/                     # source texts (one folder per language) and their registry
-    languages/                   # (planned) one file per sound system
-    settings/                    # (planned) Real world, D&D 5e
-  ui/                            # React components
+    languages/                   # one file per language, and the registry that loads them
+    settings.ts                  # Real world and D&D 5e: names for languages, and Stele styles
+  ui/                            # React components, and the page's state in its URL
 ```
 
 ## Milestones
@@ -241,7 +247,10 @@ so the live site never shows one)*
 - *Done when* a push to `master` updates the site. That needs the repository public (or a paid
   GitHub plan) and Settings → Pages → Source set to "GitHub Actions".
 
-**Phase 1: Invented words and both jobs.**
+**Phase 1: Invented words and both jobs.** *(done. The blocklist for invented words came forward
+from Phase 2. Latin's flow comes from Caesar, since Project Gutenberg has no Latin Cicero of the
+right kind, and Old Norse's from an Icelandic translation of Verne. Lorem ipsum got its own
+language, with a Latin spelling-to-sound converter for its "say it" line.)*
 - the sound-system word generator, spelling rules, the "say it" respelling and the word swap
 - French, Latin (real lorem ipsum and invented) and Old Norse, under their own names (the Real
   world setting's first entries) and as the Elvish and Dwarvish presets
@@ -257,8 +266,6 @@ so the live site never shows one)*
 - conversation mode (two to four speakers, lines taken from quoted speech in the source texts),
   and a short-inscription length
 - a tuning page showing sample words and statistics for each sound system
-- the blocklist extended to invented words, so the generator never hands you a real swear word or
-  slur to read aloud. Real text already leaves out any sentence containing a slur.
 
 **Phase 3: Build-your-own languages.**
 - the language builder described [above](#build-your-own-languages), with live samples
