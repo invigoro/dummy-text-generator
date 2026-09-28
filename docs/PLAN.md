@@ -12,7 +12,7 @@ jobs:
 The generated text must flow like the real language, every source text must be in the public
 domain, and the site must be static, hosted on GitHub Pages.
 
-**Current phase:** Phase 3. Phases 0 to 2 are done. See [Milestones](#milestones).
+**Current phase:** Phases 0 to 3 are done; the backlog is what's left. See [Milestones](#milestones).
 
 ## The approach
 
@@ -240,7 +240,7 @@ src/
     corpora/                     # source texts (one folder per language) and their registry
     languages/                   # one file per language, and the registry that loads them
     settings.ts                  # Real world and D&D 5e: names for languages, and Stele styles
-  ui/                            # React components, custom settings, and the page's state in its URL
+  ui/                            # React components, custom settings and languages, the page's state in its URL
   dev/                           # the lab page: sample words and statistics for each sound system
 ```
 
@@ -285,7 +285,11 @@ dev server only.)*
   and a short-inscription length
 - a tuning page showing sample words and statistics for each sound system
 
-**Phase 3: Build-your-own languages.**
+**Phase 3: Build-your-own languages.** *(done. The builder edits every part of a sound system
+but the "say it" spellings of single sounds, which a language keeps from the one it started from.
+A language is saved whenever it works, and share links carry the made languages a page uses. Its
+samples come from an excerpt of the flow text, so they keep up with typing. The read-aloud view
+opens over the page.)*
 - the language builder described [above](#build-your-own-languages), with live samples
 - saving, sharing by link or JSON, and use in custom settings
 - a read-aloud view in large type, with each language's voicing tips

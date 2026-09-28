@@ -20,6 +20,11 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
   names, such as Renan for French and Old Deciman for Latin. Settings are kept in the browser,
   exported and imported as files, and carried in share links, so whoever opens one sees the same
   names and can save the setting.
+- **Build a language of your own**, for a monster or a people of your world. Start from nothing
+  or from any language here ("Orcish, but hissing"). Then set its sounds, how they make syllables,
+  where the stress falls, how it's spelled and whose rhythm it borrows, with sample words and a
+  passage updating as you go. Your languages are kept in the browser, exported and imported as
+  files, and carried in share links like settings.
 - **Pick a form:**
   - **Prose:** paragraphs, as in a letter or a book.
   - **Conversation:** lines of speech for two to four speakers, each after the speaker's name in
@@ -39,6 +44,8 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
 - 🎲 **Reroll** for new text. The seed is shown beside it: the same seed and settings always give
   the same text.
 - **Take it away:**
+  - **Read aloud** shows the text in large type for reading at the table, with the language's tip
+    for voicing it.
   - **Copy** copies the text as it's shown.
   - **Share link** copies a link that recreates it exactly.
   - **Open in Stele** puts it on an object: parchment for Elvish, runes on granite for Dwarvish,
