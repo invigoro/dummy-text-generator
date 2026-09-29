@@ -60,7 +60,9 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
   - **Open in Stele** puts it on an object: parchment for Elvish, runes on granite for Dwarvish,
     Roman lettering on marble for Latin.
 
-Every text the words and flow come from is in the public domain.
+Every text the words and flow come from is in the public domain. If you think one isn't, the
+[copyright page](https://jabberwock.invigoro.me/copyright/) says how to ask for it to be taken
+down.
 
 ## Development
 

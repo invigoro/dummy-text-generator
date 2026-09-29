@@ -1,0 +1,47 @@
+/* The site's colours, type and base rules, shared by the app and the copyright page. */
+
+:root {
+  color-scheme: light dark;
+  --paper: #f4eee2;
+  --page: #fffcf5;
+  --ink: #2b211b;
+  --muted: #6e5d4e;
+  --line: #ddd0b8;
+  --hover: #ebe2d0;
+  --accent: #8a3b1f;
+  --accent-ink: #fffaf2;
+  --tip: #f7ecd5;
+  --danger: #a3261b;
+  --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1b1714;
+    --page: #25201b;
+    --ink: #eee4d3;
+    --muted: #b3a38f;
+    --line: #463b32;
+    --hover: #322a24;
+    --accent: #e0885f;
+    --accent-ink: #1b1714;
+    --tip: #2e2620;
+    --danger: #f08a7e;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+}

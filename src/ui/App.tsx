@@ -404,6 +404,9 @@ function About({ className }: { className: string }) {
           Source on GitHub
         </a>
       </p>
+      <p>
+        <a href="copyright/">Copyright and takedown requests</a>
+      </p>
     </footer>
   );
 }

@@ -41,6 +41,15 @@ describe('App', () => {
     expect(screen.getByText('Les Trois Mousquetaires')).toBeInTheDocument();
   });
 
+  it('links to the copyright page, for takedown requests', async () => {
+    render(<App />);
+    await paragraphs();
+    // The footer is drawn twice, beside the text and below it, for wide and narrow screens.
+    for (const link of screen.getAllByRole('link', { name: 'Copyright and takedown requests' })) {
+      expect(link).toHaveAttribute('href', 'copyright/');
+    }
+  });
+
   it('switches language', async () => {
     const user = userEvent.setup();
     render(<App />);

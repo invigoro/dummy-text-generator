@@ -193,6 +193,8 @@ place to update. A plain `#text=` parameter in Stele would remove the coupling a
   how it was cleaned.
 - Nothing else here is sourced text. The sound systems and spelling rules are written from
   scratch, and the fonts are openly licensed.
+- **Takedown requests** go to the address on the copyright page
+  ([`copyright/index.html`](../copyright/index.html)), linked from the app's footer.
 
 ## Stack and hosting
 
@@ -203,6 +205,7 @@ place to update. A plain `#text=` parameter in Stele would remove the coupling a
   The site is served at `jabberwock.invigoro.me`, set as the custom domain in the repository's
   Pages settings. Vite uses a relative `base`, so the same build works there, at
   `invigoro.github.io/dummy-text-generator/`, or locally.
+  The build has two pages: the app and the copyright page. The lab stays out of it.
 - **Node 24**, pinned in `.nvmrc` and used by CI. Anything from 22.12 up works locally.
 - **The generator is plain TypeScript** (`src/engine/`) with no React in it. The same seed always
   gives the same text, which is what makes tests and share links possible.
@@ -217,6 +220,7 @@ Items marked *(planned)* don't exist yet.
 ```
 .github/workflows/               # deploy.yml (master → Pages), test.yml (other branches)
 index.html · vite.config.ts · package.json · .nvmrc · tsconfig.json
+copyright/index.html             # the copyright page: where to send a takedown request
 lab.html                         # the sound-system lab, for tuning (dev server only)
 docs/PLAN.md                     # this file
 SOURCES.md                       # provenance of every source text
@@ -224,6 +228,7 @@ scripts/import-gutenberg.ts      # cleans a Project Gutenberg download into a so
 public/                          # copied as-is (favicon)
 src/
   main.tsx · style.css           # app entry and styles
+  theme.css · copyright.css      # colours and type shared with the copyright page, and its styles
   engine/                        # the generator: no React, no DOM
     rng.ts                       # seeded PRNG, shuffling, string hashing
     tokenize.ts                  # paragraphs → sentences → words and punctuation, per language
