@@ -7,6 +7,7 @@ const isChoice = (key: string) => ['dnd/elvish', 'real/latin'].includes(key);
 /** What a prose page's hash holds: prose, and the speakers it doesn't need, go without saying. */
 const inHash = (page: PageState) => ({
   ...page,
+  alphabet: page.alphabet === 'own' ? undefined : page.alphabet,
   form: page.form === 'prose' ? undefined : page.form,
   speakers: page.form === 'conversation' ? page.speakers : undefined,
   names: page.form === 'names' ? page.names : undefined,
@@ -18,6 +19,7 @@ const state: PageState = {
   length: { unit: 'paragraphs', count: 3 },
   seed: 123456,
   view: 'both',
+  alphabet: 'own',
   form: 'prose',
   speakers: 2,
   names: 'people',
@@ -44,6 +46,13 @@ describe('writeHash and readHash', () => {
     expect(writeHash(places)).toMatch(/&form=names&names=places$/);
     expect(readHash(writeHash(places), isChoice)).toEqual(inHash(places));
     expect(readHash('#form=song&speakers=9', isChoice)).toEqual({});
+  });
+
+  it('carry Latin letters for a language with an alphabet of its own, and leave its own out', () => {
+    const latin = { ...state, choice: 'real/latin', alphabet: 'latin' } as const;
+    expect(writeHash(latin)).toBe('#lang=real/latin&order=sentences&len=3p&seed=123456&view=both&alphabet=latin');
+    expect(readHash(writeHash(latin), isChoice)).toEqual(inHash(latin));
+    expect(readHash('#alphabet=greek', isChoice)).toEqual({});
   });
 
   it('carry a custom setting last, and only when there is one', () => {

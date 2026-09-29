@@ -27,10 +27,25 @@ interface LanguageBase {
   voicing?: string;
 }
 
+/**
+ * A language written in an alphabet of its own, such as Cyrillic or Arabic, with its words spelled
+ * in Latin letters too, for readers who don't know it.
+ */
+export interface AlphabetDef {
+  /** What the alphabet is called, for the switch between it and Latin letters: "Cyrillic". */
+  name: string;
+  /** Which way it's written: right to left, as Arabic is. */
+  direction?: 'rtl';
+  /** How the words are spelled in Latin letters: a transliteration of their sounds. */
+  latin: readonly SpellingRule[];
+}
+
 export interface InventedLanguageDef extends LanguageBase {
   kind: 'invented';
   sounds: SoundsDef;
+  /** How the words are spelled: in the language's own alphabet, if it has one. */
   spelling: readonly SpellingRule[];
+  alphabet?: AlphabetDef;
   say?: SayOverrides;
   punctuation: PunctuationDef;
   voicing: string;
@@ -69,14 +84,20 @@ export interface RealLanguageDef extends LanguageBase {
 export type LanguageDef = InventedLanguageDef | VocabularyLanguageDef | RealLanguageDef;
 
 export type Language =
-  | (InventedLanguageDef & { system: SoundSystem; rules: CompiledRule[]; respell: Respeller })
+  | (InventedLanguageDef & { system: SoundSystem; rules: CompiledRule[]; latinRules?: CompiledRule[]; respell: Respeller })
   | (VocabularyLanguageDef & { respell: Respeller })
   | (RealLanguageDef & { respell?: Respeller });
 
 export function compileLanguage(def: LanguageDef): Language {
   switch (def.kind) {
     case 'invented':
-      return { ...def, system: compileSounds(def.sounds), rules: compileSpelling(def.spelling), respell: respeller(def.say) };
+      return {
+        ...def,
+        system: compileSounds(def.sounds),
+        rules: compileSpelling(def.spelling),
+        latinRules: def.alphabet && compileSpelling(def.alphabet.latin),
+        respell: respeller(def.say),
+      };
     case 'vocabulary':
       return { ...def, respell: respeller(def.say) };
     case 'real':

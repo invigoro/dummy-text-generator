@@ -5,7 +5,7 @@ import { FORMS, SPEAKERS, type Form } from '../engine/forms';
 import { NAME_KINDS, type NameKind } from '../engine/names';
 import type { LanguageDef } from '../engine/language';
 import { UNNAMED_LANGUAGE, UNTITLED_SETTING } from './customSettings';
-import { VIEWS, type View } from './urlState';
+import { VIEWS, type Alphabet, type View } from './urlState';
 
 type Order = { label: string; hint: string };
 
@@ -74,6 +74,10 @@ interface ControlsProps {
   spoken: boolean;
   view: View;
   onView: (view: View) => void;
+  /** What the language's own alphabet is called, for one written in another than Latin letters: "Cyrillic". */
+  ownAlphabet?: string;
+  alphabet: Alphabet;
+  onAlphabet: (alphabet: Alphabet) => void;
   form: Form;
   onForm: (form: Form) => void;
   speakers: number;
@@ -137,6 +141,26 @@ export function Controls(props: ControlsProps) {
               <label key={view}>
                 <input type="radio" name={`${id}-view`} value={view} checked={props.view === view} onChange={() => props.onView(view)} />
                 <span>{VIEW_LABELS[view]}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
+      {props.ownAlphabet && (
+        <fieldset>
+          <legend className="label">Alphabet</legend>
+          <div className="segmented">
+            {(['own', 'latin'] as const).map((alphabet) => (
+              <label key={alphabet}>
+                <input
+                  type="radio"
+                  name={`${id}-alphabet`}
+                  value={alphabet}
+                  checked={props.alphabet === alphabet}
+                  onChange={() => props.onAlphabet(alphabet)}
+                />
+                <span>{alphabet === 'own' ? props.ownAlphabet : 'Latin'}</span>
               </label>
             ))}
           </div>

@@ -73,6 +73,14 @@ describe('say', () => {
     expect(navajo.say(word('k|a|'), null)).toBe('gah');
   });
 
+  it('says a soft consonant with a y, where the y isn’t heard anyway', () => {
+    expect(say(word('lʲ|a|'), null)).toBe('lyah');
+    expect(say(word('lʲ|i|'), null)).toBe('lee');
+    expect(say(word('m|a|tʲ'), null)).toBe('maht');
+    // A soft g before i is still hard: "ghee", not "gee".
+    expect(say(word('gʲ|i|'), null)).toBe('ghee');
+  });
+
   it('marks a popped consonant with an apostrophe, and says a breathy one plainly', () => {
     expect(say(word('tʼ|a|n', 'tʰ|a|'), 0)).toBe("T'AHN-tah");
     expect(say(word('pʰ|u|', 'j|u|'), 0)).toBe('POO-yoo');

@@ -23,6 +23,11 @@ export interface Phoneme {
    * syllable, and is said across the break: "GAHT-toh".
    */
   geminate?: boolean;
+  /**
+   * A soft consonant, said with the tongue raised to the palate, as Russian's are: "ty", "ly". The
+   * y is only written before a, o and u; before e and i, and at a syllable's end, it's heard anyway.
+   */
+  soft?: boolean;
 }
 
 const vowel = (say: string, extra: Omit<Phoneme, 'type' | 'say'> = {}): Phoneme => ({ type: 'vowel', say, ...extra });
@@ -104,6 +109,11 @@ const BASE: Readonly<Record<string, Phoneme>> = {
   // Old English "ea" and "eo".
   eɑ: vowel('eah', { long: true }),
   eo: vowel('ayo', { long: true }),
+  // Dutch: the u of "bus", and the diphthongs of "wijn", "huis" and "koud".
+  ʏ: vowel('uh', { sayClosed: 'u', front: true }),
+  ɛi: vowel('ay', { front: true, long: true }),
+  œy: vowel('ow', { long: true }),
+  ɑu: vowel('ow', { long: true }),
 
   // Consonants
   p: consonant('p', { labial: true }),
@@ -127,6 +137,9 @@ const BASE: Readonly<Record<string, Phoneme>> = {
   ɣ: consonant('gh'),
   ʁ: consonant('r'),
   h: consonant('h'),
+  // Dutch h, voiced, and w, between a v and a w.
+  ɦ: consonant('h'),
+  ʋ: consonant('w', { labial: true }),
   ħ: consonant('h'),
   ʕ: consonant("'"),
   ç: consonant('kh'),
@@ -169,13 +182,29 @@ const BASE: Readonly<Record<string, Phoneme>> = {
   tʃʼ: consonant("ch'"),
   tsʼ: consonant("ts'"),
   tɬʼ: consonant("tl'"),
+  // Russian's hushing sounds: ш, ж, щ and ч.
+  ʂ: consonant('sh'),
+  ʐ: consonant('zh'),
+  ɕ: consonant('sh'),
+  tɕ: consonant('ch'),
+  // Arabic's emphatic consonants, said far back with the tongue low: ص, ض, ط, ظ.
+  sˤ: consonant('s'),
+  dˤ: consonant('d'),
+  tˤ: consonant('t'),
+  ðˤ: consonant('dh'),
   gw: consonant('gw'),
   β: consonant('v', { labial: true }),
   ɸ: consonant('f', { labial: true }),
 };
 
-/** Consonants that can be doubled, as in Italian, Finnish or Old Norse. */
-const DOUBLED = ['p', 'b', 't', 'd', 'k', 'g', 'f', 'v', 's', 'z', 'ʃ', 'm', 'n', 'l', 'r', 'ɲ', 'ʎ', 'tʃ', 'dʒ', 'ts', 'dz', 'θ', 'ð', 'x', 'j', 'ŋ'];
+/** Consonants that can be doubled, as in Italian, Finnish, Old Norse or Arabic. */
+const DOUBLED = [
+  ...['p', 'b', 't', 'd', 'k', 'g', 'f', 'v', 's', 'z', 'ʃ', 'm', 'n', 'l', 'r', 'ɲ', 'ʎ', 'tʃ', 'dʒ', 'ts', 'dz', 'θ', 'ð', 'x', 'j', 'ŋ'],
+  ...['q', 'ħ', 'ʕ', 'w', 'sˤ', 'dˤ', 'tˤ'],
+];
+
+/** Russian's soft consonants: the ones it has hard, said with the tongue raised to the palate. */
+const SOFTENED = ['p', 'b', 't', 'd', 'k', 'g', 'f', 'v', 's', 'z', 'm', 'n', 'l', 'r', 'x'];
 
 /** Sound symbols are compared in decomposed form, so "ẽ" matches however it was typed. */
 export const normalizeSound = (symbol: string) => symbol.normalize('NFD');
@@ -183,6 +212,7 @@ export const normalizeSound = (symbol: string) => symbol.normalize('NFD');
 export const PHONEMES: Readonly<Record<string, Phoneme>> = Object.fromEntries([
   ...Object.entries(BASE).map(([symbol, sound]) => [normalizeSound(symbol), sound]),
   ...DOUBLED.map((symbol) => [`${symbol}ː`, { ...BASE[symbol], geminate: true }]),
+  ...SOFTENED.map((symbol) => [`${symbol}ʲ`, { ...BASE[symbol], say: `${BASE[symbol].say}y`, soft: true }]),
 ]);
 
 const HIGH_OR_LOW = /[̀́]/gu;

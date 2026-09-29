@@ -127,13 +127,16 @@ function nameFrom(recipe: NameRecipe, source: TextSource, rule: ReturnType<typeo
   const [first, second] = recipe.words.map((word) => wordOf(source, word));
   const hyphened = recipe.joiner === '-';
   if (!hyphened && first.spoken && second.spoken && joinsBadly(source.language, first.spoken, second.spoken)) return null;
-  const joined = hyphened ? `${first.text}-${second.text}` : (first.text + second.text.toLowerCase()).replace(/\p{L}/u, (letter) => letter.toUpperCase());
-  // Where the two meet, no letter comes three times: "Pwll" and "lidd" make "Pwllidd".
-  const text = joined.replace(/(\p{L})\1\1+/gu, '$1$1');
+  const join = (a: string, b: string) =>
+    // Where the two meet, no letter comes three times: "Pwll" and "lidd" make "Pwllidd".
+    (hyphened ? `${a}-${b}` : (a + b.toLowerCase()).replace(/\p{L}/u, (letter) => letter.toUpperCase())).replace(/(\p{L})\1\1+/gu, '$1$1');
+  const text = join(first.text, second.text);
+  const latin = first.latin !== undefined || second.latin !== undefined ? join(first.latin ?? first.text, second.latin ?? second.text) : undefined;
   let spoken: WordSounds[] | undefined;
   if (first.spoken && second.spoken) {
     const syllables = [...first.spoken, ...second.spoken].flatMap((part) => part.syllables);
     spoken = hyphened ? [...first.spoken, ...second.spoken] : [{ syllables, stress: rule ? stressOf(rule, syllables) : null }];
   }
-  return { sentences: [{ tokens: [spoken ? { kind: 'word', text, spoken } : { kind: 'word', text }] }] };
+  const word: DocWord = { kind: 'word', text, ...(latin !== undefined ? { latin } : {}), ...(spoken ? { spoken } : {}) };
+  return { sentences: [{ tokens: [word] }] };
 }

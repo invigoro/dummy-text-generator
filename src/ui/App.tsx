@@ -24,7 +24,7 @@ import { LanguageBuilder } from './LanguageBuilder';
 import { Output } from './Output';
 import { SettingsEditor } from './SettingsEditor';
 import { useLanguage } from './useLanguage';
-import { madeInHash, readHash, worldInHash, writeHash, type PageState, type View } from './urlState';
+import { madeInHash, readHash, worldInHash, writeHash, type Alphabet, type PageState, type View } from './urlState';
 
 /** Your languages, with a link's in place of yours where they differ. */
 function merged(own: readonly CustomLanguageDef[], shared: readonly CustomLanguageDef[]): CustomLanguageDef[] {
@@ -94,6 +94,7 @@ function initialState(): Initial {
       length: { unit: 'paragraphs', count: DEFAULT_COUNTS[form].paragraphs },
       seed: randomSeed(),
       view: 'written',
+      alphabet: 'own',
       form,
       speakers: SPEAKERS.min,
       names: 'people',
@@ -125,6 +126,7 @@ export default function App() {
   const [nameKind, setNameKind] = useState<NameKind>(initial.state.names);
   const [seed, setSeed] = useState(initial.state.seed);
   const [view, setView] = useState<View>(initial.state.view);
+  const [alphabet, setAlphabet] = useState<Alphabet>(initial.state.alphabet);
 
   const made = useMemo(() => merged(languages, sharedLanguages), [languages, sharedLanguages]);
   const known = useMemo(() => new Map<string, LanguageDef>([...LANGUAGES, ...made].map((def) => [def.id, def])), [made]);
@@ -171,6 +173,7 @@ export default function App() {
     length,
     seed,
     view,
+    alphabet,
     form,
     speakers,
     names: nameKind,
@@ -202,6 +205,8 @@ export default function App() {
       if (state.names) setNameKind(state.names);
       if (state.seed !== undefined) setSeed(state.seed);
       if (state.view) setView(state.view);
+      // A link leaves out the alphabet for a language's own.
+      setAlphabet(state.alphabet ?? 'own');
     };
     window.addEventListener('hashchange', apply);
     return () => window.removeEventListener('hashchange', apply);
@@ -258,6 +263,9 @@ export default function App() {
           spoken={language.status === 'ready' && isSpoken(language.loaded.language)}
           view={view}
           onView={setView}
+          ownAlphabet={language.status === 'ready' && language.loaded.language.kind === 'invented' ? language.loaded.language.alphabet?.name : undefined}
+          alphabet={alphabet}
+          onAlphabet={setAlphabet}
           form={form}
           onForm={setForm}
           speakers={speakers}
@@ -301,6 +309,7 @@ export default function App() {
                 paragraphs={text}
                 language={language.loaded.language}
                 view={view}
+                alphabet={alphabet}
                 form={form}
                 stele={found.choice.stele}
                 title={found.choice.name}

@@ -63,6 +63,8 @@ export interface TokenizeOptions {
    * "qu’il"), after it in English ("don’t", "he’ll").
    */
   elision?: 'before' | 'after';
+  /** Little words written joined to the next, which are words of their own: Arabic's article ال. */
+  prefixes?: readonly string[];
 }
 
 export const ENGLISH: TokenizeOptions = {
@@ -173,6 +175,41 @@ const MIDDLE_ENGLISH: TokenizeOptions = {
   elision: 'after',
 };
 
+const RUSSIAN: TokenizeOptions = {
+  abbreviations: new Set(['г', 'гг', 'т', 'тт', 'д', 'пр', 'др', 'см', 'ул']),
+  quotes: [
+    ['«', '»'],
+    ['„', '“'],
+  ],
+  elisions: new Set(),
+};
+
+const ARABIC: TokenizeOptions = {
+  abbreviations: new Set(),
+  quotes: [
+    ['«', '»'],
+    ['“', '”'],
+    ['"', '"'],
+  ],
+  elisions: new Set(),
+  // The article, and the article after "and", "with" and "so".
+  prefixes: ['وال', 'بال', 'فال', 'ال'],
+};
+
+const DUTCH: TokenizeOptions = {
+  abbreviations: new Set(['Mr', 'Mevr', 'Dr', 'St', 'bijv', 'enz', 'blz', 'jhr', 'mej']),
+  // Van Eeden puts speech in straight single quotes: 'Ja Johannes!'
+  quotes: [
+    ["'", "'"],
+    ['„', '”'],
+    ['“', '”'],
+    ['"', '"'],
+  ],
+  // 't, 's, 'n and 'k: het, des, een and ik.
+  elisions: new Set(['t', 's', 'n', 'k']),
+  elision: 'after',
+};
+
 const TOKENIZERS: Readonly<Record<string, TokenizeOptions>> = {
   en: ENGLISH,
   fr: FRENCH,
@@ -185,6 +222,9 @@ const TOKENIZERS: Readonly<Record<string, TokenizeOptions>> = {
   cy: WELSH,
   de: GERMAN,
   enm: MIDDLE_ENGLISH,
+  ru: RUSSIAN,
+  ar: ARABIC,
+  nl: DUTCH,
 };
 
 /** The options for text in a language, from its BCP 47 tag. English rules if there are none. */
@@ -195,7 +235,8 @@ export function tokenizerFor(language: string): TokenizeOptions {
 /** Letters and digits, with apostrophes or hyphens allowed between them ("Cap’n", "sea-chest"). */
 const WORD = /[\p{L}\p{M}\p{N}]+(?:['’-][\p{L}\p{M}\p{N}]+)*/uy;
 const SPACE = /\s+/uy;
-const STOP = /^[.!?…]$/u;
+// Arabic's question mark is ؟.
+const STOP = /^[.!?…؟]$/u;
 const SINGLE_QUOTES = new Set(['‘', '’', "'"]);
 
 function lex(text: string): Token[] {
@@ -308,7 +349,8 @@ function isAbbreviation(tokens: Token[], stop: number, options: TokenizeOptions)
   );
 }
 
-const startsUpper = (text: string) => /^[\p{Lu}\p{N}]/u.test(text);
+/** A capital starts a sentence, or a number; so does any letter of a script without capitals, as Arabic is. */
+const startsUpper = (text: string) => /^[\p{Lu}\p{Lt}\p{Lo}\p{N}]/u.test(text);
 
 function startsSentence(tokens: Token[], index: number, afterQuotation: boolean): boolean {
   const token = tokens[index];

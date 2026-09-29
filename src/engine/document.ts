@@ -13,6 +13,8 @@ import type { Vocabulary } from './vocabulary';
 export interface DocWord {
   kind: 'word';
   text: string;
+  /** The word in Latin letters, for a language written in another alphabet. */
+  latin?: string;
   /** How it's said: one entry per word it's made of ("sea-chest" has two). Missing for numbers and real words. */
   spoken?: WordSounds[];
 }
@@ -53,23 +55,28 @@ function caseLike(source: string, word: string): string {
 }
 
 /** One source word replaced by its invented word, keeping apostrophes, hyphens and capitals. */
-export function inventWordToken(text: string, lexicon: Lexicon, elision: TokenizeOptions['elision']): DocWord {
+export function inventWordToken(text: string, lexicon: Lexicon, elision: TokenizeOptions['elision'], prefixes?: readonly string[]): DocWord {
   // A kept word stays real, and has no "say it" form: it's read as it's written.
   if (isNumber(text) || lexicon.keeps(text)) return { kind: 'word', text };
 
-  const parts = pieces(text, elision);
+  const parts = pieces(text, elision, prefixes);
   let written = '';
+  // The same in Latin letters, for a language written in another alphabet.
+  let latin = '';
+  const inLatinToo = !!lexicon.language.latinRules;
   const spoken: WordSounds[] = [];
   // Consonants of a clitic waiting for the next word ("l’" before "homme").
   let pending: string[] = [];
   for (const piece of parts) {
     if (piece.kind === 'join') {
       written += piece.text;
+      latin += piece.latin ?? piece.text;
       continue;
     }
     if (piece.clitic) {
       const clitic = lexicon.clitic(piece.text);
       written += caseLike(piece.text, clitic.spelling);
+      latin += caseLike(piece.text, clitic.latin ?? clitic.spelling);
       if (elision === 'before') {
         pending = [...pending, ...clitic.consonants];
       } else if (spoken.length > 0) {
@@ -84,6 +91,7 @@ export function inventWordToken(text: string, lexicon: Lexicon, elision: Tokeniz
     }
     const word = lexicon.word(piece.text);
     written += caseLike(piece.text, word.spelling);
+    latin += caseLike(piece.text, word.latin ?? word.spelling);
     if (pending.length > 0) {
       const [first, ...rest] = word.sounds.syllables;
       spoken.push({ ...word.sounds, syllables: [{ ...first, onset: [...pending, ...first.onset] }, ...rest] });
@@ -92,7 +100,12 @@ export function inventWordToken(text: string, lexicon: Lexicon, elision: Tokeniz
       spoken.push(word.sounds);
     }
   }
-  return { kind: 'word', text: written, spoken: spoken.length > 0 ? spoken : undefined };
+  return {
+    kind: 'word',
+    text: written,
+    ...(inLatinToo ? { latin } : {}),
+    spoken: spoken.length > 0 ? spoken : undefined,
+  };
 }
 
 /**
@@ -144,7 +157,9 @@ export function inventedWords(
 ): DocParagraph[] {
   const convert = (token: Token, i: number, tokens: Token[]): DocToken => {
     if (token.kind === 'word') {
-      return isAbbreviation(token.text, tokens[i + 1], source) ? { kind: 'word', text: token.text } : inventWordToken(token.text, lexicon, source.elision);
+      return isAbbreviation(token.text, tokens[i + 1], source)
+        ? { kind: 'word', text: token.text }
+        : inventWordToken(token.text, lexicon, source.elision, source.prefixes);
     }
     if (token.kind === 'punct' && token.quote && source.quotes.some((pair) => pair.includes(token.text))) {
       return { kind: 'punct', text: token.quote === 'open' ? target.quotes[0] : target.quotes[1], quote: token.quote };
@@ -222,7 +237,7 @@ export function sayWords(sentence: DocSentence, rule: StressRule, respell: Respe
   };
   return tokens.map((token, index) => {
     if (token.kind !== 'word') return null;
-    if (!token.spoken) return { say: token.text, ipa: token.text };
+    if (!token.spoken) return { say: latinDigits(token.latin ?? token.text), ipa: latinDigits(token.latin ?? token.text) };
     const last = endsPhrase(index);
     const said = token.spoken.map((word, part) => {
       const final = part === token.spoken!.length - 1;
@@ -234,11 +249,48 @@ export function sayWords(sentence: DocSentence, rule: StressRule, respell: Respe
   });
 }
 
+/** Punctuation a script writes its own way, as the Latin alphabet writes it: Arabic's ، ؛ ؟. */
+const LATIN_PUNCTUATION: Readonly<Record<string, string>> = { '،': ',', '؛': ';', '؟': '?', '٪': '%' };
+
+/** Digits of another script, such as Arabic's ٣, as 0 to 9. */
+const latinDigits = (text: string) => text.replace(/[\u0660-\u0669]/gu, (digit) => String(digit.charCodeAt(0) - 0x0660));
+
 /** A sentence's punctuation for English readers: plain quotation marks, and no French spaces. */
 function plainPunctuation(token: DocToken): string {
   if (token.kind === 'punct' && token.quote) return token.quote === 'open' ? '“' : '”';
   if (token.kind === 'space' && token.text === NBSP) return '';
+  if (token.kind === 'punct') return LATIN_PUNCTUATION[token.text] ?? token.text;
   return token.text;
+}
+
+/** A word with a capital: its first letter that has one, so "ʿalī" is "ʿAlī". */
+const capitalized = (word: string) => word.replace(/\p{Ll}/u, (letter) => letter.toUpperCase());
+
+/**
+ * The text in Latin letters, for a language written in another alphabet, punctuated as Latin
+ * letters are. Where the alphabet has no capitals, as Arabic's hasn't, a sentence starts with one,
+ * and every word of a name (a speaker's, or each of a list of names) does.
+ */
+export function inLatin(paragraphs: readonly DocParagraph[], names = false): DocParagraph[] {
+  const convert = (sentence: DocSentence, everyWord: boolean): DocSentence => {
+    let first = true;
+    const tokens = sentence.tokens.map((token): DocToken => {
+      // A quotation starts with a capital too.
+      if (token.kind === 'punct' && token.quote === 'open') first = true;
+      if (token.kind === 'punct') return { ...token, text: LATIN_PUNCTUATION[token.text] ?? token.text };
+      if (token.kind !== 'word') return token;
+      const caseless = !/[\p{Lu}\p{Ll}]/u.test(token.text);
+      const text = latinDigits(token.latin ?? token.text);
+      const shown = caseless && (first || everyWord) ? capitalized(text) : text;
+      first = false;
+      return { ...token, text: shown };
+    });
+    return { tokens };
+  };
+  return paragraphs.map((paragraph) => ({
+    sentences: paragraph.sentences.map((sentence) => convert(sentence, names)),
+    ...(paragraph.speaker ? { speaker: convert(paragraph.speaker, true) } : {}),
+  }));
 }
 
 /** The "say it" or IPA line for every paragraph. */

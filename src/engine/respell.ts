@@ -37,10 +37,12 @@ export function respeller(overrides: SayOverrides = {}): Respeller {
     const vowel = sound(syllable.nucleus);
     const onset = syllable.onset
       .map((symbol, i) => {
+        const { soft } = sound(symbol);
+        const last = i === syllable.onset.length - 1;
+        // A soft consonant's y is heard anyway before e or i: Russian "ти" is "tee", not "tyee".
+        const say = soft && (!last || vowel.front) ? sound(symbol).say.replace(/y$/, '') : sound(symbol).say;
         // "g" before e or i reads as "j" (gem), so it gets an h (ghee).
-        const say = sound(symbol).say;
-        if (say === 'g' && i === syllable.onset.length - 1 && vowel.front) return 'gh';
-        return say;
+        return say === 'g' && last && vowel.front ? 'gh' : say;
       })
       .join('');
     const nucleus =
@@ -55,7 +57,8 @@ export function respeller(overrides: SayOverrides = {}): Respeller {
         if (symbol === 'ŋ' && (following === 'k' || following === 'g')) return 'n';
         // After a long vowel, a final s reads as z ("days"), so it doubles: "dayss".
         if (symbol === 's' && syllable.coda.length === 1 && nucleus.length > 1) return 'ss';
-        return sound(symbol).say;
+        const { say, soft } = sound(symbol);
+        return soft ? say.replace(/y$/, '') : say;
       })
       .join('');
     return onset + nucleus + coda;

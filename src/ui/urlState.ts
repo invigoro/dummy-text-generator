@@ -10,6 +10,9 @@ import { NAME_KINDS, type NameKind } from '../engine/names';
 export type View = 'written' | 'say' | 'both' | 'ipa';
 export const VIEWS: readonly View[] = ['written', 'say', 'both', 'ipa'];
 
+/** The alphabet a language with one of its own (Russian's Cyrillic) is shown in: that one, or Latin letters. */
+export type Alphabet = 'own' | 'latin';
+
 export interface PageState {
   /** A setting and language choice: "dnd/elvish". */
   choice: string;
@@ -17,6 +20,7 @@ export interface PageState {
   length: Length;
   seed: number;
   view: View;
+  alphabet: Alphabet;
   form: Form;
   /** How many speakers a conversation has. */
   speakers: number;
@@ -69,6 +73,9 @@ export function readHash(hash: string, isChoice: (key: string) => boolean): Part
   const view = params.get('view');
   if (view && (VIEWS as readonly string[]).includes(view)) state.view = view as View;
 
+  const alphabet = params.get('alphabet');
+  if (alphabet === 'own' || alphabet === 'latin') state.alphabet = alphabet;
+
   const form = params.get('form');
   if (form && (FORMS as readonly string[]).includes(form)) state.form = form as Form;
 
@@ -95,6 +102,7 @@ export function writeHash(state: PageState): string {
     seed: String(state.seed),
     view: state.view,
   });
+  if (state.alphabet === 'latin') params.set('alphabet', 'latin');
   if (state.form !== 'prose') params.set('form', state.form);
   if (state.form === 'conversation') params.set('speakers', String(state.speakers));
   if (state.form === 'names') params.set('names', state.names);

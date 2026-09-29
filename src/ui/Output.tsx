@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import {
   countDocWords,
+  inLatin,
   paragraphText,
   sayWords,
   spokenText,
@@ -12,13 +13,15 @@ import type { Form } from '../engine/forms';
 import { voiceOf, type Language, type Voice } from '../engine/language';
 import { steleLink, trimForStele, type SteleOptions } from '../engine/stele';
 import { Listen } from './Listen';
-import type { View } from './urlState';
+import type { Alphabet, View } from './urlState';
 
 interface OutputProps {
   paragraphs: DocParagraph[];
   language: Language;
   /** The view to show; ignored for a language without a "say it" line. */
   view: View;
+  /** For a language written in an alphabet of its own, whether to show that one or Latin letters. */
+  alphabet: Alphabet;
   /** Prose, a conversation (a speaker before each line) or an inscription (one short line each). */
   form: Form;
   stele: SteleOptions;
@@ -36,22 +39,29 @@ function viewText(paragraphs: DocParagraph[], view: View, voice: Voice | null, s
   return paragraphs.map((paragraph) => `${paragraphText(paragraph)}\n${spokenText([paragraph], voice.rule, voice.respell, 'say')}`).join('\n\n');
 }
 
-export function Output({ paragraphs, language, view, form, stele, title }: OutputProps) {
+export function Output({ paragraphs: own, language, view, alphabet, form, stele, title }: OutputProps) {
   const voice = voiceOf(language);
   const shown = voice ? view : 'written';
   // An inscription's lines and a list of names go one to a line.
   const separator = form === 'inscription' || form === 'names' ? '\n' : '\n\n';
   const [reading, setReading] = useState(false);
   const readButton = useRef<HTMLButtonElement>(null);
-  const written = writtenText(paragraphs, separator);
+  const script = language.kind === 'invented' ? language.alphabet : undefined;
+  const latin = script ? inLatin(own, form === 'names') : null;
+  const paragraphs = latin && alphabet === 'latin' ? latin : own;
+  const direction = script?.direction && paragraphs === own ? script.direction : undefined;
+  // A voice for the language reads its own alphabet.
+  const written = writtenText(own, separator);
   const said = voice ? spokenText(paragraphs, voice.rule, voice.respell, 'say', separator) : null;
+  // Stele has letters for the Latin alphabet (and runes), not Cyrillic or Arabic.
+  const steleText = latin ? writtenText(latin, separator) : written;
   return (
     <section className="output" aria-label="Generated text">
       <div className="output-bar">
         <p className="word-count">
           {form === 'names' ? `${paragraphs.length} names` : `${countDocWords(paragraphs).toLocaleString('en')} words`}
         </p>
-        <Actions copyText={viewText(paragraphs, shown, voice, separator)} steleText={written} stele={stele}>
+        <Actions copyText={viewText(paragraphs, shown, voice, separator)} steleText={steleText} stele={stele}>
           <Listen languageId={language.id} written={written} said={said} />
           <button ref={readButton} type="button" onClick={() => setReading(true)}>
             Read aloud
@@ -59,10 +69,11 @@ export function Output({ paragraphs, language, view, form, stele, title }: Outpu
         </Actions>
       </div>
       {voice && shown !== 'written' && <Voicing language={language} />}
-      <TextPage paragraphs={paragraphs} view={shown} voice={voice} form={form} />
+      <TextPage paragraphs={paragraphs} view={shown} voice={voice} form={form} direction={direction} />
       {reading && (
         <ReadAloud
           paragraphs={paragraphs}
+          direction={direction}
           language={language}
           voice={voice}
           form={form}
@@ -94,6 +105,8 @@ interface TextPageProps {
   view: View;
   voice: Voice | null;
   form: Form;
+  /** Right to left, for Arabic in its own alphabet. The "say it" and IPA lines always run left to right. */
+  direction?: 'rtl';
   className?: string;
 }
 
@@ -105,9 +118,10 @@ const hasMarks = (paragraphs: readonly DocParagraph[]) =>
   paragraphs.some((paragraph) => /\p{M}/u.test(paragraphText(paragraph) + (paragraph.speaker ? paragraphText({ sentences: [paragraph.speaker] }) : '')));
 
 /** The text as a page, in the view asked for. */
-function TextPage({ paragraphs, view, voice, form, className = 'page' }: TextPageProps) {
+function TextPage({ paragraphs, view, voice, form, direction, className = 'page' }: TextPageProps) {
+  const dir = direction && (view === 'written' || view === 'both' || !voice) ? direction : undefined;
   return (
-    <article className={`${className} view-${view} form-${form}${hasMarks(paragraphs) ? ' marks' : ''}`}>
+    <article className={`${className} view-${view} form-${form}${hasMarks(paragraphs) ? ' marks' : ''}`} dir={dir}>
       {paragraphs.map((paragraph, i) => (
         <p key={i}>
           {paragraph.speaker && (
@@ -133,6 +147,7 @@ const SIZES = [1.25, 1.5, 1.8, 2.2, 2.7, 3.3] as const;
 
 interface ReadAloudProps {
   paragraphs: DocParagraph[];
+  direction?: 'rtl';
   language: Language;
   voice: Voice | null;
   form: Form;
@@ -144,7 +159,7 @@ interface ReadAloudProps {
 }
 
 /** The text in large type, for reading aloud at the table, with the language's tip for voicing it. */
-function ReadAloud({ paragraphs, language, voice, form, title, initialView, listen, onClose }: ReadAloudProps) {
+function ReadAloud({ paragraphs, direction, language, voice, form, title, initialView, listen, onClose }: ReadAloudProps) {
   const id = useId();
   const dialog = useRef<HTMLDialogElement>(null);
   const [view, setView] = useState<View>(initialView);
@@ -190,7 +205,7 @@ function ReadAloud({ paragraphs, language, voice, form, title, initialView, list
       </div>
       {voice && view !== 'written' && <Voicing language={language} />}
       <div style={{ fontSize: `${SIZES[size]}rem` }}>
-        <TextPage paragraphs={paragraphs} view={view} voice={voice} form={form} className="read-aloud-text" />
+        <TextPage paragraphs={paragraphs} view={view} voice={voice} form={form} direction={direction} className="read-aloud-text" />
       </div>
     </dialog>
   );

@@ -6,7 +6,7 @@
  */
 import { SOURCE_TEXTS } from '../data/corpora';
 import type { Setting } from '../data/settings';
-import { compileLanguage, type InventedLanguageDef, type PunctuationDef } from '../engine/language';
+import { compileLanguage, type AlphabetDef, type InventedLanguageDef, type PunctuationDef } from '../engine/language';
 import { mulberry32 } from '../engine/rng';
 import type { SoundsDef, StressRule } from '../engine/sounds/system';
 import { inventWord } from '../engine/sounds/words';
@@ -34,7 +34,7 @@ export const QUOTE_STYLES: readonly { quotes: readonly [string, string]; name: s
   { quotes: ['“', '”'], name: 'English' },
   { quotes: ['‘', '’'], name: 'English, single' },
   { quotes: [`«${NBSP}`, `${NBSP}»`], name: 'French, spaced' },
-  { quotes: ['«', '»'], name: 'Spanish and Italian' },
+  { quotes: ['«', '»'], name: 'Spanish, Italian, Russian, Arabic' },
   { quotes: ['„', '“'], name: 'German and Icelandic' },
   { quotes: ['»', '«'], name: 'German, pointing in' },
   { quotes: ['”', '”'], name: 'Finnish' },
@@ -169,11 +169,22 @@ function sanitizeSay(value: unknown): Record<string, SayOverride> | undefined {
     const clean: SayOverride = {};
     for (const key of ['say', 'sayClosed', 'sayAlone'] as const) {
       const spelled = (override as Record<string, unknown>)[key];
-      if (typeof spelled === 'string' && /^[a-z'-]{1,10}$/.test(spelled)) clean[key] = spelled;
+      // Empty says a sound isn't written in the "say it" line at all, as Arabic's catch at a word's start.
+      if (typeof spelled === 'string' && /^[a-z'-]{0,10}$/.test(spelled)) clean[key] = spelled;
     }
     if (Object.keys(clean).length > 0) say[sound] = clean;
   }
   return Object.keys(say).length > 0 ? say : undefined;
+}
+
+/** A second alphabet, for a language written in one of its own: its name, direction and Latin spelling. */
+function sanitizeAlphabet(value: unknown): AlphabetDef | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const input = value as Record<string, unknown>;
+  const name = text(input.name, 30)?.trim();
+  const latin = sanitizeSpelling(input.latin);
+  if (!name || latin.length === 0) return undefined;
+  return input.direction === 'rtl' ? { name, direction: 'rtl', latin } : { name, latin };
 }
 
 function sanitizePunctuation(value: unknown): PunctuationDef {
@@ -211,6 +222,7 @@ export function sanitizeLanguage(data: unknown): CustomLanguageDef | null {
   const id = typeof input.id === 'string' && /^my-[a-z0-9-]{1,60}$/.test(input.id) ? input.id : `my-${slug(name)}`;
   const flow = FLOWS.find((source) => source.id === input.flow)?.id ?? SCRATCH.flow;
   const say = sanitizeSay(input.say);
+  const alphabet = sanitizeAlphabet(input.alphabet);
   const basedOn = typeof input.basedOn === 'string' && /^[a-z-]{1,40}$/.test(input.basedOn) ? input.basedOn : undefined;
   // Real words the language keeps, as Shakespearean English keeps "thou" and "hath".
   const keep = Array.isArray(input.keep)
@@ -223,6 +235,7 @@ export function sanitizeLanguage(data: unknown): CustomLanguageDef | null {
     flow,
     sounds,
     spelling: sanitizeSpelling(input.spelling),
+    ...(alphabet ? { alphabet } : {}),
     ...(say ? { say } : {}),
     punctuation: sanitizePunctuation(input.punctuation),
     voicing: text(input.voicing, 600) ?? '',

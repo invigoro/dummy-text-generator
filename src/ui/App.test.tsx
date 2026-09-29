@@ -61,6 +61,36 @@ describe('App', () => {
     expect(screen.queryByRole('radio', { name: 'Say it' })).not.toBeInTheDocument();
   });
 
+  it('shows a language with an alphabet of its own in that alphabet or in Latin letters', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await paragraphs();
+    expect(screen.queryByRole('radio', { name: 'Latin' })).not.toBeInTheDocument();
+    await user.selectOptions(language(), 'real/russian');
+    await screen.findByText('Герой нашего времени');
+    expect((await paragraphs()).join(' ')).toMatch(/[а-я]/);
+    expect(screen.getByRole('radio', { name: 'Cyrillic' })).toBeChecked();
+    await user.click(screen.getByRole('radio', { name: 'Latin' }));
+    const latin = (await paragraphs()).join(' ');
+    expect(latin).not.toMatch(/[а-яА-Я]/);
+    expect(latin).toMatch(/[a-z]/);
+    expect(window.location.hash).toContain('alphabet=latin');
+  });
+
+  it('writes Arabic right to left, and its Latin letters left to right', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await paragraphs();
+    await user.selectOptions(language(), 'real/arabic');
+    await screen.findByText('النظرات');
+    expect(await screen.findByRole('article')).toHaveAttribute('dir', 'rtl');
+    await user.click(screen.getByRole('radio', { name: 'Latin' }));
+    expect(screen.getByRole('article')).not.toHaveAttribute('dir');
+    await user.click(screen.getByRole('radio', { name: 'Arabic' }));
+    await user.click(screen.getByRole('radio', { name: 'Say it' }));
+    expect(screen.getByRole('article')).not.toHaveAttribute('dir');
+  });
+
   it('writes real French, with a "say it" line worked out from its spelling', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -495,7 +525,7 @@ describe('Your own languages', () => {
     await user.click(screen.getByRole('button', { name: '+ New language' }));
     await user.click(screen.getByRole('textbox', { name: 'Sounds in class F' }));
     await user.click(screen.getByText('Sounds to choose from'));
-    await user.click(within(screen.getByRole('group', { name: 'Consonants' })).getByRole('button', { name: /^x/ }));
+    await user.click(within(screen.getByRole('group', { name: 'Consonants' })).getByRole('button', { name: 'x kh' }));
     expect(screen.getByRole('textbox', { name: 'Sounds in class F' })).toHaveValue('n s r l x');
     expect(loadCustomLanguages()[0].sounds.classes.F).toBe('n s r l x');
   });

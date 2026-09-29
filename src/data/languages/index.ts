@@ -6,7 +6,9 @@ import { tokenizeParagraph, tokenizerFor, type Paragraph } from '../../engine/to
 import { Vocabulary } from '../../engine/vocabulary';
 import { loadCorpus, sourceText, type SourceText } from '../corpora';
 import abyssal from './abyssal';
+import arabic from './arabic';
 import draconic from './draconic';
+import dutch from './dutch';
 import english from './english';
 import englishInvented from './english-invented';
 import enochian from './enochian';
@@ -27,6 +29,7 @@ import oldNorse from './old-norse';
 import orcish from './orcish';
 import portuguese from './portuguese';
 import quechua from './quechua';
+import russian from './russian';
 import { aquan, auran, ignan, terran } from './primordial';
 import shakespearean from './shakespearean';
 import spanish from './spanish';
@@ -42,6 +45,9 @@ export const LANGUAGES: readonly LanguageDef[] = [
   portuguese,
   italian,
   german,
+  dutch,
+  russian,
+  arabic,
   latin,
   loremIpsum,
   finnish,

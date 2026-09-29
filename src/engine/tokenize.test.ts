@@ -46,6 +46,11 @@ describe('sentences', () => {
     ]);
   });
 
+  it('splits Arabic at its question mark, and at any full stop, since it has no capitals', () => {
+    const [paragraph] = tokenize('هل رأيت؟ نعم رأيت. ثم ذهبت', tokenizerFor('ar')).paragraphs;
+    expect(paragraph.sentences.map((sentence) => sentence.tokens.map((token) => token.text).join(''))).toEqual(['هل رأيت؟', 'نعم رأيت.', 'ثم ذهبت']);
+  });
+
   it('does not split after titles or initials', () => {
     expect(sentences('Come aboard, Mr. Hands. Dr. Livesey waits. J. F. Flint signed it.')).toEqual([
       'Come aboard, Mr. Hands.',

@@ -28,8 +28,12 @@ const isPunct = (token: Token, pattern: RegExp) => token.kind === 'punct' && pat
 const wordsIn = (tokens: readonly Token[]) => tokens.filter(isWord).length;
 
 const DASH = /^[—–]$/u;
-const ENDS = /^[.!?…]$/u;
-const PAUSES = /^[,;:]$/u;
+// Arabic's ؟ and ، and ؛ among them.
+const ENDS = /^[.!?…؟]$/u;
+const PAUSES = /^[,;:،؛]$/u;
+
+/** The comma a text's script writes: Arabic's is ،. */
+const commaFor = (tokens: readonly Token[]) => (tokens.some((token) => token.kind === 'word' && /[\u0600-\u06FF]/u.test(token.text)) ? '،' : ',');
 
 function trim(tokens: readonly Token[]): Token[] {
   let start = 0;
@@ -84,7 +88,7 @@ function joined(parts: readonly Token[][]): Token[] {
       // English "I" is always a capital.
       const first = part.find(isWord);
       const capital = !!first && /^\p{Lu}/u.test(first.text) && !/^I(?:$|['’])/u.test(first.text);
-      const stop: Token = { kind: 'punct', text: capital ? '.' : ',' };
+      const stop: Token = { kind: 'punct', text: capital ? '.' : commaFor(part) };
       if (isPunct(last, PAUSES)) {
         if (stop.text === '.') line[line.length - 1] = stop;
       } else if (!isPunct(last, ENDS) && !isPunct(last, DASH)) {

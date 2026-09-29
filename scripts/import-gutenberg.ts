@@ -114,6 +114,14 @@ const RECIPES: Record<string, Recipe> = {
     output: 'src/data/corpora/de/verwandlung.txt',
     startAt: /^I\.$/,
   },
+  'nl-kleine-johannes': {
+    url: 'https://www.gutenberg.org/cache/epub/10819/pg10819.txt',
+    output: 'src/data/corpora/nl/kleine-johannes.txt',
+    // The whole tale, after the title and the dedication.
+    startAt: /^I$/,
+    // A slip that runs a sentence into the next one's opening quote: "Johannes.'Naar".
+    fixes: [[/([.!?])'(?=\p{Lu})/gu, "$1 '"]],
+  },
   'oj-catechism': {
     url: 'https://www.gutenberg.org/cache/epub/40466/pg40466.txt',
     output: 'src/data/corpora/oj/catechism.txt',

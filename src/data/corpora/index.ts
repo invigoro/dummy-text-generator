@@ -151,6 +151,30 @@ export const SOURCE_TEXTS: readonly SourceText[] = [
     date: '1952–54',
     load: () => import('./nv/narratives.txt?raw').then((module) => module.default),
   },
+  {
+    id: 'nl-kleine-johannes',
+    language: 'nl',
+    title: 'De kleine Johannes',
+    author: 'Frederik van Eeden',
+    date: '1887',
+    load: () => import('./nl/kleine-johannes.txt?raw').then((module) => module.default),
+  },
+  {
+    id: 'ru-geroy',
+    language: 'ru',
+    title: 'Герой нашего времени',
+    author: 'Mikhail Lermontov',
+    date: '1840',
+    load: () => import('./ru/geroy.txt?raw').then((module) => module.default),
+  },
+  {
+    id: 'ar-nazarat',
+    language: 'ar',
+    title: 'النظرات',
+    author: 'Mustafa Lutfi al-Manfaluti',
+    date: '1910',
+    load: () => import('./ar/nazarat.txt?raw').then((module) => module.default),
+  },
 ];
 
 export function sourceText(id: string): SourceText {

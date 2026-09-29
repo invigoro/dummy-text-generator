@@ -3,6 +3,7 @@ import french from '../data/languages/french';
 import latin from '../data/languages/latin';
 import {
   countDocWords,
+  inLatin,
   inventedWords,
   inventWordToken,
   sayWords,
@@ -87,6 +88,34 @@ describe('inventedWords', () => {
     const text = writtenText(doc);
     expect(text.startsWith('M. ')).toBe(true);
     expect(text).toContain('Mme ');
+  });
+});
+
+describe('inLatin', () => {
+  const word = (text: string, latin: string): DocWord => ({ kind: 'word', text, latin });
+  const arabic: DocParagraph[] = [
+    {
+      speaker: { tokens: [word('أحمد', 'aḥmad'), { kind: 'space', text: ' ' }, word('علي', 'ʿalī'), { kind: 'punct', text: ':' }] },
+      sentences: [
+        { tokens: [word('كتاب', 'kitāb'), { kind: 'punct', text: '،' }, { kind: 'space', text: ' ' }, word('قلم', 'qalam'), { kind: 'punct', text: '؟' }] },
+        { tokens: [word('سنة', 'sana'), { kind: 'space', text: ' ' }, { kind: 'word', text: '١٧٦١' }, { kind: 'punct', text: '.' }] },
+      ],
+    },
+  ];
+
+  it('writes the words in Latin letters, punctuated as Latin letters are', () => {
+    expect(writtenText(inLatin(arabic))).toBe('Aḥmad ʿAlī: Kitāb, qalam? Sana 1761.');
+  });
+
+  it('capitalizes where the script has no capitals: a sentence’s start, a speaker’s name, a name’s every word', () => {
+    expect(inLatin(arabic)[0].speaker!.tokens.map((token) => token.text)).toEqual(['Aḥmad', ' ', 'ʿAlī', ':']);
+    const [name] = inLatin([{ sentences: [{ tokens: [word('دار', 'dār'), { kind: 'space', text: ' ' }, word('نور', 'nūr')] }] }], true);
+    expect(writtenText([name])).toBe('Dār Nūr');
+  });
+
+  it('leaves a word of a script with capitals as it came', () => {
+    const russian: DocParagraph[] = [{ sentences: [{ tokens: [word('мано', 'mano'), { kind: 'space', text: ' ' }, word('Ку', 'Ku')] }] }];
+    expect(writtenText(inLatin(russian))).toBe('mano Ku');
   });
 });
 

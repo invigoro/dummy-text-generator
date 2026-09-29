@@ -18,7 +18,8 @@ export interface SpellingRule {
   write: string;
   /**
    * What must come next: sounds, or 'V' (a vowel), 'C' (a consonant), 'front' or 'back' (vowels),
-   * 'labial', and '#' for the end of the word. Space-separated alternatives.
+   * 'labial', 'soft' (a soft consonant, as Russian's), and '#' for the end of the word.
+   * Space-separated alternatives.
    */
   before?: string;
   /** What must come just before, in the same terms, with '#' for the start of the word. */
@@ -69,6 +70,8 @@ function context(alternatives: string): Context {
           return (slot) => !!slot && phoneme(slot.sound).type === 'vowel' && !phoneme(slot.sound).front;
         case 'labial':
           return (slot) => !!slot && !!phoneme(slot.sound).labial;
+        case 'soft':
+          return (slot) => !!slot && !!phoneme(slot.sound).soft;
         default: {
           phoneme(token); // an unknown sound is a mistake in the rules
           const sound = normalizeSound(token);

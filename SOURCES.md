@@ -10,8 +10,10 @@ Texts from Project Gutenberg are cleaned by `npm run import-gutenberg`, whose re
 download. Cleaning removes the Project Gutenberg header and footer, and with them its trademark
 and license text.
 
-Texts from elsewhere, a scanned book's OCR text or a published corpus, are cleaned the same way
-by `npm run import-text`, with recipes in [`scripts/import-text.ts`](scripts/import-text.ts).
+Texts from elsewhere, a scanned book's OCR text, a published corpus or a text's pages on
+Wikisource, are cleaned the same way by `npm run import-text`, with recipes in
+[`scripts/import-text.ts`](scripts/import-text.ts). Wikisource hosts only texts in the public
+domain, or freely licensed ones; these are all in the public domain.
 
 ## English
 
@@ -157,6 +159,54 @@ paragraph lengths, punctuation and word lengths, and replaces every word.
   chapter numbers.
 - **Why this text:** the Grimms' *Deutsche Sagen* was the first choice, but it includes
   antisemitic legends, so it's not used even as a flow.
+
+## Dutch
+
+### De kleine Johannes
+
+- **Author:** Frederik van Eeden (1860–1932)
+- **Published:** 1887
+- **File:** [`src/data/corpora/nl/kleine-johannes.txt`](src/data/corpora/nl/kleine-johannes.txt)
+- **From:** Project Gutenberg eBook #10819, <https://www.gutenberg.org/ebooks/10819>
+- **Cleaning:** `npm run import-gutenberg -- nl-kleine-johannes` keeps the whole tale (about
+  38,000 words), after the title and the dedication, without its chapter numbers. It puts a space
+  where the edition runs a sentence into the next one's opening quote.
+- **Why this text:** a fairy tale, and good Dutch prose, in the spelling of its day ("zoo",
+  "menschen"). Only its flow is used; the invented words are spelled as Dutch is today.
+
+## Russian
+
+### Герой нашего времени (A Hero of Our Time)
+
+- **Author:** Mikhail Lermontov (1814–1841)
+- **Published:** 1840
+- **File:** [`src/data/corpora/ru/geroy.txt`](src/data/corpora/ru/geroy.txt)
+- **From:** Russian Wikisource, the novel's text in modern spelling, part by part:
+  <https://ru.wikisource.org/wiki/Герой_нашего_времени_(Лермонтов)/СО/Бэла> and the pages beside
+  it
+- **Cleaning:** `npm run import-text -- ru-geroy` takes the seven parts in order (about 43,000
+  words) and keeps their prose, without the pages' header and notes, headings, the song in
+  "Taman" (set as verse) and the asterisks marking the author's notes.
+- **Why this text:** Caucasus adventure, full of dialogue, by a classic of Russian prose.
+
+## Arabic
+
+### النظرات (Al-Nazarat), the first volume
+
+- **Author:** Mustafa Lutfi al-Manfaluti (1876–1924)
+- **Published:** Cairo, 1910 (the first of three volumes)
+- **File:** [`src/data/corpora/ar/nazarat.txt`](src/data/corpora/ar/nazarat.txt)
+- **From:** Arabic Wikisource, the essays of the first volume:
+  <https://ar.wikisource.org/wiki/النظرات> and the pages it lists
+- **Cleaning:** `npm run import-text -- ar-nazarat` takes 49 of the first volume's 51 essays
+  (about 45,000 words), leaving out two on Islam and Christianity. It keeps their prose, without
+  the pages' header, headings and verse. It removes the Qur'an's verses where the essays quote
+  them, between ﴿ and ﴾ or marked with its pause signs, and the mark that ends a quotation
+  ("ا.هـ"). It takes off the short vowels and other marks written over some words, and the tatweel
+  that stretches a letter, so the same word is always written the same.
+- **Why this text:** modern Arabic prose, well punctuated, by a stylist of the early 1900s. Older
+  texts, such as the 1816 *Kalila wa-Dimna*, are printed almost without punctuation, which would
+  give the flow no sentences.
 
 ## Middle English
 

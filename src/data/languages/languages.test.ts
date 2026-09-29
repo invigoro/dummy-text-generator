@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ARRANGEMENTS } from '../../engine/arrange';
 import { isOffensive } from '../../engine/blocklist';
-import { countDocWords, paragraphText, sentenceText, spokenText, writtenText, type DocWord } from '../../engine/document';
+import { countDocWords, inLatin, paragraphText, sentenceText, spokenText, writtenText, type DocWord } from '../../engine/document';
 import { generate } from '../../engine/generate';
 import { stressRule } from '../../engine/language';
 import { LANGUAGES, loadLanguage } from './index';
@@ -50,8 +50,9 @@ describe.each(LANGUAGES.map((def) => [def.name, def] as const))('%s', (_, def) =
       expect(written, names).toHaveLength(8);
       expect(new Set(written).size, names).toBe(8);
       for (const name of written) {
-        // Abyssal can start a name with a catch in the throat, written as an apostrophe.
-        expect(name).toMatch(/^['’]?\p{Lu}/u);
+        // Abyssal can start a name with a catch in the throat, written as an apostrophe. Arabic
+        // script has no capitals.
+        if (/[\p{Lu}\p{Ll}]/u.test(name)) expect(name).toMatch(/^['’]?\p{Lu}/u);
         expect(name).not.toMatch(/[.,;:!?«»“”"]/u);
         expect(name).not.toMatch(IPA_ONLY);
       }
@@ -138,6 +139,27 @@ describe('Languages of the Americas', () => {
     const loaded = await loadLanguage('navajo');
     const text = writtenText(generate(loaded, { arrangement: 'sentences', length: { unit: 'words', count: 600 }, seed: 7 }));
     for (const letters of [/[áéíó]/u, /[ąęįǫ]/u, /ł/u, /’/u, /aa|ii|oo|ee/u]) expect(text).toMatch(letters);
+  });
+
+  it('write Russian and Arabic in their own alphabets, and in Latin letters for the switch', async () => {
+    for (const [id, own] of [
+      ['russian', /[а-яё]/u],
+      ['arabic', /[\u0621-\u064A]/u],
+    ] as const) {
+      const loaded = await loadLanguage(id);
+      const doc = generate(loaded, { arrangement: 'sentences', length: { unit: 'words', count: 400 }, seed: 7 });
+      expect(writtenText(doc), id).toMatch(own);
+      const latin = writtenText(inLatin(doc));
+      expect(latin, id).not.toMatch(own);
+      expect(latin, id).toMatch(/^[\p{Script=Latin}\p{P}\p{N}\s'’ʾʿ\-]+$/u);
+    }
+  });
+
+  it('join Arabic’s article to the next word, with a hyphen in Latin letters', async () => {
+    const loaded = await loadLanguage('arabic');
+    const doc = generate(loaded, { arrangement: 'sentences', length: { unit: 'words', count: 400 }, seed: 7 });
+    expect(writtenText(inLatin(doc))).toMatch(/\p{L}-\p{L}/u);
+    expect(writtenText(doc)).not.toMatch(/-/);
   });
 
   it('write Ojibwe’s long vowels double', async () => {

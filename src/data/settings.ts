@@ -39,6 +39,10 @@ export const SETTINGS: readonly Setting[] = [
       { id: 'portuguese', name: 'Portuguese', language: 'portuguese', stele: PARCHMENT },
       { id: 'italian', name: 'Italian', language: 'italian', stele: PARCHMENT },
       { id: 'german', name: 'German', language: 'german', stele: { medium: 'paper', font: 'unifrakturmaguntia' } },
+      { id: 'dutch', name: 'Dutch', language: 'dutch', stele: PAPER },
+      // Stele has no Cyrillic or Arabic letters yet, so these go to it in Latin letters.
+      { id: 'russian', name: 'Russian', language: 'russian', stele: PAPER },
+      { id: 'arabic', name: 'Arabic', language: 'arabic', stele: PARCHMENT },
       { id: 'latin', name: 'Latin', language: 'latin', stele: { medium: 'marble', roman: true } },
       { id: 'lorem-ipsum', name: 'Lorem ipsum', language: 'lorem-ipsum', stele: PARCHMENT },
       { id: 'finnish', name: 'Finnish', language: 'finnish', stele: PAPER },

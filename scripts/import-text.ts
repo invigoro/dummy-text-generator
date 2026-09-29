@@ -1,10 +1,10 @@
 /**
  * Downloads a public-domain text that isn't on Project Gutenberg and cleans it into a source text
- * under src/data/corpora/: the OCR text of a scanned book on the Internet Archive, or the
- * sentences of a published corpus.
+ * under src/data/corpora/: the OCR text of a scanned book on the Internet Archive, the sentences of
+ * a published corpus, or a text's pages on Wikisource.
  *
  *   npm run import-text -- nah-chimalpahin               # download and clean it
- *   npm run import-text -- nah-chimalpahin scan.txt      # or clean a file you downloaded
+ *   npm run import-text -- nah-chimalpahin scan.txt      # or clean files you downloaded, in order
  *
  * Each text's recipe lives here, so the committed file can always be rebuilt from the original.
  * Add a text's provenance to SOURCES.md when you add its recipe.
@@ -12,12 +12,25 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { cleanScan } from '../src/engine/corpus/scan.ts';
 import { paragraphsFromTable } from '../src/engine/corpus/table.ts';
+import { cleanWikitext } from '../src/engine/corpus/wiki.ts';
 
 interface Recipe {
-  url: string;
+  /** Where the text is: one address, or several fetched in turn, such as a book's chapters. */
+  urls: readonly string[];
   output: string;
-  clean: (raw: string) => string;
+  clean: (raws: readonly string[]) => string;
 }
+
+/** A Wikisource page's wikitext. */
+const wikisource = (language: string, title: string) =>
+  `https://${language}.wikisource.org/w/index.php?${new URLSearchParams({ title, action: 'raw' })}`;
+
+/** Pages cleaned one by one and joined, leaving out any with nothing left. */
+const eachPage = (clean: (raw: string) => string) => (raws: readonly string[]) =>
+  raws
+    .map((raw) => clean(raw).trim())
+    .filter(Boolean)
+    .join('\n\n') + '\n';
 
 /** French's commonest little words, for leaving out a French translation printed beside the text. */
 const FRENCH = {
@@ -66,11 +79,11 @@ const TIDY: readonly (readonly [RegExp, string])[] = [
 
 const RECIPES: Record<string, Recipe> = {
   'nah-chimalpahin': {
-    url: 'https://archive.org/download/bibliothquelin12adamuoft/bibliothquelin12adamuoft_djvu.txt',
+    urls: ['https://archive.org/download/bibliothquelin12adamuoft/bibliothquelin12adamuoft_djvu.txt'],
     output: 'src/data/corpora/nah/chimalpahin.txt',
     // The annals, from the first heading to the index, without Siméon's French translation in the
     // facing column, and his notes below it.
-    clean: (raw) =>
+    clean: ([raw]) =>
       cleanScan(raw, {
         startAt: /^SIXI[EÈ]ME\s+RELATION$/,
         endBefore: /^TABLE\s+DES\s+MATI[EÈ]RES$/,
@@ -100,10 +113,10 @@ const RECIPES: Record<string, Recipe> = {
       }),
   },
   'qu-tercero': {
-    url: 'https://archive.org/download/tercerocatecism00cath/tercerocatecism00cath_djvu.txt',
+    urls: ['https://archive.org/download/tercerocatecism00cath/tercerocatecism00cath_djvu.txt'],
     output: 'src/data/corpora/qu/tercero.txt',
     // The thirty-one sermons in Quechua, which face their Spanish page by page; the Spanish goes.
-    clean: (raw) =>
+    clean: ([raw]) =>
       cleanScan(raw, {
         startAt: /^Ancha\s+munascay\s+ch/,
         // Running heads the OCR has put a lowercase letter in: "SERMOiN PRIMERO".
@@ -126,11 +139,11 @@ const RECIPES: Record<string, Recipe> = {
       }),
   },
   'nv-narratives': {
-    url: 'https://raw.githubusercontent.com/OpenTextCollections/nava1243a/v1.0/sentences.csv',
+    urls: ['https://raw.githubusercontent.com/OpenTextCollections/nava1243a/v1.0/sentences.csv'],
     output: 'src/data/corpora/nv/narratives.txt',
     // Seven of the nine narratives, leaving out the two sacred ones: the fourth, on the traditional
     // Navajo country and the emergence, and the fifth, on First Man and First Woman.
-    clean: (raw) =>
+    clean: ([raw]) =>
       paragraphsFromTable(raw, {
         text: 'Primary_Text',
         texts: { column: 'Text_ID', keep: ['01_3', '02_3', '03_3', '06_3', '07_3', '08_3', '09_3'] },
@@ -149,25 +162,118 @@ const RECIPES: Record<string, Recipe> = {
         ],
       }),
   },
+  'ru-geroy': {
+    // The novel in its modern spelling, part by part.
+    urls: ['Предисловие', 'Бэла', 'Максим Максимыч', 'Журнал Печорина', 'Тамань', 'Княжна Мери', 'Фаталист'].map((part) =>
+      wikisource('ru', `Герой нашего времени (Лермонтов)/СО/${part}`),
+    ),
+    output: 'src/data/corpora/ru/geroy.txt',
+    // Asterisks mark the author's notes.
+    clean: eachPage((raw) => cleanWikitext(raw, { fixes: [[/\s*\*+/g, '']] })),
+  },
+  'ar-nazarat': {
+    // The essays of the first volume, but for two on Islam and Christianity.
+    urls: [
+      'المقدمة',
+      'الغد',
+      'الكأس الأولى',
+      'الدَّفِينُ الصَّغِير',
+      'مناجاة القمر',
+      'أين الفضيلة؟',
+      'الغَنيُّ والفقير',
+      'مدينة السعادة',
+      'أيها المحزون',
+      'إلى الدَّيْر',
+      'الرحمة',
+      'رسالة الغفران',
+      'عبرة الدهر',
+      'أفسدك قومُك',
+      'الصدق والكذب',
+      'النظَّامون',
+      'الحرية',
+      'عِبرةُ الهجرة',
+      'الإنصاف',
+      'المدنية الغربية',
+      'يوم الحساب',
+      'الشعرة البيضاء',
+      'الصياد',
+      'الانتحار',
+      'الجمال',
+      'الكذب',
+      'غرفة الأحزان',
+      'الشرف',
+      'الحب والزواج',
+      'أهناءٌ أم عزاء؟',
+      'الزوجتان',
+      'في سبيل الإحسان',
+      'أدب المناظرة',
+      'الإحسان في الزواج',
+      'البخيل',
+      'البعوض والإنسان',
+      'الجزع',
+      'الاتحاد',
+      'النبوغ',
+      'البائسات',
+      'البيان',
+      'السريرة',
+      'زيدٌ وعمرو',
+      'أبو الشمقمق',
+      'دورة الفلك',
+      'تأبين فولتير',
+      'العلماء والجهلاء',
+      'الرجل والمرأة',
+      'الدعوة',
+    ].map((essay) => wikisource('ar', `النظرات/${essay}`)),
+    output: 'src/data/corpora/ar/nazarat.txt',
+    clean: eachPage((raw) =>
+      cleanWikitext(raw, {
+        fixes: [
+          // Verses of the Qur’an, which the essays quote between ﴿ and ﴾, or with its pause
+          // marks (ۖ, ۚ): the sentence goes.
+          [/﴿[^﴾]*﴾/gu, ''],
+          [/[^.؟!:\n]*[ۖ-ۭ][^.؟!\n]*[.؟!]?/gu, ''],
+          // The short vowels and other marks the edition writes on some words, and the tatweel
+          // that stretches a letter: the same word is then always written the same.
+          [/[\u064B-\u0652\u0670\u0640]/gu, ''],
+          // "\u0627.\u0647\u0640", the mark that ends a quotation.
+          [/\s*\u0627\.\u0647\.?/gu, ''],
+          [/\s+([،؛؟.,;:!?])/gu, '$1'],
+        ],
+      }),
+    ),
+  },
 };
 
-const [id, file] = process.argv.slice(2);
+const [id, ...files] = process.argv.slice(2);
 const recipe = RECIPES[id];
 if (!recipe) {
-  console.error(`Usage: npm run import-text -- <${Object.keys(RECIPES).join(' | ')}> [downloaded file]`);
+  console.error(`Usage: npm run import-text -- <${Object.keys(RECIPES).join(' | ')}> [downloaded files]`);
   process.exit(1);
 }
 
-let raw: string;
-if (file) {
-  raw = await readFile(file, 'utf8');
-} else {
-  const response = await fetch(recipe.url);
-  if (!response.ok) throw new Error(`${recipe.url}: HTTP ${response.status}`);
-  raw = await response.text();
+const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** A page, fetched gently: Wikimedia asks for a name and a pause, and says when it's too busy. */
+async function download(url: string): Promise<string> {
+  for (let attempt = 1; ; attempt++) {
+    const response = await fetch(url, { headers: { 'User-Agent': 'Jabberwock source import (https://github.com/invigoro/dummy-text-generator)' } });
+    if (response.ok) return response.text();
+    if (response.status !== 429 || attempt === 5) throw new Error(`${url}: HTTP ${response.status}`);
+    await pause(10_000 * attempt);
+  }
 }
 
-const text = recipe.clean(raw);
+const raws: string[] = [];
+if (files.length > 0) {
+  for (const file of files) raws.push(await readFile(file, 'utf8'));
+} else {
+  for (const url of recipe.urls) {
+    if (raws.length > 0) await pause(1_000);
+    raws.push(await download(url));
+  }
+}
+
+const text = recipe.clean(raws);
 await writeFile(recipe.output, text);
 const paragraphs = text.split('\n\n').length;
 const words = text.split(/\s+/).filter(Boolean).length;

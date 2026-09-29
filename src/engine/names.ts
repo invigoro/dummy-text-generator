@@ -163,6 +163,27 @@ const NAMING: Readonly<Record<string, Naming>> = {
     // On the earth, in the water, in the field.
     after: ['aking', 'nibing', 'kitiganing'],
   },
+  nl: {
+    articles: ['de', 'het', 'een', "'t"],
+    toPlaces: ['in', 'naar', 'uit', 'te', 'bij'],
+    notNames: ['god', 'heer', 'mijnheer', 'meneer'],
+    // Wood, field, forest and hill, as in 's-Hertogenbosch, Veldhoven and Heiloo.
+    after: ['bosch', 'veld', 'woud', 'berg'],
+  },
+  ru: {
+    articles: [],
+    toPlaces: ['в', 'во', 'на', 'из', 'к', 'до'],
+    notNames: ['бог', 'господи', 'господь', 'боже'],
+    // Town, mountains, fortress, field: -град, -горск, as in Kislovodsk and Pyatigorsk.
+    after: ['город', 'горы', 'крепость', 'поле'],
+  },
+  ar: {
+    // Arabic writes no capitals, so its names can't be told from its words; places start with a
+    // word for what they are, as Wadi Rum, Ayn Shams and Jabal Tariq do.
+    articles: [],
+    before: ['وادي', 'عين', 'جبل', 'بيت', 'دار'],
+    joiner: ' ',
+  },
   is: { toPlaces: ['í', 'til', 'frá'], after: ['fjörður', 'vík', 'nes', 'dalur', 'fell', 'bær', 'staðir', 'eyri'] },
   fi: { after: ['järvi', 'mäki', 'joki', 'niemi', 'saari', 'lahti', 'vaara', 'koski', 'kylä'] },
   cy: { articles: ['y', 'yr'], toPlaces: ['yn', 'i', 'o'], particles: ['ap'], before: ['aber', 'llan', 'pen', 'tre', 'caer', 'nant', 'bryn', 'cwm'], joiner: '' },
@@ -250,9 +271,11 @@ export const namesOf = cached((corpus: Corpus): Names => {
     .filter(([name, seen]) => seen.count >= 3 && !isPlace(name, seen) && seen.afterArticle <= seen.count / 4)
     .map(([name]) => name);
   const places = names.filter(([name, seen]) => seen.count >= 2 && isPlace(name, seen)).map(([name]) => name);
-  // Ordinary words only: a name turned down as a thing ("the Hispaniola") stays out.
+  // Ordinary words only: a name turned down as a thing ("the Hispaniola") stays out, and so does a
+  // word with an article joined to it (Arabic's al-).
+  const prefixes = corpus.options.prefixes ?? [];
   const others = [...words]
-    .filter(([word]) => /^\p{L}{4,}$/u.test(word) && lowercase.has(word))
+    .filter(([word]) => /^\p{L}{4,}$/u.test(word) && lowercase.has(word) && !prefixes.some((prefix) => word.startsWith(prefix)))
     .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))
     .map(([word]) => capitalized(word))
     .filter((word) => !people.includes(word))
@@ -269,7 +292,8 @@ const placeStems = cached((corpus: Corpus): string[] => {
   const counts = new Map<string, number>();
   for (const paragraph of corpus.paragraphs) {
     for (const { tokens } of paragraph.sentences) {
-      for (const token of tokens) if (token.kind === 'word' && /^\p{Ll}{4,}$/u.test(token.text)) counts.set(token.text, (counts.get(token.text) ?? 0) + 1);
+      // Lowercase, or of a script without capitals, as Arabic's is.
+      for (const token of tokens) if (token.kind === 'word' && /^[\p{Ll}\p{Lo}]{4,}$/u.test(token.text)) counts.set(token.text, (counts.get(token.text) ?? 0) + 1);
     }
   }
   const ranked = [...counts].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));

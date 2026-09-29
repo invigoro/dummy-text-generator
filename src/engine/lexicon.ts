@@ -16,19 +16,25 @@ type InventedLanguage = Extract<Language, { kind: 'invented' }>;
 export interface InventedWord {
   /** The spelling, in lowercase. */
   spelling: string;
+  /** The spelling in Latin letters, for a language written in another alphabet. */
+  latin?: string;
   sounds: WordSounds;
 }
 
 /** A short elided word, like "l’" or "’t": consonants only, said as part of the word next to it. */
 export interface InventedClitic {
   spelling: string;
+  latin?: string;
   consonants: string[];
 }
 
-/** One piece of a word token: "l’auteur" is l, ’ and auteur; "sea-chest" is sea, - and chest. */
+/**
+ * One piece of a word token: "l’auteur" is l, ’ and auteur; "sea-chest" is sea, - and chest; Arabic
+ * "الكتاب" is the article ال, joined without a break (a hyphen in Latin letters: al-kitāb), and كتاب.
+ */
 export type Piece =
   | { kind: 'part'; text: string; clitic: boolean; vowelFirst: boolean }
-  | { kind: 'join'; text: string };
+  | { kind: 'join'; text: string; latin?: string };
 
 const APOSTROPHE = /^['’]$/;
 
@@ -37,7 +43,13 @@ const APOSTROPHE = /^['’]$/;
  * apostrophe in French ("l’", "qu’"), after it in English ("’t", "’ll"). A word after a French
  * elision starts with a vowel, and its invented word must too.
  */
-export function pieces(text: string, elision: TokenizeOptions['elision'] = 'after'): Piece[] {
+export function pieces(text: string, elision: TokenizeOptions['elision'] = 'after', prefixes: readonly string[] = []): Piece[] {
+  // A little word written joined to the next, as Arabic's article is, is a piece of its own.
+  const prefix = prefixes.find((start) => text.startsWith(start) && [...text].length > [...start].length + 1);
+  if (prefix) {
+    const rest = pieces(text.slice(prefix.length), elision, prefixes);
+    return [{ kind: 'part', text: prefix, clitic: false, vowelFirst: false }, { kind: 'join', text: '', latin: '-' }, ...rest];
+  }
   const raw = text.split(/(['’-])/).filter((piece) => piece !== '');
   return raw.map((piece, i): Piece => {
     if (/^['’-]$/.test(piece)) return { kind: 'join', text: piece };
@@ -56,10 +68,16 @@ export function pieces(text: string, elision: TokenizeOptions['elision'] = 'afte
   });
 }
 
-const VOWEL_GROUPS = /[aeiouyàâäáãåæéèêëíìîïóòôöõøœúùûüýÿ]+/giu;
+const VOWEL_GROUPS = /[aeiouyàâäáãåæéèêëíìîïóòôöõøœúùûüýÿаеёиоуыэюя]+/giu;
+const ARABIC_LETTERS = /[\u0621-\u064A]/gu;
 
-/** Roughly how many syllables a word of the source text has, from its vowel letters. */
+/**
+ * Roughly how many syllables a word of the source text has, from its vowel letters. Arabic writes
+ * few of its vowels, but most of its syllables are two letters long, or three.
+ */
 export function estimateSyllables(word: string, language: string): number {
+  const arabic = word.match(ARABIC_LETTERS)?.length ?? 0;
+  if (arabic > 0) return Math.max(1, Math.round(arabic / 2));
   const lower = word.toLowerCase();
   let count = (lower.match(VOWEL_GROUPS) ?? []).length;
   // French and English leave final e silent: "porte", "parlent", "stone".
@@ -82,7 +100,7 @@ function survey(corpus: Corpus, language: string): { entries: Map<string, Entry>
     for (const sentence of paragraph.sentences) {
       for (const token of sentence.tokens) {
         if (token.kind !== 'word') continue;
-        for (const piece of pieces(token.text, corpus.options.elision)) {
+        for (const piece of pieces(token.text, corpus.options.elision, corpus.options.prefixes)) {
           if (piece.kind !== 'part') continue;
           if (piece.clitic) {
             clitics.add(piece.text.toLowerCase());
@@ -157,15 +175,17 @@ export class Lexicon {
   }
 
   private invent(key: string, entry: Entry): InventedWord {
-    const { system, rules, respell, id } = this.language;
+    const { system, rules, latinRules, respell, id } = this.language;
     let candidate: InventedWord | undefined;
     for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
       const seed = hashString(`${id}/${key}/${attempt}`);
       const sounds = inventWord(system, mulberry32(seed), { syllables: entry.syllables, vowelFirst: entry.vowelFirst });
       const spelling = spell(sounds, rules, mulberry32(seed ^ 0x5bd1e995));
+      const latin = latinRules && spell(sounds, latinRules, mulberry32(seed ^ 0x2545f491));
       const said = respell.say(sounds, sounds.stress);
-      if (isOffensive(spelling, said, this.sourceLanguage) || (entry.vowelFirst && this.offensiveAfterClitic(spelling, sounds))) continue;
-      candidate = { spelling, sounds };
+      if (isOffensive(spelling, said, this.sourceLanguage) || (latin !== undefined && isOffensive(latin, said, this.sourceLanguage))) continue;
+      if (entry.vowelFirst && this.offensiveAfterClitic(spelling, sounds)) continue;
+      candidate = latin === undefined ? { spelling, sounds } : { spelling, latin, sounds };
       // Two words that look alike would blur the vocabulary, though a few short ones may share.
       if (!this.taken.has(spelling)) break;
     }
@@ -186,7 +206,7 @@ export class Lexicon {
   }
 
   private inventClitic(key: string): InventedClitic {
-    const { system, rules, id } = this.language;
+    const { system, rules, latinRules, id } = this.language;
     for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
       const seed = hashString(`${id}/clitic/${key}/${attempt}`);
       const syllable = inventWord(system, mulberry32(seed), { syllables: 1 }).syllables[0];
@@ -194,9 +214,11 @@ export class Lexicon {
       if (consonants.length !== 1) continue;
       // Spell the consonant as it would be before "a", then drop the a. A spelling that keeps a
       // vowel letter (Italian soft g is "gi" before a) won't do: clitics are l', d', m', c'.
-      const written = spell({ syllables: [{ onset: consonants, nucleus: 'a', coda: [] }], stress: null }, rules, mulberry32(seed));
-      const spelling = written.replace(/[aàâáä]+$/u, '');
-      if (spelling && !/[aeiouyàâáäéèêíìîóòôúùû]/iu.test(spelling)) return { spelling, consonants };
+      const bare = { syllables: [{ onset: consonants, nucleus: 'a', coda: [] }], stress: null };
+      const spelling = spell(bare, rules, mulberry32(seed)).replace(/[aàâáä]+$/u, '');
+      if (spelling && !/[aeiouyàâáäéèêíìîóòôúùû]/iu.test(spelling)) {
+        return latinRules ? { spelling, latin: spell(bare, latinRules, mulberry32(seed)).replace(/a+$/u, ''), consonants } : { spelling, consonants };
+      }
     }
     return { spelling: 'l', consonants: ['l'] };
   }

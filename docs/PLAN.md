@@ -116,6 +116,9 @@ lists of names for them, one list per game world.
 | Old English | *Treasure Island*: Project Gutenberg has no Old English prose | 2 |
 | Middle English, its little words real | Chaucer, *The Canterbury Tales* (about 1390): the prose of Melibee and the Parson's Tale, in Skeat's edition (1894) | later |
 | Shakespearean English, its little words real | Shakespeare, *Hamlet* (about 1600) | later |
+| Dutch | Van Eeden, *De kleine Johannes* (1887) | later |
+| Russian, in Cyrillic or Latin letters | Lermontov, *Герой нашего времени* (1840), from Wikisource | later |
+| Arabic, in Arabic script (right to left) or Latin letters | Al-Manfaluti, *Al-Nazarat* (1910), from Wikisource | later |
 | Quechua, spelled as Cusco spells it today | The Third Council of Lima's Quechua sermons, the *Tercero catecismo* (1585), from a scan of the 1867 edition | later |
 | Nahuatl, in the colonial spelling | Chimalpahin's *Sixth and Seventh Relations* (about 1620), from a scan of Siméon's edition (1889) | later |
 | Ojibwe (for Algonquian), in the double-vowel spelling | Sifferath's Ojibwe catechism (1869) | later |
@@ -250,6 +253,7 @@ src/
     generate.ts                  # flow text + options → a document in the language's words
     corpus/gutenberg.ts          # the cleaning steps behind scripts/import-gutenberg.ts
     corpus/scan.ts · table.ts    # and behind scripts/import-text.ts: OCR text, and sentences from a CSV
+    corpus/wiki.ts               # and Wikisource pages' wikitext
     sounds/                      # phonemes, sound systems, and inventing words from them
     spelling.ts · respell.ts     # sounds → the language's spelling; sounds → "say it" and IPA
     language.ts                  # the three kinds of language: invented, vocabulary, real
@@ -344,6 +348,11 @@ out liaison.)*
   keep ("whan", "thou", "hath"), without which they wouldn't read as either.
 - **Presentation stays in Stele.** This tool makes the text; styles, fonts, scripts and export
   belong there.
+- **Alphabets of their own are spelling, not presentation.** Russian's Cyrillic and Arabic's
+  script are how those languages are written, so they're here: each invented word is spelled
+  from its sounds twice, in the language's alphabet and in Latin letters, and a switch picks one.
+  Arabic runs right to left. Stele gets the Latin letters until it has Cyrillic and Arabic
+  lettering of its own.
 - **React for the UI.** Stele uses plain TypeScript because its hard part is the renderer. This
   tool is mostly forms (the language builder especially) and text that updates as you type,
   which is what React is for.

@@ -22,6 +22,16 @@ describe('pieces', () => {
     expect(parts('o’', 'after')).toEqual(['o', '’']);
   });
 
+  it('splits off a little word written joined to the next, as Arabic’s article is', () => {
+    expect(pieces('الكتاب', 'after', ['ال'])).toEqual([
+      { kind: 'part', text: 'ال', clitic: false, vowelFirst: false },
+      { kind: 'join', text: '', latin: '-' },
+      { kind: 'part', text: 'كتاب', clitic: false, vowelFirst: false },
+    ]);
+    // Not when there'd be nothing left but a letter: "ال" alone, or "الا".
+    expect(pieces('الا', 'after', ['ال'])).toHaveLength(1);
+  });
+
   it('splits compounds at hyphens', () => {
     expect(parts('sea-chest', 'after')).toEqual(['sea', '-', 'chest']);
   });
@@ -40,6 +50,13 @@ describe('estimateSyllables', () => {
     expect(estimateSyllables('parlent', 'fr')).toBe(1);
     expect(estimateSyllables('stone', 'en')).toBe(1);
     expect(estimateSyllables('stone', 'la')).toBe(2);
+  });
+
+  it('counts Cyrillic vowels, and Arabic’s syllables from its letters', () => {
+    expect(estimateSyllables('Печорин', 'ru')).toBe(3);
+    expect(estimateSyllables('كتاب', 'ar')).toBe(2);
+    expect(estimateSyllables('مدرسة', 'ar')).toBe(3);
+    expect(estimateSyllables('في', 'ar')).toBe(1);
   });
 
   it('gives a word with no vowels one syllable', () => {

@@ -9,9 +9,10 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
 
 ## Using it
 
-- **Pick a language:** a real one (English, French, Spanish, Portuguese, Italian, German, Latin,
-  lorem ipsum, Finnish, Welsh, Old English, Middle English, Shakespearean English, Old Norse,
-  Quechua, Nahuatl, Algonquian (Ojibwe), Navajo, Enochian), or one of D&D's, such as Elvish
+- **Pick a language:** a real one (English, French, Spanish, Portuguese, Italian, German, Dutch,
+  Russian, Arabic, Latin, lorem ipsum, Finnish, Welsh, Old English, Middle English, Shakespearean
+  English, Old Norse, Quechua, Nahuatl, Algonquian (Ojibwe), Navajo, Enochian), or one of D&D's,
+  such as Elvish
   (invented French), Dwarvish (invented Old Norse) or Orc. Apart from Real English and Real French,
   the words are invented. The text flows like the real language, with its rhythm, its punctuation
   and its short words turning up everywhere, but nobody can understand it, not even someone who
@@ -44,6 +45,10 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
   - "IPA" is there for anyone who reads it.
 
   Each language comes with a tip for voicing it.
+- **Russian and Arabic in their own alphabets, or in Latin letters:** they're written in
+  Cyrillic and in Arabic script (right to left), and the alphabet switch shows the same text
+  transliterated into Latin letters ("Mano chi ay kevay", "Kāʿar tuḥik khab-ḍiyā"). Stele gets
+  them in Latin letters, since it has no Cyrillic or Arabic lettering yet.
 - **Pick an order:** a passage in its original order, or paragraphs, sentences (or lines) or words
   shuffled from all over the source text. Shuffled words keep the rhythm and punctuation of prose.
 - **Set the length** in paragraphs (or lines) or words. The text always stops at the end of a
@@ -95,7 +100,7 @@ from. To add one:
 
 1. Add a recipe to [`scripts/import-gutenberg.ts`](scripts/import-gutenberg.ts) and run
    `npm run import-gutenberg -- <id>`. For a text that isn't on Project Gutenberg, such as a
-   scanned book on the Internet Archive, the recipe goes in
+   scanned book on the Internet Archive or a text's pages on Wikisource, the recipe goes in
    [`scripts/import-text.ts`](scripts/import-text.ts), run with `npm run import-text -- <id>`.
 2. Register the file in [`src/data/corpora/index.ts`](src/data/corpora/index.ts).
 3. Record its provenance in SOURCES.md.
