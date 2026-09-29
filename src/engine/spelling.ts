@@ -132,5 +132,6 @@ export function spell(word: WordSounds, rules: readonly CompiledRule[], random: 
       at++;
     }
   }
-  return written;
+  // Letters with accents composed, as they're typed: "á", not "a" and an accent.
+  return written.normalize('NFC');
 }

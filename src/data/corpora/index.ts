@@ -119,6 +119,38 @@ export const SOURCE_TEXTS: readonly SourceText[] = [
     date: 'c. 1600',
     load: () => import('./en/hamlet.txt?raw').then((module) => module.default),
   },
+  {
+    id: 'nah-chimalpahin',
+    language: 'nah',
+    title: 'Sixth and Seventh Relations',
+    author: 'Domingo Chimalpahin',
+    date: 'c. 1620',
+    load: () => import('./nah/chimalpahin.txt?raw').then((module) => module.default),
+  },
+  {
+    id: 'qu-tercero',
+    language: 'qu',
+    title: 'Tercero catecismo',
+    author: 'the Third Council of Lima',
+    date: '1585',
+    load: () => import('./qu/tercero.txt?raw').then((module) => module.default),
+  },
+  {
+    id: 'oj-catechism',
+    language: 'oj',
+    title: 'A Short Compendium of the Catechism for the Indians',
+    author: 'N. L. Sifferath',
+    date: '1869',
+    load: () => import('./oj/catechism.txt?raw').then((module) => module.default),
+  },
+  {
+    id: 'nv-narratives',
+    language: 'nv',
+    title: 'The Trouble at Round Rock and Navajo Historical Selections',
+    author: 'Robert W. Young and William Morgan',
+    date: '1952–54',
+    load: () => import('./nv/narratives.txt?raw').then((module) => module.default),
+  },
 ];
 
 export function sourceText(id: string): SourceText {

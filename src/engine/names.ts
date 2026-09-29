@@ -32,6 +32,13 @@ interface Naming {
   particles?: readonly string[];
   /** Words written with a capital that aren't anyone's name: titles, and words for God. */
   notNames?: readonly string[];
+  /** The same, whatever endings follow, in a language that adds them to names: Quechua's "Dios", "Diospa", "Diosta". */
+  notNameStems?: readonly string[];
+  /**
+   * Endings only places' names have, for a language whose places the words before them don't
+   * show: Nahuatl's -co, -pan and -tlan ("Chalco", "Tlacopan", "Tenochtitlan").
+   */
+  placeEndings?: RegExp;
   /** Words that end a place's name as part of it: "Ashford", "Beaumont". */
   after?: readonly string[];
   /** Words that start one: "Saint-Malo", "Puerto Rico", "Llandaff". */
@@ -115,6 +122,47 @@ const NAMING: Readonly<Record<string, Naming>> = {
     notNames: ['god', 'crist', 'iesu', 'seint', 'lord', 'certes'],
     after: ['ford', 'wode', 'hil', 'ston', 'brigge', 'feeld', 'mor', 'toun', 'bury', 'wyk'],
   },
+  nah: {
+    // "yn" comes before names and nouns alike, so it tells a thing from a person no better than chance.
+    articles: [],
+    toPlaces: ['nican', 'oncan', 'onca', 'ompa', 'ipan', 'ypan', 'motocayotia'],
+    kindsOfPlace: ['altepetl'],
+    notNames: [
+      ...['dios', 'santa', 'maria', 'yesu', 'jesu', 'jesus', 'cristo', 'christo', 'espiritu', 'san', 'santo', 'sancto'],
+      ...['don', 'doña', 'fray', 'padre', 'señor', 'marques', 'virrey', 'obispo', 'rey', 'juez', 'capitan', 'alcalde'],
+    ],
+    placeEndings: /(?:co|can|pan|tlan|tla|yan|tepec)$/,
+    // Mountain, water, land, stone and tree, as in Chapultepec, Atlixco and Cuauhnahuac.
+    after: ['tepetl', 'atl', 'tlalli', 'tetl', 'quahuitl'],
+  },
+  qu: {
+    // Quechua has no articles, and its sermons few names but God's and the saints'.
+    articles: [],
+    notNameStems: [
+      ...['dios', 'jesu', 'christ', 'santa', 'santi', 'santí', 'sancta', 'maria', 'espiritu', 'santo', 'padre', 'señor'],
+      ...['iglesia', 'sacrament', 'sacerdote', 'angel', 'san'],
+    ],
+    // Plain, town, lake and land, as in Cajamarca, Urubamba and Huaycocha.
+    after: ['pampa', 'marca', 'cocha', 'llacta'],
+  },
+  nv: {
+    // Navajo has no articles, and puts its places' names first, as in Tó Naneesdizí and Tséyiʼ:
+    // rock, water, mountain, house.
+    articles: [],
+    before: ['tsé', 'tó', 'dził', 'kin'],
+    joiner: ' ',
+  },
+  oj: {
+    // Ojibwe has no articles; a place takes the ending -ing instead ("Jerusaleming").
+    articles: [],
+    toPlaces: ['wadi', 'tchigaii'],
+    notNames: [
+      ...['kije', 'keje', 'manito', 'manitowid', 'manitowi', 'manitowiian', 'debendjiged', 'debendjigenidjin', 'debeniminang'],
+      ...['catholik', 'apeingi', 'eukaristiwin', 'eukaristiwining', 'sakrema', 'sakreman'],
+    ],
+    // On the earth, in the water, in the field.
+    after: ['aking', 'nibing', 'kitiganing'],
+  },
   is: { toPlaces: ['í', 'til', 'frá'], after: ['fjörður', 'vík', 'nes', 'dalur', 'fell', 'bær', 'staðir', 'eyri'] },
   fi: { after: ['järvi', 'mäki', 'joki', 'niemi', 'saari', 'lahti', 'vaara', 'koski', 'kylä'] },
   cy: { articles: ['y', 'yr'], toPlaces: ['yn', 'i', 'o'], particles: ['ap'], before: ['aber', 'llan', 'pen', 'tre', 'caer', 'nant', 'bryn', 'cwm'], joiner: '' },
@@ -186,15 +234,22 @@ export const namesOf = cached((corpus: Corpus): Names => {
       });
     }
   }
+  const notNameStems = naming.notNameStems ?? [];
   const names = [...counts]
-    .filter(([name]) => !lowercase.has(name.toLowerCase()) && !notNames.has(name.toLowerCase()) && !corpus.options.abbreviations.has(name))
+    .filter(([name]) => {
+      const lower = name.toLowerCase();
+      if (lowercase.has(lower) || notNames.has(lower) || corpus.options.abbreviations.has(name)) return false;
+      return !notNameStems.some((stem) => lower.startsWith(stem));
+    })
     .sort((a, b) => b[1].count - a[1].count || (a[0] < b[0] ? -1 : 1));
-  // A place follows the words places do twice at least, and in a good share of its uses.
-  const isPlace = ({ count, afterPlace }: { count: number; afterPlace: number }) => afterPlace >= 2 && afterPlace >= count * 0.3;
+  // A place follows the words places do twice at least, and in a good share of its uses, or ends
+  // the way only places' names do.
+  const isPlace = (name: string, { count, afterPlace }: { count: number; afterPlace: number }) =>
+    (afterPlace >= 2 && afterPlace >= count * 0.3) || !!naming.placeEndings?.test(name.toLowerCase());
   const people = names
-    .filter(([, seen]) => seen.count >= 3 && !isPlace(seen) && seen.afterArticle <= seen.count / 4)
+    .filter(([name, seen]) => seen.count >= 3 && !isPlace(name, seen) && seen.afterArticle <= seen.count / 4)
     .map(([name]) => name);
-  const places = names.filter(([, seen]) => seen.count >= 2 && isPlace(seen)).map(([name]) => name);
+  const places = names.filter(([name, seen]) => seen.count >= 2 && isPlace(name, seen)).map(([name]) => name);
   // Ordinary words only: a name turned down as a thing ("the Hispaniola") stays out.
   const others = [...words]
     .filter(([word]) => /^\p{L}{4,}$/u.test(word) && lowercase.has(word))

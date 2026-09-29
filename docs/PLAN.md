@@ -116,6 +116,10 @@ lists of names for them, one list per game world.
 | Old English | *Treasure Island*: Project Gutenberg has no Old English prose | 2 |
 | Middle English, its little words real | Chaucer, *The Canterbury Tales* (about 1390): the prose of Melibee and the Parson's Tale, in Skeat's edition (1894) | later |
 | Shakespearean English, its little words real | Shakespeare, *Hamlet* (about 1600) | later |
+| Quechua, spelled as Cusco spells it today | The Third Council of Lima's Quechua sermons, the *Tercero catecismo* (1585), from a scan of the 1867 edition | later |
+| Nahuatl, in the colonial spelling | Chimalpahin's *Sixth and Seventh Relations* (about 1620), from a scan of Siméon's edition (1889) | later |
+| Ojibwe (for Algonquian), in the double-vowel spelling | Sifferath's Ojibwe catechism (1869) | later |
+| Navajo | Seven narratives the Bureau of Indian Affairs published in Navajo (1952 and 1954) | later |
 | Enochian, after John Dee's angelic language (1580s) | Caesar: Project Gutenberg has no Enochian | 2 |
 | Orcish: harsh and clipped | *Sæfarinn* | 2 |
 | Draconic: hissing and grand | Caesar | 2 |
@@ -189,6 +193,13 @@ place to update. A plain `#text=` parameter in Stele would remove the coupling a
   *Kalevala* isn't public domain even though the poem is.
 - **Project Gutenberg texts** are fine once the Project Gutenberg header and footer are stripped.
   Those hold the Project Gutenberg trademark and license terms; the work itself is free.
+- **Where Project Gutenberg has nothing,** the text comes from a public-domain book's scan on the
+  Internet Archive (its OCR text, cleaned), or from a scholarly edition's dataset. From a dataset,
+  only the public-domain text is taken, not the editors' own work. Navajo's is a US government
+  publication, given in an edition whose glosses and translations are CC BY, and credited in
+  SOURCES.md.
+- **Works of the US government** are in the public domain whenever they were published, like the
+  Bureau of Indian Affairs' Navajo books of the 1950s.
 - **[SOURCES.md](../SOURCES.md)** records the title, author, year and origin of every text, and
   how it was cleaned.
 - Nothing else here is sourced text. The sound systems and spelling rules are written from
@@ -225,6 +236,7 @@ lab.html                         # the sound-system lab, for tuning (dev server 
 docs/PLAN.md                     # this file
 SOURCES.md                       # provenance of every source text
 scripts/import-gutenberg.ts      # cleans a Project Gutenberg download into a source text
+scripts/import-text.ts           # the same for texts elsewhere: a book's scan, a corpus's table
 public/                          # copied as-is (favicon)
 src/
   main.tsx · style.css           # app entry and styles
@@ -237,6 +249,7 @@ src/
     names.ts                     # people's and places' names, made the way the source's language makes them
     generate.ts                  # flow text + options → a document in the language's words
     corpus/gutenberg.ts          # the cleaning steps behind scripts/import-gutenberg.ts
+    corpus/scan.ts · table.ts    # and behind scripts/import-text.ts: OCR text, and sentences from a CSV
     sounds/                      # phonemes, sound systems, and inventing words from them
     spelling.ts · respell.ts     # sounds → the language's spelling; sounds → "say it" and IPA
     language.ts                  # the three kinds of language: invented, vocabulary, real

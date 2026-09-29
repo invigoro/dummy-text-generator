@@ -19,10 +19,14 @@ import italian from './italian';
 import latin from './latin';
 import loremIpsum from './lorem-ipsum';
 import middleEnglish from './middle-english';
+import nahuatl from './nahuatl';
+import navajo from './navajo';
 import oldEnglish from './old-english';
+import ojibwe from './ojibwe';
 import oldNorse from './old-norse';
 import orcish from './orcish';
 import portuguese from './portuguese';
+import quechua from './quechua';
 import { aquan, auran, ignan, terran } from './primordial';
 import shakespearean from './shakespearean';
 import spanish from './spanish';
@@ -45,6 +49,10 @@ export const LANGUAGES: readonly LanguageDef[] = [
   oldEnglish,
   middleEnglish,
   oldNorse,
+  quechua,
+  nahuatl,
+  ojibwe,
+  navajo,
   enochian,
   orcish,
   draconic,

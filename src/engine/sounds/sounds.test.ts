@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../rng';
-import { PHONEMES } from './phonemes';
+import { isVowel, phoneme, PHONEMES } from './phonemes';
 import { compileSounds, parseWeights, pick, soundString, stressOf, weighted, type SoundsDef, type Syllable } from './system';
 import { inventWord } from './words';
 
@@ -17,6 +17,17 @@ const system = compileSounds(def);
 describe('phonemes', () => {
   it('give every sound a respelling', () => {
     for (const [symbol, sound] of Object.entries(PHONEMES)) expect(sound.say, symbol).toMatch(/^[a-z']+$/);
+  });
+
+  it('take a vowel marked for its tone as the vowel, and a nasal one as the vowel with an n', () => {
+    expect(phoneme('á')).toEqual(phoneme('a'));
+    expect(phoneme('íː')).toEqual(phoneme('iː'));
+    expect(phoneme('ã')).toMatchObject({ type: 'vowel', say: 'ahn' });
+    expect(phoneme('ɪ̃́')).toMatchObject({ say: 'ihn', sayClosed: 'in' });
+    expect(phoneme('ã́ː')).toMatchObject({ say: 'ahn', long: true });
+    expect(isVowel('ṍ')).toBe(true);
+    // Only vowels carry tone.
+    expect(() => phoneme('ń')).toThrow('Unknown sound');
   });
 });
 

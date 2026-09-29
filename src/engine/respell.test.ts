@@ -59,6 +59,24 @@ describe('say', () => {
     expect(latin.say(word('|i|p', 's|u|m'), 0)).toBe('IP-sum');
     expect(say(word('|i|p', 's|u|m'), 0)).toBe('EEP-soom');
   });
+
+  it('says a vowel marked for its tone as the language says the vowel', () => {
+    const navajo = respeller({ ɛ̃: { say: 'ehn', sayClosed: 'en' } });
+    expect(navajo.say(word('t|ɛ̃́|'), null)).toBe('tehn');
+    expect(navajo.say(word('t|ɛ̃́|k'), null)).toBe('tenk');
+    expect(say(word('t|á|'), null)).toBe('tah');
+  });
+
+  it('writes "gh" before e and i for any sound a language says as g', () => {
+    const navajo = respeller({ k: { say: 'g' } });
+    expect(navajo.say(word('k|i|'), null)).toBe('ghee');
+    expect(navajo.say(word('k|a|'), null)).toBe('gah');
+  });
+
+  it('marks a popped consonant with an apostrophe, and says a breathy one plainly', () => {
+    expect(say(word('tʼ|a|n', 'tʰ|a|'), 0)).toBe("T'AHN-tah");
+    expect(say(word('pʰ|u|', 'j|u|'), 0)).toBe('POO-yoo');
+  });
 });
 
 describe('double consonants', () => {

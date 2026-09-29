@@ -25,6 +25,8 @@ const NATIVE: Readonly<Record<string, readonly string[]>> = {
   finnish: ['fi-FI', 'fi'],
   welsh: ['cy-GB', 'cy'],
   'old-norse': ['is-IS', 'is'],
+  // Nahuatl is spelled the way Mexican Spanish would read it: Tlaxcala, Xochimilco.
+  nahuatl: ['es-MX', 'es-US', 'es'],
 };
 
 const ENGLISH = ['en-GB', 'en-US', 'en'];

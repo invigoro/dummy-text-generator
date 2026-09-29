@@ -122,9 +122,11 @@ function sanitizeSounds(value: unknown): SoundsDef | null {
   if (typeof input.hiatus === 'boolean') sounds.hiatus = input.hiatus;
   const max = input.maxSyllables;
   if (typeof max === 'number' && Number.isInteger(max) && max >= 1 && max <= 8) sounds.maxSyllables = max;
-  if (Array.isArray(input.avoid)) {
-    const avoid = input.avoid.filter(isSafePattern).slice(0, 20);
-    if (avoid.length > 0) sounds.avoid = avoid;
+  for (const key of ['avoid', 'joins'] as const) {
+    const patterns = input[key];
+    if (!Array.isArray(patterns)) continue;
+    const safe = patterns.filter(isSafePattern).slice(0, 20);
+    if (safe.length > 0) sounds[key] = safe;
   }
   const irregular = input.irregularStress as Record<string, unknown> | undefined;
   if (irregular && typeof irregular === 'object') {

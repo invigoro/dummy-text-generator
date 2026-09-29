@@ -3,7 +3,7 @@
  * hyphens between syllables and the stressed one in capitals ("lay-RAHN"). Also IPA, for anyone
  * who reads it.
  */
-import { phoneme, single, type Phoneme } from './sounds/phonemes';
+import { normalizeSound, phoneme, single, untoned, type Phoneme } from './sounds/phonemes';
 import type { Syllable, WordSounds } from './sounds/system';
 
 /** Double consonants said across the syllable break: "ga.tːo" as "gat.to". */
@@ -29,15 +29,18 @@ export interface Respeller {
 }
 
 export function respeller(overrides: SayOverrides = {}): Respeller {
-  const sound = (symbol: string) => ({ ...phoneme(symbol), ...overrides[symbol] });
+  const own = new Map(Object.entries(overrides).map(([symbol, say]) => [normalizeSound(symbol), say]));
+  // A vowel marked for its tone is said as the one without the mark is.
+  const sound = (symbol: string) => ({ ...phoneme(symbol), ...(own.get(normalizeSound(symbol)) ?? own.get(untoned(symbol))) });
 
   function saySyllable(syllable: Syllable, next: Syllable | undefined): string {
     const vowel = sound(syllable.nucleus);
     const onset = syllable.onset
       .map((symbol, i) => {
         // "g" before e or i reads as "j" (gem), so it gets an h (ghee).
-        if (symbol === 'g' && i === syllable.onset.length - 1 && vowel.front) return 'gh';
-        return sound(symbol).say;
+        const say = sound(symbol).say;
+        if (say === 'g' && i === syllable.onset.length - 1 && vowel.front) return 'gh';
+        return say;
       })
       .join('');
     const nucleus =

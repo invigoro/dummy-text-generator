@@ -25,6 +25,21 @@ describe('namesOf', () => {
     expect(places).toEqual(expect.arrayContaining(['Bristol', 'London']));
     for (const word of ['Bristol', 'London', 'Bible', 'English', 'God']) expect(people).not.toContain(word);
   });
+
+  it('knows a place by its ending, in a language whose places end as nothing else does', () => {
+    const nahuatl = corpus(
+      'nah',
+      Array.from({ length: 4 }, () => 'Auh yn Tlacaelel yhuan yn Moteuhczoma quimittaque yn Chalco yhuan yn Tlacopan.').join('\n\n'),
+    );
+    const { people, places } = namesOf(nahuatl);
+    expect(people).toEqual(['Moteuhczoma', 'Tlacaelel']);
+    expect(places).toEqual(['Chalco', 'Tlacopan']);
+  });
+
+  it('leaves out what isn’t a name, whatever endings it takes, in a language that puts them on names', () => {
+    const quechua = corpus('qu', Array.from({ length: 4 }, () => 'Chayca Diospa siminta, Diosta munaspa, Pablo Pedrohuan rimanacun.').join('\n\n'));
+    expect(namesOf(quechua).people).toEqual(['Pablo', 'Pedrohuan']);
+  });
 });
 
 describe('personNames', () => {

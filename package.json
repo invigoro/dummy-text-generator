@@ -12,7 +12,8 @@
     "build": "tsc && tsc -p scripts && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "import-gutenberg": "node scripts/import-gutenberg.ts"
+    "import-gutenberg": "node scripts/import-gutenberg.ts",
+    "import-text": "node scripts/import-text.ts"
   },
   "dependencies": {
     "react": "^19.3.0",

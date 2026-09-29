@@ -58,6 +58,12 @@ export interface SoundsDef {
    * between syllables. 'ə[^.]*$' avoids a schwa in the last syllable.
    */
   avoid?: readonly string[];
+  /**
+   * Sound sequences to avoid where a name joins two words into one, as regular expressions over
+   * the two syllables that meet. Nahuatl's 'tɬ\\.[^aeio]' keeps a word ending in tl from running
+   * into a consonant, as "Nitl" and "nitin" would.
+   */
+  joins?: readonly string[];
   /** The most syllables a word gets. */
   maxSyllables?: number;
 }
@@ -83,6 +89,7 @@ export interface SoundSystem {
   irregularStress?: SoundsDef['irregularStress'];
   hiatus: boolean;
   avoid: readonly RegExp[];
+  joins: readonly RegExp[];
   maxSyllables: number;
 }
 
@@ -156,6 +163,7 @@ export function compileSounds(def: SoundsDef): SoundSystem {
     irregularStress: def.irregularStress,
     hiatus: def.hiatus ?? false,
     avoid: (def.avoid ?? []).map((pattern) => new RegExp(pattern, 'u')),
+    joins: (def.joins ?? []).map((pattern) => new RegExp(pattern, 'u')),
     maxSyllables: def.maxSyllables ?? 5,
   };
 }

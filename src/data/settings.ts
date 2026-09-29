@@ -46,6 +46,14 @@ export const SETTINGS: readonly Setting[] = [
       { id: 'old-english', name: 'Old English', language: 'old-english', stele: { medium: 'parchment', font: 'uncial-antiqua' } },
       { id: 'middle-english', name: 'Middle English', language: 'middle-english', stele: { medium: 'parchment', font: 'unifrakturmaguntia' } },
       { id: 'old-norse', name: 'Old Norse', language: 'old-norse', stele: { medium: 'granite', script: 'younger-futhark' } },
+      // Granite, as the Incas built in.
+      { id: 'quechua', name: 'Quechua', language: 'quechua', stele: { medium: 'granite' } },
+      // Bark paper, as the codices were painted on.
+      { id: 'nahuatl', name: 'Nahuatl', language: 'nahuatl', stele: { medium: 'papyrus' } },
+      // Ojibwe, an Algonquian language, on wood for the birch-bark scrolls.
+      { id: 'algonquian', name: 'Algonquian', language: 'ojibwe', stele: { medium: 'wood' } },
+      // Sandstone, as the canyons of the Navajo country are.
+      { id: 'navajo', name: 'Navajo', language: 'navajo', stele: { medium: 'sandstone' } },
       { id: 'enochian', name: 'Enochian', language: 'enochian', stele: PARCHMENT },
     ],
   },

@@ -114,6 +114,14 @@ const RECIPES: Record<string, Recipe> = {
     output: 'src/data/corpora/de/verwandlung.txt',
     startAt: /^I\.$/,
   },
+  'oj-catechism': {
+    url: 'https://www.gutenberg.org/cache/epub/40466/pg40466.txt',
+    output: 'src/data/corpora/oj/catechism.txt',
+    // The prayers and the catechism, after the title page. The hymns are indented, so they go, and
+    // the spelling lessons and numbers at the back are left out.
+    startAt: /^Mi manda Misinaigans KATECHISM ejinikadeg\.$/,
+    endBefore: /^A\. {4}B\. {4}C\.$/,
+  },
 };
 
 const [id, file] = process.argv.slice(2);

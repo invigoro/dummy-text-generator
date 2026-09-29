@@ -4,7 +4,7 @@ import { conversation, inscription, proseOf, SPEAKERS, type Form } from './forms
 import { stressRule, type Language } from './language';
 import { personNames, placeNames, type NameKind, type NameRecipe } from './names';
 import { mulberry32 } from './rng';
-import { stressOf, type WordSounds } from './sounds/system';
+import { soundString, stressOf, type WordSounds } from './sounds/system';
 import type { Corpus, Paragraph, Token } from './tokenize';
 
 export interface GenerateOptions {
@@ -51,6 +51,7 @@ export function generate(source: TextSource, options: GenerateOptions): DocParag
       const seen = new Set<string>();
       return recipes
         .map((recipe) => nameFrom(recipe, source, rule))
+        .filter((name): name is DocParagraph => name !== null)
         .filter((name) => {
           const written = name.sentences.map((sentence) => sentence.tokens.map((token) => token.text).join('')).join(' ').toLowerCase();
           if (seen.has(written)) return false;
@@ -102,11 +103,22 @@ function wordOf(source: TextSource, word: string): DocWord {
   return found?.kind === 'word' ? found : { kind: 'word', text: word };
 }
 
+/** Whether two words run badly into each other as one name, by the language's rules for joins. */
+function joinsBadly(language: Language | undefined, first: readonly WordSounds[], second: readonly WordSounds[]): boolean {
+  const joins = language?.kind === 'invented' ? language.system.joins : [];
+  const end = first[first.length - 1]?.syllables.at(-1);
+  const start = second[0]?.syllables[0];
+  if (joins.length === 0 || !end || !start) return false;
+  const meeting = soundString({ syllables: [end, start], stress: null });
+  return joins.some((pattern) => pattern.test(meeting));
+}
+
 /**
  * A name in the language's words. Two words made one run their syllables together, stressed by
- * the language's rule: "Doumé" and "voren" make "Doumévoren", said as one word.
+ * the language's rule: "Doumé" and "voren" make "Doumévoren", said as one word. Null when the two
+ * run badly into each other, by the language's rules.
  */
-function nameFrom(recipe: NameRecipe, source: TextSource, rule: ReturnType<typeof stressRule>): DocParagraph {
+function nameFrom(recipe: NameRecipe, source: TextSource, rule: ReturnType<typeof stressRule>): DocParagraph | null {
   if (recipe.kind === 'words') {
     const tokens = recipe.words.flatMap((word, i): Token[] => (i === 0 ? [{ kind: 'word', text: word }] : [SPACE, { kind: 'word', text: word }]));
     const [paragraph] = source.words([{ sentences: [{ tokens }] }], { opening: false });
@@ -114,6 +126,7 @@ function nameFrom(recipe: NameRecipe, source: TextSource, rule: ReturnType<typeo
   }
   const [first, second] = recipe.words.map((word) => wordOf(source, word));
   const hyphened = recipe.joiner === '-';
+  if (!hyphened && first.spoken && second.spoken && joinsBadly(source.language, first.spoken, second.spoken)) return null;
   const joined = hyphened ? `${first.text}-${second.text}` : (first.text + second.text.toLowerCase()).replace(/\p{L}/u, (letter) => letter.toUpperCase());
   // Where the two meet, no letter comes three times: "Pwll" and "lidd" make "Pwllidd".
   const text = joined.replace(/(\p{L})\1\1+/gu, '$1$1');

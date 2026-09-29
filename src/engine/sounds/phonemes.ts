@@ -148,7 +148,27 @@ const BASE: Readonly<Record<string, Phoneme>> = {
   ts: consonant('ts'),
   dz: consonant('dz'),
   pf: consonant('pf', { labial: true }),
+  // Nahuatl tl, one sound that can start a word or end one: "tlalli", "atl".
+  tɬ: consonant('tl'),
   kw: consonant('kw'),
+  kʷ: consonant('kw'),
+  // Stops with a puff of air after them (Quechua ph, kh; Navajo t, k), said as the plain sound,
+  // since English says its own that way; never "ph" or "th", which would read as f and th.
+  pʰ: consonant('p', { labial: true }),
+  tʰ: consonant('t'),
+  kʰ: consonant('k'),
+  qʰ: consonant('k'),
+  tʃʰ: consonant('ch'),
+  tsʰ: consonant('ts'),
+  tɬʰ: consonant('tl'),
+  // Ejectives, popped with a closed throat (Quechua t’anta, Navajo ch’ah), with an apostrophe.
+  pʼ: consonant("p'", { labial: true }),
+  tʼ: consonant("t'"),
+  kʼ: consonant("k'"),
+  qʼ: consonant("k'"),
+  tʃʼ: consonant("ch'"),
+  tsʼ: consonant("ts'"),
+  tɬʼ: consonant("tl'"),
   gw: consonant('gw'),
   β: consonant('v', { labial: true }),
   ɸ: consonant('f', { labial: true }),
@@ -165,13 +185,41 @@ export const PHONEMES: Readonly<Record<string, Phoneme>> = Object.fromEntries([
   ...DOUBLED.map((symbol) => [`${symbol}ː`, { ...BASE[symbol], geminate: true }]),
 ]);
 
+const HIGH_OR_LOW = /[̀́]/gu;
+const NASAL = '̃';
+
+/**
+ * A vowel marked for its tone, as Navajo marks a high one ("á"), is said as the vowel is: the
+ * "say it" line can't show pitch. A nasal vowel the list doesn't have ("ą", written ã) is the
+ * vowel with an n, as the ones it has are.
+ */
+function marked(symbol: string): Phoneme | undefined {
+  const toneless = untoned(symbol);
+  if (toneless !== symbol) {
+    const found = PHONEMES[toneless] ?? marked(toneless);
+    return found?.type === 'vowel' ? found : undefined;
+  }
+  if (!symbol.includes(NASAL)) return undefined;
+  const oral = PHONEMES[symbol.replace(NASAL, '')];
+  if (oral?.type !== 'vowel') return undefined;
+  const nasal = (say: string | undefined) => say && `${say}n`;
+  return { ...oral, say: nasal(oral.say)!, sayClosed: nasal(oral.sayClosed), sayAlone: nasal(oral.sayAlone) };
+}
+
+/** A sound without the accents that mark its tone: "á" is "a". */
+export const untoned = (symbol: string) => normalizeSound(symbol).replace(HIGH_OR_LOW, '');
+
 export function phoneme(symbol: string): Phoneme {
-  const found = PHONEMES[normalizeSound(symbol)];
+  const key = normalizeSound(symbol);
+  const found = PHONEMES[key] ?? marked(key);
   if (!found) throw new Error(`Unknown sound "${symbol}"`);
   return found;
 }
 
-export const isVowel = (symbol: string) => PHONEMES[normalizeSound(symbol)]?.type === 'vowel';
+export const isVowel = (symbol: string) => {
+  const key = normalizeSound(symbol);
+  return (PHONEMES[key] ?? marked(key))?.type === 'vowel';
+};
 
 /** A double consonant's single form: "tː" is "t". */
 export const single = (symbol: string) => (phoneme(symbol).geminate ? symbol.slice(0, -1) : symbol);

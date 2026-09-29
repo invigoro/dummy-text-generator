@@ -10,6 +10,9 @@ Texts from Project Gutenberg are cleaned by `npm run import-gutenberg`, whose re
 download. Cleaning removes the Project Gutenberg header and footer, and with them its trademark
 and license text.
 
+Texts from elsewhere, a scanned book's OCR text or a published corpus, are cleaned the same way
+by `npm run import-text`, with recipes in [`scripts/import-text.ts`](scripts/import-text.ts).
+
 ## English
 
 ### Treasure Island
@@ -188,3 +191,100 @@ paragraph lengths, punctuation and word lengths, and replaces every word.
 
 Middle English and Shakespearean English keep some of their texts' little words real ("whan",
 "quod", "thou", "hath"), as "Jabberwocky" does, and invent the rest.
+
+## Quechua
+
+### Tercero catecismo: the sermons
+
+- **Author:** the Third Council of Lima (1582–1583), which had the sermons written in Spanish and
+  Quechua; they're attributed to José de Acosta and others
+- **Written:** 1585; this edition published in Paris by Rosa y Bouret, 1867
+- **File:** [`src/data/corpora/qu/tercero.txt`](src/data/corpora/qu/tercero.txt)
+- **From:** the Internet Archive's scan of the Smithsonian Libraries' copy,
+  <https://archive.org/details/tercerocatecism00cath>, and its OCR text
+- **Cleaning:** `npm run import-text -- qu-tercero` keeps the thirty-one sermons in Quechua
+  (about 33,000 words). They face their Spanish page by page, and the Spanish pages go, told by
+  their words. It also:
+  - leaves out the running heads, and the page and note numbers
+  - rejoins the words split across lines, and the paragraphs split across pages
+  - corrects some OCR misreadings: ll read as "U" or "11", a C starting a word read as G, and a
+    letter read as a bracket
+
+  The OCR's other slips, such as c read as e, stay. They only make a few words into two.
+- **Why this text:** it's the "lengua general" of the colonial Andes, the Quechua of the time,
+  in prose. Only its flow is used; the invented words are spelled the way Cusco spells Quechua
+  today.
+
+## Nahuatl
+
+### Sixth and Seventh Relations
+
+- **Author:** Domingo Francisco de San Antón Muñón Chimalpahin Cuauhtlehuanitzin (1579–1660), a
+  Nahua historian of Chalco-Amaquemecan, edited with a French translation by Rémi Siméon
+  (1827–1890)
+- **Written:** in the early 1600s; this edition published in Paris by Maisonneuve et Ch. Leclerc,
+  1889, as *Annales de Domingo Francisco de San Anton Muñon Chimalpahin Quauhtlehuanitzin:
+  sixième et septième relations (1258–1612)*
+- **File:** [`src/data/corpora/nah/chimalpahin.txt`](src/data/corpora/nah/chimalpahin.txt)
+- **From:** the Internet Archive's scan of the University of Toronto's copy,
+  <https://archive.org/details/bibliothquelin12adamuoft>, and its OCR text
+- **Cleaning:** `npm run import-text -- nah-chimalpahin` keeps the annals (about 37,000 words),
+  from the first heading to the index. It leaves out:
+  - Siméon's French translation in the facing column, and his notes, told by their words
+  - the running heads and page numbers
+  - the Christian year after the Mexican one ("III calli xihuitl, 1261 años"), and the numbers
+    of the notes, stuck to words ("Tepetlicpac3")
+
+  It rejoins the words split across lines, and puts back together the entries that run over a
+  page. It corrects a few OCR misreadings (the l of "xihuitl" read as i, a Q as "(^") and removes
+  specks, and the brackets round the letters Siméon restored. The OCR's other slips stay.
+- **Why this text:** it's Nahuatl as a Nahua author wrote it, not translated scripture, and it's
+  prose. Its many rulers and towns give the names form plenty to work from.
+
+## Ojibwe (Algonquian)
+
+### A Short Compendium of the Catechism for the Indians
+
+- **Author:** Nicholas Louis Sifferath (1828–1898), missionary to the Odawa and Ojibwe, with the
+  approbation of Bishop Frederic Baraga (1864)
+- **Published:** Buffalo, 1869
+- **File:** [`src/data/corpora/oj/catechism.txt`](src/data/corpora/oj/catechism.txt)
+- **From:** Project Gutenberg eBook #40466, <https://www.gutenberg.org/ebooks/40466>
+- **Cleaning:** `npm run import-gutenberg -- oj-catechism` keeps the prayers and the catechism
+  (about 10,500 words), from the first line after the title page. It leaves out the hymns (set as
+  indented blocks), the section headings in capitals, and the spelling lessons and numbers at the
+  back. The underscores marking the questions' italics are removed.
+- **Why this text:** it's clean, proofread Ojibwe prose, in the Odawa dialect and Baraga's
+  French-based spelling. Longer Ojibwe texts are in the public domain, such as Chrysostom
+  Verwyst's sermons (1907), but only as OCR. Only the flow is used; the invented words are
+  spelled the way Ojibwe mostly is today.
+
+## Navajo
+
+### The Trouble at Round Rock and Navajo Historical Selections
+
+- **Authors:** seven Navajo narrators: Left-Handed Mexican Clansman, Howard Gorman, the Nephew of
+  Former Big Man, John C. Claw, Dan Phillips, the Blind Man's Daughter and Tim Yazzie. Robert W.
+  Young and William Morgan recorded and published them.
+- **Published:** by the US Bureau of Indian Affairs, in 1952 and 1954
+- **Public domain:** the US government published both books, without a copyright notice. The
+  edition the text comes from (below) records that the Bureau and the US Copyright Office
+  confirmed they're in the public domain.
+- **File:** [`src/data/corpora/nv/narratives.txt`](src/data/corpora/nv/narratives.txt)
+- **From:** the Navajo text of Lukas Denk and Melvatha R. Chee's edition, *Nine Navajo
+  Narratives* (Language Science Press, 2026), in its dataset,
+  <https://github.com/OpenTextCollections/nava1243a> (v1.0), also at
+  <https://zenodo.org/records/21377033>. The edition's own work, its glosses and translations, is
+  licensed CC BY 4.0. Only the Navajo, as Young and Morgan published it, is used here.
+- **Cleaning:** `npm run import-text -- nv-narratives` keeps seven of the nine narratives (about
+  9,100 words). The two it leaves out are sacred: the fourth, on the traditional Navajo country
+  and the emergence, and the fifth, on First Man and First Woman. It also:
+  - makes paragraphs, since the dataset has a sentence to a row: six sentences to a paragraph,
+    with each narrative starting a new one
+  - turns quotation marks typed as ``…'' into “…”
+  - makes the glottal stop the letter ʼ, so a word isn't cut at it. At the start of a word it
+    goes, as today's spelling mostly leaves it out there.
+- **Why this text:** it's the cleanest Navajo in the public domain, with every accent and hook,
+  and it's storytelling, with speech in it. *Ádahooníłígíí*, the newspaper the Bureau published in
+  Navajo from 1943 to 1957, is far longer and also in the public domain, but its OCR loses every
+  accent.

@@ -11,7 +11,7 @@ It pairs with [Stele](https://stele.invigoro.me/), which turns the text into a w
 
 - **Pick a language:** a real one (English, French, Spanish, Portuguese, Italian, German, Latin,
   lorem ipsum, Finnish, Welsh, Old English, Middle English, Shakespearean English, Old Norse,
-  Enochian), or one of D&D's, such as Elvish
+  Quechua, Nahuatl, Algonquian (Ojibwe), Navajo, Enochian), or one of D&D's, such as Elvish
   (invented French), Dwarvish (invented Old Norse) or Orc. Apart from Real English and Real French,
   the words are invented. The text flows like the real language, with its rhythm, its punctuation
   and its short words turning up everywhere, but nobody can understand it, not even someone who
@@ -91,10 +91,12 @@ tests and the build without deploying ([`.github/workflows/test.yml`](.github/wo
 ### Source texts
 
 Every source text is in the public domain; [SOURCES.md](SOURCES.md) records where each one came
-from. To add one from Project Gutenberg:
+from. To add one:
 
 1. Add a recipe to [`scripts/import-gutenberg.ts`](scripts/import-gutenberg.ts) and run
-   `npm run import-gutenberg -- <id>`.
+   `npm run import-gutenberg -- <id>`. For a text that isn't on Project Gutenberg, such as a
+   scanned book on the Internet Archive, the recipe goes in
+   [`scripts/import-text.ts`](scripts/import-text.ts), run with `npm run import-text -- <id>`.
 2. Register the file in [`src/data/corpora/index.ts`](src/data/corpora/index.ts).
 3. Record its provenance in SOURCES.md.
 

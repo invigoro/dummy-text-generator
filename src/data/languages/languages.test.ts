@@ -123,6 +123,38 @@ describe('Lorem ipsum', () => {
   });
 });
 
+/** The words of a text, lowercase. */
+const wordsOf = (text: string) => text.toLowerCase().match(/[\p{L}\p{M}’]+/gu) ?? [];
+
+describe('Languages of the Americas', () => {
+  it('spell Quechua’s e and o only beside q, where i and u open', async () => {
+    const loaded = await loadLanguage('quechua');
+    const text = writtenText(generate(loaded, { arrangement: 'sentences', length: { unit: 'words', count: 600 }, seed: 7 }));
+    expect(text).toMatch(/q/);
+    for (const word of wordsOf(text)) expect(word).not.toMatch(/(?<!q[h’]?)[eo](?!q)/u);
+  });
+
+  it('write Navajo’s tones with accents, its nasal vowels with hooks, and its ł and catches', async () => {
+    const loaded = await loadLanguage('navajo');
+    const text = writtenText(generate(loaded, { arrangement: 'sentences', length: { unit: 'words', count: 600 }, seed: 7 }));
+    for (const letters of [/[áéíó]/u, /[ąęįǫ]/u, /ł/u, /’/u, /aa|ii|oo|ee/u]) expect(text).toMatch(letters);
+  });
+
+  it('write Ojibwe’s long vowels double', async () => {
+    const loaded = await loadLanguage('ojibwe');
+    const text = writtenText(generate(loaded, { arrangement: 'sentences', length: { unit: 'words', count: 300 }, seed: 7 }));
+    expect(text).toMatch(/aa|ii|oo/);
+  });
+
+  it('never run a Nahuatl word ending in tl into a consonant, in a place’s name', async () => {
+    const loaded = await loadLanguage('nahuatl');
+    for (const seed of [1, 2, 3, 4]) {
+      const names = generate(loaded, { arrangement: 'sentences', length: { unit: 'paragraphs', count: 30 }, seed, form: 'names', names: 'places' });
+      for (const name of names.map(paragraphText)) expect(name).not.toMatch(/tl(?![aeiou]|$)/iu);
+    }
+  });
+});
+
 describe('Middle English and Shakespearean English', () => {
   it('keep their little words real, and invent the rest', async () => {
     for (const [id, kept] of [
