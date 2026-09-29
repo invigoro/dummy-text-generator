@@ -97,10 +97,17 @@ interface TextPageProps {
   className?: string;
 }
 
+/**
+ * Whether the text has letters made with a combining accent, such as Navajo's ą́, which has no
+ * letter of its own. Not every font can place the accent, so such a text gets one that can.
+ */
+const hasMarks = (paragraphs: readonly DocParagraph[]) =>
+  paragraphs.some((paragraph) => /\p{M}/u.test(paragraphText(paragraph) + (paragraph.speaker ? paragraphText({ sentences: [paragraph.speaker] }) : '')));
+
 /** The text as a page, in the view asked for. */
 function TextPage({ paragraphs, view, voice, form, className = 'page' }: TextPageProps) {
   return (
-    <article className={`${className} view-${view} form-${form}`}>
+    <article className={`${className} view-${view} form-${form}${hasMarks(paragraphs) ? ' marks' : ''}`}>
       {paragraphs.map((paragraph, i) => (
         <p key={i}>
           {paragraph.speaker && (
@@ -207,7 +214,7 @@ function Interlinear({ sentence, voice }: { sentence: DocSentence; voice: Voice 
   return sentence.tokens.map((token, i) =>
     token.kind === 'word' && said[i] ? (
       <ruby key={i}>
-        {token.text}
+        <span className="word">{token.text}</span>
         <rt>{said[i]!.say}</rt>
       </ruby>
     ) : (

@@ -371,6 +371,11 @@ label.button:has(:focus-visible) {
   hyphens: auto;
 }
 
+.marks.view-written,
+.marks.view-both {
+  font-family: var(--serif-marks);
+}
+
 /* The "say it" and IPA lines are read, not admired: plain type, a little more room. */
 .view-say,
 .view-ipa {
@@ -395,6 +400,13 @@ label.button:has(:focus-visible) {
 .view-both ruby {
   ruby-position: under;
   -webkit-ruby-position: after;
+}
+
+/* One block, so no browser spreads the word's letters to its "say it" form's width: Chrome, which
+   ignores ruby-align, would pull a letter away from its combining accent (Navajo ą́). */
+.view-both .word {
+  display: inline-block;
+  line-height: 1.25;
 }
 
 .view-both rt {
